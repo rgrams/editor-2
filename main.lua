@@ -14,7 +14,7 @@ local layers = {
 }
 local defaultLayer = "default"
 
-local guiDebugDrawEnabled = false
+local guiDebugDrawEnabled = true
 
 function love.load()
 	math.randomseed(love.timer.getTime() * 10000)
@@ -26,7 +26,7 @@ function love.load()
 
 	scene = SceneTree(layers, defaultLayer)
 
-	-- ui = scene:add( require("interface.UI")() )
+	ui = scene:add( require("ui.UI")() )
 end
 
 function love.update(dt)
@@ -50,5 +50,5 @@ end
 function love.resize(w, h)
 	Camera.setAllViewports(0, 0, w, h)
 	screenRect.w, screenRect.h = w, h
-	-- ui:allocate(screenRect)
+	ui:allocate(screenRect)
 end
