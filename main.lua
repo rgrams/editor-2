@@ -27,6 +27,8 @@ function love.load()
 	scene = SceneTree(layers, defaultLayer)
 
 	ui = scene:add( require("ui.UI")() )
+
+	scene:add(Camera(0, 0, 0, {800,600}, "expand view"))
 end
 
 function love.update(dt)

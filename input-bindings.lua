@@ -6,6 +6,9 @@ return {
 	{ "button", "M:wheely+", "zoom camera" },
 	{ "button", "M:wheely-", "zoom camera" },
 
+	{ "button", "M:wheely+", "scroll" },
+	{ "button", "M:wheely-", "scroll" },
+
 	{ "button", "up", "up" },
 	{ "button", "down", "down" },
 	{ "button", "left", "left" },

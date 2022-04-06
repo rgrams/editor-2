@@ -1,0 +1,58 @@
+
+local Viewport = gui.Node:extend()
+Viewport.className = "Viewport"
+
+local config = require "config"
+
+local maxLineWidth = 3
+
+function Viewport.set(self, ruu)
+	Viewport.super.set(self, 50, 600, "C", "C", "fill")
+	self.isGreedy = true
+	self.layer = "gui"
+	self.ruu = ruu
+	self.widget = ruu:Panel(self)
+	self.widget.scroll = Viewport.scroll
+	self.widget.ruuInput = Viewport.ruuInput
+	self.widget.drag = Viewport.drag
+	ruu.isHoverAction["pan camera"] = true
+end
+
+function Viewport.scroll(wgt, dx, dy)
+	local self = wgt.object
+	Camera.current:zoomIn(config.zoomRate*dy, love.mouse.getPosition()) -- dy is actual, signed, mouse wheel dy.
+end
+
+function Viewport.drag(wgt, dx, dy, dragType)
+	local wdx, wdy = Camera.current:screenToWorld(dx, dy, true)
+	local pos = Camera.current.pos
+	pos.x, pos.y = pos.x - wdx, pos.y - wdy
+end
+
+function Viewport.ruuInput(wgt, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
+	if action == "pan camera" then
+		if change == 1 then
+			wgt.ruu:startDrag(wgt, "pan")
+		elseif change == -1 then
+			wgt.ruu:stopDrag("pan")
+		end
+	end
+end
+
+function Viewport.draw(self)
+	if self.widget.isFocused then
+		local depth = self.panelIndex or 0
+		local lineWidth = maxLineWidth / (depth + 1)
+		love.graphics.setLineWidth(lineWidth)
+		love.graphics.setColor(1, 1, 0, 1)
+
+		if self.widget.isFocused then
+			local w, h = self.w - lineWidth, self.h - lineWidth
+			love.graphics.rectangle("line", -w/2, -h/2, w, h)
+		end
+
+		love.graphics.setLineWidth(1)
+	end
+end
+
+return Viewport
