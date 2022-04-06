@@ -3,6 +3,7 @@ local Viewport = gui.Node:extend()
 Viewport.className = "Viewport"
 
 local config = require "config"
+local BackgroundGrid = require "ui.BackgroundGrid"
 
 local maxLineWidth = 3
 
@@ -18,8 +19,18 @@ function Viewport.set(self, ruu)
 	ruu.isHoverAction["pan camera"] = true
 end
 
+function Viewport.init(self)
+	Viewport.super.init(self)
+	self.tree:add(BackgroundGrid(self))
+end
+
+function Viewport.allocate(self, ...)
+	Viewport.super.allocate(self, ...)
+	-- TODO: Debug what's going on with Node allocations and make this non-hard-coded.
+	Camera.current:setViewport(0, 0, self.w, self.h)
+end
+
 function Viewport.scroll(wgt, dx, dy)
-	local self = wgt.object
 	Camera.current:zoomIn(config.zoomRate*dy, love.mouse.getPosition()) -- dy is actual, signed, mouse wheel dy.
 end
 

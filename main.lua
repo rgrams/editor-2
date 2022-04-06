@@ -8,7 +8,7 @@ local ui
 local screenRect = gui.Rect(0, 0, love.graphics.getDimensions())
 
 local layers = {
-	world = { "default" },
+	world = { "default", "background" },
 	gui = { "gui text", "gui" },
 	guiDebug = { "guiDebug" },
 }
@@ -24,11 +24,13 @@ function love.load()
 	Input.bind( require("input-bindings") )
 	love.keyboard.setKeyRepeat(true)
 
+	local config = require "config"
+	love.graphics.setBackgroundColor(config.viewportBackgroundColor)
+
 	scene = SceneTree(layers, defaultLayer)
 
+	scene:add(mod(Camera(0, 0, 0, {800,600}, "expand view"), {name="MyCamera"}))
 	ui = scene:add( require("ui.UI")() )
-
-	scene:add(Camera(0, 0, 0, {800,600}, "expand view"))
 end
 
 function love.update(dt)
@@ -50,7 +52,6 @@ function love.draw()
 end
 
 function love.resize(w, h)
-	Camera.setAllViewports(0, 0, w, h)
 	screenRect.w, screenRect.h = w, h
 	ui:allocate(screenRect)
 end
