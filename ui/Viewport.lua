@@ -35,9 +35,11 @@ function Viewport.scroll(wgt, dx, dy)
 end
 
 function Viewport.drag(wgt, dx, dy, dragType)
-	local wdx, wdy = Camera.current:screenToWorld(dx, dy, true)
-	local pos = Camera.current.pos
-	pos.x, pos.y = pos.x - wdx, pos.y - wdy
+	if dragType == "pan" then
+		local wdx, wdy = Camera.current:screenToWorld(dx, dy, true)
+		local pos = Camera.current.pos
+		pos.x, pos.y = pos.x - wdx, pos.y - wdy
+	end
 end
 
 function Viewport.ruuInput(wgt, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
