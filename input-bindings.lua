@@ -28,4 +28,6 @@ return {
 	{ "button", "escape", "cancel" },
 	{ "button", "lshift", "selection modifier" },
 	{ "button", "rshift", "selection modifier" },
+
+	{ "button", "k:q", "add" },
 }

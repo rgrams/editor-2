@@ -4,8 +4,9 @@ Viewport.className = "Viewport"
 
 local config = require "config"
 local BackgroundGrid = require "ui.BackgroundGrid"
+local Tool = require "tools.Tool"
 
-local maxLineWidth = 3
+local maxLineWidth = 1
 
 function Viewport.set(self, ruu)
 	Viewport.super.set(self, 50, 600, "C", "C", "fill")
@@ -17,6 +18,9 @@ function Viewport.set(self, ruu)
 	self.widget.ruuInput = Viewport.ruuInput
 	self.widget.drag = Viewport.drag
 	ruu.isHoverAction["pan camera"] = true
+	self.children = {
+		Tool(ruu)
+	}
 end
 
 function Viewport.init(self)
@@ -49,6 +53,8 @@ function Viewport.ruuInput(wgt, action, value, change, rawChange, isRepeat, x, y
 		elseif change == -1 then
 			wgt.ruu:stopDrag("pan")
 		end
+	elseif action == "scroll" then
+		wgt:scroll(dx, dy)
 	end
 end
 
@@ -57,12 +63,10 @@ function Viewport.draw(self)
 		local depth = self.panelIndex or 0
 		local lineWidth = maxLineWidth / (depth + 1)
 		love.graphics.setLineWidth(lineWidth)
-		love.graphics.setColor(1, 1, 0, 1)
+		love.graphics.setColor(1, 1, 1, 0.5)
 
-		if self.widget.isFocused then
-			local w, h = self.w - lineWidth, self.h - lineWidth
-			love.graphics.rectangle("line", -w/2, -h/2, w, h)
-		end
+		local w, h = self.w - lineWidth, self.h - lineWidth
+		love.graphics.rectangle("line", -w/2, -h/2, w, h)
 
 		love.graphics.setLineWidth(1)
 	end
