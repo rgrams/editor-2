@@ -2,6 +2,7 @@
 require "philtre.init"
 _G.gui = require "philtre.objects.gui.all"
 
+local scenes = require "scenes"
 local scene
 local ui
 
@@ -14,7 +15,7 @@ local layers = {
 }
 local defaultLayer = "default"
 
-local guiDebugDrawEnabled = true
+local guiDebugDrawEnabled = false
 
 function love.load()
 	math.randomseed(love.timer.getTime() * 10000)
@@ -31,15 +32,20 @@ function love.load()
 
 	scene:add(mod(Camera(0, 0, 0, {800,600}, "expand view"), {name="MyCamera"}))
 	ui = scene:add( require("ui.UI")() )
+
+	scenes.add(SceneTree({"default"}, "default"))
 end
 
 function love.update(dt)
+	if scenes.active then  scenes.active:update(dt)  end
 	scene:update(dt)
 end
 
 function love.draw()
 	scene:updateTransforms()
+	if scenes.active then  scenes.active:updateTransforms()  end
 	Camera.current:applyTransform()
+	if scenes.active then  scenes.active:draw()  end
 	scene:draw("world")
 	Camera.current:resetTransform()
 	scene:draw("gui")
