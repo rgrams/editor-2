@@ -1,6 +1,17 @@
 
 local M = {}
 
+local Selection = require "Selection"
+local History = require "philtre.lib.commands"
+
+function M.create(layers, defaultLayer, commands)
+	local scene = SceneTree(layers, defaultLayer)
+	scene.selection = Selection()
+	scene.history = History(commands)
+	scene.properties = {}
+	return scene
+end
+
 function M.add(scene, isNotActive)
 	table.insert(M, scene)
 	if not isNotActive then

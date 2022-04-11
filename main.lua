@@ -33,7 +33,11 @@ function love.load()
 	scene:add(mod(Camera(0, 0, 0, {800,600}, "expand view"), {name="MyCamera"}))
 	ui = scene:add( require("ui.UI")() )
 
-	scenes.add(SceneTree({"default"}, "default"))
+	-- Add default editing scene.
+	local sceneLayers = { "default" }
+	local sceneDefaultLayer = "default"
+	local commands = require("commands.all")
+	scenes.add( scenes.create(sceneLayers, sceneDefaultLayer, commands) )
 end
 
 function love.update(dt)
