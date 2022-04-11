@@ -8,6 +8,7 @@ function PropertyPanel.set(self, ruu)
 	self.children = {
 		gui.Node(100, 20)
 	}
+	self.layer = "gui"
 	self.ruu = ruu
 	self.widget = self.ruu:Panel(self)
 end

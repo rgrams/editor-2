@@ -34,7 +34,7 @@ function Viewport.allocate(self, ...)
 	Camera.current:setViewport(0, 0, self.w, self.h)
 end
 
-function Viewport.scroll(wgt, dx, dy)
+function Viewport.scroll(wgt, depth, dx, dy)
 	Camera.current:zoomIn(config.zoomRate*dy, love.mouse.getPosition()) -- dy is actual, signed, mouse wheel dy.
 end
 
@@ -46,7 +46,7 @@ function Viewport.drag(wgt, dx, dy, dragType)
 	end
 end
 
-function Viewport.ruuInput(wgt, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
+function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
 	if action == "pan camera" then
 		if change == 1 then
 			wgt.ruu:startDrag(wgt, "pan")
@@ -54,7 +54,7 @@ function Viewport.ruuInput(wgt, action, value, change, rawChange, isRepeat, x, y
 			wgt.ruu:stopDrag("pan")
 		end
 	elseif action == "scroll" then
-		wgt:scroll(dx, dy)
+		wgt:scroll(depth, dx, dy)
 	end
 end
 
