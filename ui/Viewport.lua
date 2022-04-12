@@ -3,6 +3,7 @@ local Viewport = gui.Node:extend()
 Viewport.className = "Viewport"
 
 local config = require "config"
+local scenes = require "scenes"
 local BackgroundGrid = require "ui.BackgroundGrid"
 local Tool = require "tools.Tool"
 
@@ -69,6 +70,13 @@ function Viewport.draw(self)
 		love.graphics.rectangle("line", -w/2, -h/2, w, h)
 
 		love.graphics.setLineWidth(1)
+	end
+
+	if scenes.active then
+		for i,enclosure in ipairs(scenes.active.selection) do
+			local obj = enclosure[1]
+			obj:drawSelectionHighlight(self)
+		end
 	end
 end
 

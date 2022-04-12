@@ -47,7 +47,26 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 			local wx, wy = Camera.current:screenToWorld(mx, my)
 			scenes.active:add(EditorObject(wx, wy, 0.2, 2, 1))
 		elseif self.hoverObj then
+			local shouldToggle = Input.isPressed("shift")
+			local isSelected = self.hoverObj.isSelected
+			local selection = scenes.active.selection
+			local history = scenes.active.history
+
+			if not isSelected then
+				if shouldToggle then
+					history:perform("addToSelection", selection, self.hoverObj.enclosure)
+				else
+					history:perform("setSelection", selection, { self.hoverObj.enclosure })
+				end
+			elseif isSelected and shouldToggle then
+				history:perform("removeFromSelection", selection, self.hoverObj.enclosure)
+			end
 			startDrag(self)
+		else -- Clicked on nothing.
+			local selection = scenes.active.selection
+			if selection[1] and not Input.isPressed("shift") then
+				scenes.active.history:perform("clearSelection", selection)
+			end
 		end
 	end
 end
@@ -64,6 +83,7 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 	if action == wgt.ruu.MOUSE_MOVED then
 		local self = wgt.object
 		if self.isDragging then  return  end
+		if self.hoverObj then  self.hoverObj.isHovered = false  end
 		self.hoverObj = nil
 		local scene = scenes.active
 		if scene then
@@ -74,55 +94,13 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 				end
 			end
 		end
+		if self.hoverObj then
+			self.hoverObj.isHovered = true
+		end
 	end
-end
-
--- Rotates around center, not top left corner.
-local function drawRotatedRectangle(mode, x, y, width, height, angle)
-	love.graphics.push()
-	love.graphics.translate(x + width/2, y + height/2)
-	love.graphics.rotate(angle)
-	love.graphics.rectangle(mode, -width/2, -height/2, width, height) -- origin in the top left corner
-	love.graphics.pop()
 end
 
 function Tool.draw(self)
-	love.graphics.setColor(1, 0, 0, 1)
-	if self.hoverObj then
-		love.graphics.setLineWidth(config.highlightLineWidth)
-
-		local obj = self.hoverObj
-		local scrnX, scrnY = Camera.current:worldToScreen(obj.pos.x, obj.pos.y)
-		local lx, ly = self:toLocal(scrnX, scrnY)
-		local angle, sx, sy, kx, ky = matrix.parameters(obj._to_world)
-
-		love.graphics.setColor(config.hoverHighlightColor)
-		local objLineWidth = 1
-		local r = (obj.hitRadius + objLineWidth/2) * Camera.current.zoom
-		local pad = config.highlightPadding
-		local hw, hh = r*sx + pad, r*sy + pad
-		local x, y = lx - hw, ly - hh
-
-		if angle ~= 0 then
-			--[[
-			local dx, dy = math.cos(angle), math.sin(angle)
-			local pdx, pdy = -dy, dx
-			local wx, wy = hw*dx, hw*dy
-			local hx, hy = hh*pdx, hh*pdy
-			local x1, y1 = lx - wx - hx, ly - wy - hy
-			local x2, y2 = lx + wx - hx, ly + wy - hy
-			local x3, y3 = lx + wx + hx, ly + wy + hy
-			local x4, y4 = lx - wx + hx, ly - wy + hy
-			love.graphics.line(x1, y1, x2, y2, x3, y3, x4, y4, x1, y1)
-			--]]
-			drawRotatedRectangle("line", x, y, hw*2, hh*2, angle)
-		else
-			love.graphics.rectangle("line", x, y, hw*2, hh*2)
-		end
-
-
-		love.graphics.setLineWidth(1)
-	end
 end
 
 return Tool

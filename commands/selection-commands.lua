@@ -9,7 +9,19 @@ local function remove(selection, enclosure)
 	return selection, enclosure, index
 end
 
+local function clear(selection)
+	local oldList = selection:clear()
+	return selection, oldList
+end
+
+local function setTo(selection, newList)
+	local oldList = selection:setTo(newList)
+	return selection, oldList
+end
+
 return {
 	addToSelection = { add, remove },
 	removeFromSelection = { remove, add },
+	clearSelection = { clear, setTo },
+	setSelection = { setTo, clear },
 }
