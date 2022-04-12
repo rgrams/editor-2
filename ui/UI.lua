@@ -5,6 +5,7 @@ UI.className = "UI"
 local Ruu = require "ui.ruu.ruu"
 local Viewport = require "ui.Viewport"
 local PropertyPanel = require "ui.PropertyPanel"
+local scenes = require "scenes"
 
 function UI.set(self)
 	local w, h = love.graphics.getDimensions()
@@ -14,10 +15,27 @@ function UI.set(self)
 	self.ruu = Ruu()
 	self.ruu:registerLayers({"gui"})
 
+	self.widget = self.ruu:Panel(self)
+	self.widget.ruuInput = self.ruuInput
+
 	self.children = {
 		Viewport(self.ruu),
 		PropertyPanel(self.ruu)
 	}
+end
+
+function UI.ruuInput(wgt, depth, action, value, change)
+	if action == "undo/redo" and change == 1 then
+		if scenes.active and Input.isPressed("ctrl") then
+			if Input.isPressed("shift") then
+				print("redo")
+				scenes.active.history:redo()
+			else
+				print("undo")
+				scenes.active.history:undo()
+			end
+		end
+	end
 end
 
 function UI.init(self)

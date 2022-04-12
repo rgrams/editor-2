@@ -17,6 +17,8 @@ return {
 	{ "button", "tab", "next" },
 	{ "button", "lshift", "shift" },
 	{ "button", "rshift", "shift" },
+	{ "button", "lctrl", "ctrl" },
+	{ "button", "rctrl", "ctrl" },
 
 	{ "button", "return", "enter" },
 	{ "button", "kpenter", "enter" },
@@ -30,4 +32,5 @@ return {
 	{ "button", "rshift", "selection modifier" },
 
 	{ "button", "k:q", "add" },
+	{ "button", "k:z", "undo/redo" },
 }
