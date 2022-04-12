@@ -6,10 +6,39 @@ local config = require "config"
 
 EditorObject.hitRadius = 16
 
+local Position = require "objects.properties.Position"
+local Angle = require "objects.properties.Angle"
+local Scale = require "objects.properties.Scale"
+local Skew = require "objects.properties.Skew"
+
 function EditorObject.set(self, x, y, angle, ...)
 	EditorObject.super.set(self, x, y, angle, ...)
 	self.isSelected = false
-	self.properties = {}
+	self.properties = {
+		Position(self),
+		Angle(self),
+		Scale(self),
+		Skew(self),
+	}
+end
+
+function EditorObject.setProperty(self, name, ...)
+	local props = self.properties
+	for i,prop in ipairs(props) do
+		if prop.name == name then
+			prop:setValue(...)
+			return true
+		end
+	end
+	return false
+end
+
+function EditorObject.getProperty(self, name)
+	for i,prop in ipairs(self.properties) do
+		if prop.name == name then
+			return prop:getValue()
+		end
+	end
 end
 
 function EditorObject.touchesPoint(self, wx, wy)
