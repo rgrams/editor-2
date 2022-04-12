@@ -7,9 +7,23 @@ local Vec2Property = Property:extend()
 Vec2Property.type = "vec2"
 Vec2Property.name = "vec2"
 Vec2Property.displayName = "Vec2Property"
+Vec2Property.DEFAULT_VALUE = { x = 0, y = 0 }
 
 function Vec2Property.getDefaultValue(self)
-	return { x = 0, y = 0 }
+	local value = {}
+	for k,v in pairs(self.DEFAULT_VALUE) do
+		value[k] = v
+	end
+	return value
+end
+
+function Vec2Property.getDiff(self)
+	local curX, curY = self:getValue()
+	local default = self.DEFAULT_VALUE
+	local dx, dy = curX - default.x, curY - default.y
+	if dx ~= 0 or dy ~= 0 then
+		return dx, dy
+	end
 end
 
 function Vec2Property.isValid(self, x, y)

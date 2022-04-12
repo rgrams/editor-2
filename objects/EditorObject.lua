@@ -43,6 +43,18 @@ function EditorObject.getProperty(self, name)
 	end
 end
 
+function EditorObject.getModifiedProperties(self)
+	local properties
+	for i,prop in ipairs(self.properties) do
+		local values = { prop:getDiff() }
+		if values[1] then
+			properties = properties or {}
+			properties[prop.name] = values
+		end
+	end
+	return properties
+end
+
 function EditorObject.touchesPoint(self, wx, wy)
 	local lx, ly = self:toLocal(wx, wy)
 	local r = self.hitRadius

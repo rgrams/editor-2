@@ -45,7 +45,10 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 
 		if Input.isPressed("add") then
 			local wx, wy = Camera.current:screenToWorld(mx, my)
-			scenes.active:add(EditorObject(wx, wy, 0.2, 2, 1))
+			local properties = { pos = { wx, wy } }
+			local scene = scenes.active
+			local Class = EditorObject
+			scenes.active.history:perform("addObject", scene, Class, {}, properties)
 		elseif self.hoverObj then
 			local shouldToggle = Input.isPressed("shift")
 			local isSelected = self.hoverObj.isSelected

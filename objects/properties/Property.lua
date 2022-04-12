@@ -6,6 +6,7 @@ Property.type = "float"
 Property.name = "property"
 Property.displayName = "Property"
 Property.isOnObject = false
+Property.DEFAULT_VALUE = 0
 
 function Property.set(self, obj, isOnObject)
 	self.obj = obj
@@ -31,7 +32,15 @@ function Property.setOnObject(self)
 end
 
 function Property.getDefaultValue(self)
-	return 0
+	return self.DEFAULT_VALUE
+end
+
+function Property.getDiff(self)
+	local curVal = self:getValue()
+	local diff = curVal - self.DEFAULT_VALUE
+	if diff ~= 0 then
+		return diff
+	end
 end
 
 function Property.isValid(self, value)
@@ -41,7 +50,7 @@ function Property.isValid(self, value)
 end
 
 function Property.setValue(self, ...)
-	local validValue, errMsg = self:isValid(self, ...)
+	local validValue, errMsg = self:isValid(...)
 	if not validValue then
 		return errMsg
 	end
@@ -58,7 +67,7 @@ end
 local _printStr = "(Prop[%s]: '%s', %s)"
 
 function Property.__tostring(self)
-	local value = self.isOnObject and self.obj[self.name] or self.value
+	local value = self:getValue()
 	return _printStr:format(self.type, self.name, tostring(value))
 end
 
