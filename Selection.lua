@@ -42,4 +42,14 @@ function Selection.setTo(self, newList)
 	return oldList
 end
 
+function Selection.copyList(self)
+	if self[1] then
+		local list = {}
+		for i=1,#self do
+			list[i] = self[i]
+		end
+		return list
+	end
+end
+
 return Selection

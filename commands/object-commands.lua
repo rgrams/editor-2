@@ -31,7 +31,27 @@ local function deleteObject(scene, enclosure)
 	return scene, Class, enclosure, properties, isSelected
 end
 
+local function addObjects(scene, argsList)
+	local enclosures = {}
+	for i,args in ipairs(argsList) do
+		local _,enclosure = addObject(scene, unpack(args))
+		table.insert(enclosures, enclosure)
+	end
+	return scene, enclosures
+end
+
+local function deleteObjects(scene, enclosures)
+	local undoArgs = {}
+	for i,enclosure in ipairs(enclosures) do
+		local _, Class, enc, prop, isSelected = deleteObject(scene, enclosure)
+		table.insert(undoArgs, { Class, enc, prop, isSelected })
+	end
+	return scene, undoArgs
+end
+
 return {
 	addObject = { addObject, deleteObject },
 	deleteObject = { deleteObject, addObject },
+	addObjects = { addObjects, deleteObjects },
+	deleteObjects = { deleteObjects, addObjects },
 }

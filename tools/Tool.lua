@@ -100,6 +100,14 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		if self.hoverObj then
 			self.hoverObj.isHovered = true
 		end
+	elseif action == "delete" and change == 1 then
+		local scene = scenes.active
+		if scene then
+			if scene.selection[1] then
+				local enclosures = scene.selection:copyList()
+				scene.history:perform("deleteObjects", scene, enclosures)
+			end
+		end
 	end
 end
 
