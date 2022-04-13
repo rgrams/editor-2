@@ -2,9 +2,9 @@
 local Tool = gui.Node:extend()
 Tool.className = "Tool"
 
-local config = require "config"
 local scenes = require "scenes"
 local EditorObject = require "objects.EditorObject"
+local objectFn = require "commands.functions.object-functions"
 
 function Tool.set(self, ruu)
 	Tool.super.set(self, 1, 1, "C", "C", "fill")
@@ -21,9 +21,9 @@ local function startDrag(self)
 	self.isDragging = true
 	self.ruu:startDrag(self.widget)
 
-	local objPos = self.hoverObj.pos
 	local wmx, wmy = Camera.current:screenToWorld(self.ruu.mx, self.ruu.my)
-	self.dragOX, self.dragOY = objPos.x - wmx, objPos.y - wmy
+	self.lastDragX, self.lastDragY = wmx, wmy
+	self.dragStartX, self.dragStartY = wmx, wmy
 end
 
 local function stopDrag(self)
@@ -34,17 +34,22 @@ end
 
 function Tool.drag(wgt, dx, dy)
 	local self = wgt.object
-	local x, y = Camera.current:screenToWorld(self.ruu.mx, self.ruu.my)
-	x, y = x + self.dragOX, y + self.dragOY
-	local object = self.hoverObj
 	local scene = scenes.active
+
+	local x, y = Camera.current:screenToWorld(self.ruu.mx, self.ruu.my)
+	local wdx, wdy = x - self.lastDragX, y - self.lastDragY
+	self.lastDragX, self.lastDragY = x, y
+
 	if not self.startedDragCommand then
 		self.startedDragCommand = true
-		scene.history:perform("setProperty", object.enclosure, "pos", x, y)
+		local enclosures = scene.selection:copyList()
+		scene.history:perform("offsetPropertyOnMultiple", enclosures, "pos", wdx, wdy)
 	else
 		-- TODO: Make sure the last command in the history is still ours.
-		object:setProperty("pos", x, y)
-		scene.history:update(object.enclosure, "pos", x, y)
+		local enclosures = scene.selection:copyList()
+		objectFn.offsetPropertyOnMultiple(enclosures, "pos", wdx, wdy)
+		local totalDX, totalDY = x - self.dragStartX, y - self.dragStartY
+		scene.history:update(enclosures, "pos", totalDX, totalDY)
 	end
 end
 
