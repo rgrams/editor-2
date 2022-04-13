@@ -28,10 +28,8 @@ function UI.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
 	if action == "undo/redo" and (change == 1 or isRepeat) then
 		if scenes.active and Input.isPressed("ctrl") then
 			if Input.isPressed("shift") then
-				print("redo")
 				scenes.active.history:redo()
 			else
-				print("undo")
 				scenes.active.history:undo()
 			end
 		end
