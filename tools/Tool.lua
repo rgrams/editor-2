@@ -29,13 +29,23 @@ end
 local function stopDrag(self)
 	self.isDragging = false
 	self.ruu:stopDraggingWidget(self.widget)
+	self.startedDragCommand = false
 end
 
 function Tool.drag(wgt, dx, dy)
 	local self = wgt.object
 	local x, y = Camera.current:screenToWorld(self.ruu.mx, self.ruu.my)
 	x, y = x + self.dragOX, y + self.dragOY
-	self.hoverObj.pos.x, self.hoverObj.pos.y = x, y
+	local object = self.hoverObj
+	local scene = scenes.active
+	if not self.startedDragCommand then
+		self.startedDragCommand = true
+		scene.history:perform("setProperty", object.enclosure, "pos", x, y)
+	else
+		-- TODO: Make sure the last command in the history is still ours.
+		object:setProperty("pos", x, y)
+		scene.history:update(object.enclosure, "pos", x, y)
+	end
 end
 
 function Tool.press(wgt, depth, mx, my, isKeyboard)

@@ -49,9 +49,17 @@ local function deleteObjects(scene, enclosures)
 	return scene, undoArgs
 end
 
+local function setProperty(enclosure, name, ...)
+	local object = enclosure[1]
+	local oldValues = { object:getProperty(name) }
+	object:setProperty(name, ...)
+	return enclosure, name, unpack(oldValues)
+end
+
 return {
 	addObject = { addObject, deleteObject },
 	deleteObject = { deleteObject, addObject },
 	addObjects = { addObjects, deleteObjects },
 	deleteObjects = { deleteObjects, addObjects },
+	setProperty = { setProperty, setProperty },
 }
