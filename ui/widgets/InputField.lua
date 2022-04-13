@@ -2,7 +2,7 @@
 local InputField = gui.Node:extend()
 InputField.className = "InputField"
 
-InputField.font = { "assets/font/OpenSans-Semibold.ttf", 15 }
+InputField.font = { "assets/font/OpenSans-Regular.ttf", 14 }
 InputField.width = 100
 InputField.height = 24
 local pad = 2
@@ -17,14 +17,15 @@ local function selectionDraw(self)
 end
 local cursorDraw = selectionDraw
 
-function InputField.set(self, text)
-	InputField.super.set(self, self.width, self.height)
+function InputField.set(self, text, width)
+	width = width or self.width
+	InputField.super.set(self, width, self.height)
 
-	self.text = gui.Text(text, self.font, self.width - pad*2, "W", "W", "left", "stretch"):setPos(0, -2)
+	self.text = gui.Text(text, self.font, width - pad*2, "W", "W", "left", "stretch"):setPos(0, -1)
 	self.text.layer = "gui text"
 	self.cursor = gui.Node(cursorW, self.height - pad*2)
-	self.selection = gui.Node(self.width, self.height, "W", "W")
-	self.mask = gui.Mask(nil, self.width, self.height, "W", "W", "fill"):pad(pad, pad)
+	self.selection = gui.Node(width, self.height, "W", "W")
+	self.mask = gui.Mask(nil, width, self.height, "W", "W", "fill"):pad(pad, pad)
 
 	self.children = {
 		mod(self.mask, { children = {

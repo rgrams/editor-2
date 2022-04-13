@@ -17,6 +17,16 @@ function Tool.set(self, ruu)
 	self.widget.drag = self.drag
 end
 
+function Tool.init(self)
+	Tool.super.init(self)
+	self.propertyPanel = self.tree:get("/UI/PropertyPanel")
+end
+
+function Tool.updatePropertiesPanel(self)
+	local enclosures = scenes.active.selection
+	self.propertyPanel:updateProperties(enclosures)
+end
+
 local function startDrag(self)
 	self.isDragging = true
 	self.ruu:startDrag(self.widget)
@@ -44,12 +54,14 @@ function Tool.drag(wgt, dx, dy)
 		self.startedDragCommand = true
 		local enclosures = scene.selection:copyList()
 		scene.history:perform("offsetPropertyOnMultiple", enclosures, "pos", wdx, wdy)
+		self:updatePropertiesPanel()
 	else
 		-- TODO: Make sure the last command in the history is still ours.
 		local enclosures = scene.selection:copyList()
 		objectFn.offsetPropertyOnMultiple(enclosures, "pos", wdx, wdy)
 		local totalDX, totalDY = x - self.dragStartX, y - self.dragStartY
 		scene.history:update(enclosures, "pos", totalDX, totalDY)
+		self:updatePropertiesPanel()
 	end
 end
 
@@ -73,17 +85,21 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 			if not isSelected then
 				if shouldToggle then
 					history:perform("addToSelection", selection, self.hoverObj.enclosure)
+					self:updatePropertiesPanel()
 				else
 					history:perform("setSelection", selection, { self.hoverObj.enclosure })
+					self:updatePropertiesPanel()
 				end
 			elseif isSelected and shouldToggle then
 				history:perform("removeFromSelection", selection, self.hoverObj.enclosure)
+				self:updatePropertiesPanel()
 			end
 			startDrag(self)
 		else -- Clicked on nothing.
 			local selection = scenes.active.selection
 			if selection[1] and not Input.isPressed("shift") then
 				scenes.active.history:perform("clearSelection", selection)
+				self:updatePropertiesPanel()
 			end
 		end
 	end
@@ -121,6 +137,7 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 			if scene.selection[1] then
 				local enclosures = scene.selection:copyList()
 				scene.history:perform("deleteObjects", scene, enclosures)
+				wgt.object:updatePropertiesPanel()
 			end
 		end
 	end

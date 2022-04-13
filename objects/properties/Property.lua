@@ -67,7 +67,8 @@ end
 local _printStr = "(Prop[%s]: '%s', %s)"
 
 function Property.__tostring(self)
-	local value = self:getValue()
+	local value = (self.isOnObject and self.obj) and self.obj[self.name] or self.value
+	value = value or self.DEFAULT_VALUE
 	return _printStr:format(self.type, self.name, tostring(value))
 end
 

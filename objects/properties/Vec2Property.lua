@@ -45,7 +45,8 @@ end
 local _printStr = "(Prop[%s]: '%s', (%.3f, %.3f))"
 
 function Vec2Property.__tostring(self)
-	local value = self.isOnObject and self.obj[self.name] or self.value
+	local value = (self.isOnObject and self.obj) and self.obj[self.name] or self.value
+	value = value or self.DEFAULT_VALUE
 	return _printStr:format(self.type, self.name, value.x, value.y)
 end
 
