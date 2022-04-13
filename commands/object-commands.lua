@@ -21,13 +21,14 @@ end
 
 local function deleteObject(scene, enclosure)
 	local object = enclosure[1]
-	local properties = object:getModifiedProperties()
+	local properties = object:getModifiedProperties() or false
 	local isSelected = object.isSelected
 	if isSelected then
 		scene.selection:remove(enclosure)
 	end
 	object.tree:remove(object)
-	return scene, object.super, enclosure, properties, isSelected
+	local Class = getmetatable(object)
+	return scene, Class, enclosure, properties, isSelected
 end
 
 return {
