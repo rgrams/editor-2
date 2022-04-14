@@ -25,6 +25,7 @@ return {
 	addObjects = { addObjects, deleteObjects },
 	deleteObjects = { deleteObjects, addObjects },
 	setProperty = { Obj.setProperty, Obj.setProperty },
-	setPropertyOnMultiple = { Obj.setPropertyOnMultiple, Obj.setPropertyOnMultiple },
-	offsetPropertyOnMultiple = { Obj.offsetPropertyOnMultiple, Obj.setPropertyOnMultiple },
+	setSamePropertyOnMultiple = { Obj.setSamePropertyOnMultiple, Obj.setMultiPropertiesOnMultiple },
+	setMultiPropertiesOnMultiple = { Obj.setMultiPropertiesOnMultiple, Obj.setMultiPropertiesOnMultiple },
+	offsetPropertyOnMultiple = { Obj.offsetPropertyOnMultiple, Obj.setMultiPropertiesOnMultiple },
 }

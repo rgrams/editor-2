@@ -12,13 +12,45 @@ local height = 26
 function Float.set(self, name, value)
 	Float.super.set(self, spacing, false, -1, width, height)
 	self:mode("fill", "none")
-	self.children = {
-		gui.Text(name, font, width, "W", "W", "left"):setPos(2),
-		InputField(0),
-	}
-	local text = self.children[1]
-	text.isGreedy = true
-	text.color = { 0.65, 0.65, 0.65, 1 }
+	self.propertyName = name
+	self.value = value or 0
+	self.label = gui.Text(name, font, width, "W", "W", "left"):setPos(2)
+	self.field = InputField(self.value)
+	self.children = { self.label, self.field }
+	self.field.isGreedy = true
+	self.field.color = { 0.65, 0.65, 0.65, 1 }
+end
+
+function Float.setSelection(self, selection)
+	self.selection = selection
+end
+
+function Float.onConfirm(self, wgt)
+	if wgt.text == wgt.oldText then
+		return
+	end
+	local value = tonumber(wgt.text)
+	if not value then
+		return true -- Reject input.
+	end
+	if not self.selection then
+		print("Error: PropertyWidget[Float].onConfirm - No selection known.")
+	else
+		local scene = self.selection.scene
+		local cmd = "setSamePropertyOnMultiple"
+		local enclosures = self.selection:copyList()
+		scene.history:perform(cmd, enclosures, self.propertyName, value)
+	end
+end
+
+function Float.initRuu(self, ruu)
+	self.ruu = ruu
+	self.widget = self.ruu:InputField(self.field, self.onConfirm, self.value)
+	self.widget:args(self, self.widget)
+end
+
+function Float.destroyRuu(self)
+	self.ruu:destroy(self.widget)
 end
 
 return Float

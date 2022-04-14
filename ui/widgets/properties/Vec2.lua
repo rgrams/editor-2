@@ -22,16 +22,59 @@ end
 function Vec2.set(self, name, x, y)
 	Vec2.super.set(self, spacing, false, -1, width, height)
 	self:mode("fill", "none")
+	self.propertyName = name
+	self.xValue = x or 0
+	self.yValue = y or 0
 	self.children = {
 		gui.Text(name, font, width, "W", "W", "left"):setPos(2),
 		Sublabel("x"),
-		InputField(x or 0, 50),
+		InputField(self.xValue, 50),
 		Sublabel("y"),
-		InputField(y or 0, 50),
+		InputField(self.yValue, 50),
 	}
 	local text = self.children[1]
 	text.isGreedy = true
 	text.color = { 0.65, 0.65, 0.65, 1 }
+	self.fieldX = self.children[3]
+	self.fieldY = self.children[5]
+end
+
+function Vec2.setSelection(self, selection)
+	self.selection = selection
+end
+
+function Vec2.onConfirm(self, wgt, axis)
+	if wgt.text == wgt.oldText then
+		return
+	end
+	local value = tonumber(wgt.text)
+	if not value then
+		return true -- Reject input.
+	end
+	if not self.selection then
+		print("Error: PropertyWidget[Vec2].onConfirm - No selection known.")
+	else
+		local scene = self.selection.scene
+		local cmd = "setSamePropertyOnMultiple"
+		local enclosures = self.selection:copyList()
+		local x, y = false, false -- Can't have nil values in command args.
+		if axis == "x" then  x = value
+		else  y = value  end
+		scene.history:perform(cmd, enclosures, self.propertyName, x, y)
+	end
+end
+
+function Vec2.initRuu(self, ruu)
+	self.ruu = ruu
+	self.widgetX = self.ruu:InputField(self.fieldX, self.onConfirm, self.xValue)
+	self.widgetY = self.ruu:InputField(self.fieldY, self.onConfirm, self.yValue)
+	self.widgetX:args(self, self.widgetX, "x")
+	self.widgetY:args(self, self.widgetY, "y")
+end
+
+function Vec2.destroyRuu(self)
+	self.ruu:destroy(self.widgetX)
+	self.ruu:destroy(self.widgetY)
 end
 
 return Vec2

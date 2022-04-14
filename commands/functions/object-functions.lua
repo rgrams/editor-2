@@ -40,7 +40,16 @@ function M.setProperty(enclosure, name, ...)
 	return enclosure, name, unpack(oldValues)
 end
 
-function M.setPropertyOnMultiple(argList)
+function M.setSamePropertyOnMultiple(enclosures, name, ...)
+	local undoArgList = {}
+	for i,enclosure in ipairs(enclosures) do
+		local undoArgs = { M.setProperty(enclosure, name, ...) }
+		table.insert(undoArgList, undoArgs)
+	end
+	return undoArgList
+end
+
+function M.setMultiPropertiesOnMultiple(argList)
 	local undoArgList = {}
 	for i,args in ipairs(argList) do
 		local undoArgs = { M.setProperty(unpack(args)) }

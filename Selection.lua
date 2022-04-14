@@ -2,6 +2,10 @@
 local Class = require "philtre.modules.base-class"
 local Selection = Class:extend()
 
+function Selection.set(self, scene)
+	self.scene = scene
+end
+
 function Selection.add(self, enclosure, i)
 	enclosure[1].isSelected = true
 	if i then

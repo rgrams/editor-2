@@ -19,20 +19,21 @@ function PropertyPanel.set(self, ruu)
 	self.widget = self.ruu:Panel(self)
 end
 
-local function addPropertyWidget(self, PropertyClass, ...)
+local function addPropertyWidget(self, selection, PropertyClass, ...)
 	local Class = propWidget[PropertyClass.type]
 	local object = Class(PropertyClass.name, ...)
 	object.PropertyClass = PropertyClass
 	self.tree:add(object, self)
-	-- TODO: Add ruu widget(s).
+	object:setSelection(selection)
+	object:initRuu(self.ruu)
 end
 
 local function removePropertyWidget(self, object)
 	self.tree:remove(object)
-	-- TODO: ruu:destroy( widget(s) )
+	object:destroyRuu()
 end
 
-function PropertyPanel.updateProperties(self, enclosures)
+function PropertyPanel.updateProperties(self, selection)
 	for i=self.children.maxn,2,-1 do
 		local child = self.children[i]
 		if child then
@@ -40,7 +41,7 @@ function PropertyPanel.updateProperties(self, enclosures)
 		end
 	end
 
-	if not enclosures or not enclosures[1] then
+	if not selection or not selection[1] then
 		return
 	end
 
@@ -52,7 +53,7 @@ function PropertyPanel.updateProperties(self, enclosures)
 	}
 
 	-- Copy property list from the first object.
-	local firstObj = enclosures[1][1]
+	local firstObj = selection[1][1]
 	for i,property in ipairs(firstObj.properties) do
 		local PropertyClass = getmetatable(property)
 		local values = { property:getValue() }
@@ -61,8 +62,8 @@ function PropertyPanel.updateProperties(self, enclosures)
 	end
 
 	-- Loop through all other objects to check which properties are shared.
-	for objI=2,#enclosures do
-		local obj = enclosures[objI][1]
+	for objI=2,#selection do
+		local obj = selection[objI][1]
 		-- Loop once and "vote" for properties that this object has.
 		for i,property in ipairs(obj.properties) do
 			local PropertyClass = getmetatable(property)
@@ -74,7 +75,7 @@ function PropertyPanel.updateProperties(self, enclosures)
 	end
 
 	-- If not all objects "voted" for a property, remove it from the list.
-	local requiredVotes = #enclosures
+	local requiredVotes = #selection
 	for i=#commonProperties,1,-1 do
 		local Class = commonProperties[i].Class
 		if commonProperties.includes[Class] < requiredVotes then
@@ -84,7 +85,7 @@ function PropertyPanel.updateProperties(self, enclosures)
 	end
 
 	for i,propData in ipairs(commonProperties) do
-		addPropertyWidget(self, propData.Class, unpack(propData.values))
+		addPropertyWidget(self, selection, propData.Class, unpack(propData.values))
 	end
 end
 

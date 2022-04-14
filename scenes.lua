@@ -6,7 +6,7 @@ local History = require "philtre.lib.commands"
 
 function M.create(layers, defaultLayer, commands)
 	local scene = SceneTree(layers, defaultLayer)
-	scene.selection = Selection()
+	scene.selection = Selection(scene)
 	scene.history = History(commands)
 	scene.properties = {}
 	return scene
