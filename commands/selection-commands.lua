@@ -23,5 +23,5 @@ return {
 	addToSelection = { add, remove },
 	removeFromSelection = { remove, add },
 	clearSelection = { clear, setTo },
-	setSelection = { setTo, clear },
+	setSelection = { setTo, setTo },
 }
