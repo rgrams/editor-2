@@ -22,6 +22,8 @@ function UI.set(self)
 		Viewport(self.ruu),
 		PropertyPanel(self.ruu)
 	}
+
+	self.propertyPanel = self.children[2]
 end
 
 function UI.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
@@ -29,8 +31,10 @@ function UI.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
 		if scenes.active and Input.isPressed("ctrl") then
 			if Input.isPressed("shift") then
 				scenes.active.history:redo()
+				wgt.object.propertyPanel:updateProperties(scenes.active.selection)
 			else
 				scenes.active.history:undo()
+				wgt.object.propertyPanel:updateProperties(scenes.active.selection)
 			end
 		end
 	end
