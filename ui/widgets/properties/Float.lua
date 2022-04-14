@@ -15,9 +15,10 @@ function Float.set(self, name, value)
 	self.propertyName = name
 	self.value = value or 0
 	self.label = gui.Text(name, font, width, "W", "W", "left"):setPos(2)
+	self.label.color = { 0.6, 0.6, 0.6, 1 }
 	self.field = InputField(self.value)
 	self.children = { self.label, self.field }
-	self.field.isGreedy = true
+	self.label.isGreedy = true
 	self.field.color = { 0.65, 0.65, 0.65, 1 }
 end
 

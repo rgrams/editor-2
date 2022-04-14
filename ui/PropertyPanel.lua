@@ -8,8 +8,10 @@ local propWidget = {
 	vec2 = require "ui.widgets.properties.Vec2",
 }
 
+local spacing = 2
+
 function PropertyPanel.set(self, ruu)
-	PropertyPanel.super.set(self, 5, false, nil, 250, 600, "E", "E", "fill")
+	PropertyPanel.super.set(self, spacing, false, nil, 250, 600, "E", "E", "fill")
 	self:pad(4, 4)
 	self.children = {
 		gui.Text("Properties", headerFont, 250, "C", "C", "center", "fill"),

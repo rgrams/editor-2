@@ -6,7 +6,7 @@ local InputField = require "ui.widgets.InputField"
 
 local font = { "assets/font/OpenSans-Semibold.ttf", 15 }
 local sublabelFont = { "assets/font/OpenSans-Regular.ttf", 12 }
-local spacing = 1
+local spacing = 2
 local width = 100
 local height = 26
 
