@@ -46,9 +46,6 @@ function InputField.set(self, text, width)
 end
 
 function InputField.draw(self)
-	self.text.maskObject = nil
-	self.cursor.maskObject = nil
-	self.selection.maskObject = nil
 	love.graphics.setColor(self.color)
 	love.graphics.rectangle("fill", -self.w/2, -self.h/2, self.w, self.h)
 
