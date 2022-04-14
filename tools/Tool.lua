@@ -94,7 +94,9 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 				history:perform("removeFromSelection", selection, self.hoverObj.enclosure)
 				self:updatePropertiesPanel()
 			end
-			startDrag(self)
+			if self.hoverObj.isSelected then
+				startDrag(self)
+			end
 		else -- Clicked on nothing.
 			local selection = scenes.active.selection
 			if selection[1] and not Input.isPressed("shift") then
