@@ -9,7 +9,7 @@ local scenes = require "scenes"
 
 function UI.set(self)
 	local w, h = love.graphics.getDimensions()
-	UI.super.set(self, 0, false, -1, w, h, "NW", "C", "fill")
+	UI.super.set(self, 0, false, -1, w, h, "C", "C", "fill")
 	self.layer = "gui"
 
 	self.ruu = Ruu()

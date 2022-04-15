@@ -4,7 +4,7 @@ _G.gui = require "philtre.objects.gui.all"
 
 local scenes = require "scenes"
 local scene
-local ui
+local window
 
 local screenRect = gui.Rect(0, 0, love.graphics.getDimensions())
 
@@ -31,7 +31,7 @@ function love.load()
 	scene = SceneTree(layers, defaultLayer)
 
 	scene:add(mod(Camera(0, 0, 0, {800,600}, "expand view"), {name="MyCamera"}))
-	ui = scene:add( require("ui.UI")() )
+	window = scene:add( require("ui.Window")() )
 
 	-- Add default editing scene.
 	local sceneLayers = { "default" }
@@ -55,7 +55,7 @@ function love.draw()
 	scene:draw("gui")
 
 	if guiDebugDrawEnabled then
-		ui:callRecursive("debugDraw", "guiDebug")
+		window:callRecursive("debugDraw", "guiDebug")
 		scene:draw("guiDebug")
 		scene.draw_order:clear("guiDebug")
 	end
@@ -63,5 +63,5 @@ end
 
 function love.resize(w, h)
 	screenRect.w, screenRect.h = w, h
-	ui:allocate(screenRect)
+	window:allocate(screenRect)
 end

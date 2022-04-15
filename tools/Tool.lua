@@ -19,7 +19,7 @@ end
 
 function Tool.init(self)
 	Tool.super.init(self)
-	self.propertyPanel = self.tree:get("/UI/PropertyPanel")
+	self.propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
 end
 
 function Tool.updatePropertiesPanel(self)
