@@ -19,6 +19,7 @@ function PropertyPanel.set(self, ruu)
 	self.layer = "gui"
 	self.ruu = ruu
 	self.widget = self.ruu:Panel(self)
+	self.wgtMap = {}
 end
 
 local function addPropertyWidget(self, selection, PropertyClass, ...)
@@ -27,12 +28,12 @@ local function addPropertyWidget(self, selection, PropertyClass, ...)
 	object.PropertyClass = PropertyClass
 	self.tree:add(object, self)
 	object:setSelection(selection)
-	object:initRuu(self.ruu)
+	object:initRuu(self.ruu, self.wgtMap)
 end
 
 local function removePropertyWidget(self, object)
 	self.tree:remove(object)
-	object:destroyRuu()
+	object:destroyRuu(self.wgtMap)
 end
 
 function PropertyPanel.updateProperties(self, selection)
@@ -89,6 +90,7 @@ function PropertyPanel.updateProperties(self, selection)
 	for i,propData in ipairs(commonProperties) do
 		addPropertyWidget(self, selection, propData.Class, unpack(propData.values))
 	end
+	self.ruu:mapNextPrev(self.wgtMap)
 end
 
 local maxLineWidth = 1

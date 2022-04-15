@@ -64,17 +64,25 @@ function Vec2.onConfirm(self, wgt, axis)
 	end
 end
 
-function Vec2.initRuu(self, ruu)
+function Vec2.initRuu(self, ruu, map)
 	self.ruu = ruu
 	self.widgetX = self.ruu:InputField(self.fieldX, self.onConfirm, self.xValue)
 	self.widgetY = self.ruu:InputField(self.fieldY, self.onConfirm, self.yValue)
 	self.widgetX:args(self, self.widgetX, "x")
 	self.widgetY:args(self, self.widgetY, "y")
+	table.insert(map, self.widgetX)
+	table.insert(map, self.widgetY)
 end
 
-function Vec2.destroyRuu(self)
+function Vec2.destroyRuu(self, map)
 	self.ruu:destroy(self.widgetX)
 	self.ruu:destroy(self.widgetY)
+	for i=#map,1,-1 do
+		local wgt = map[i]
+		if wgt == self.widgetX or wgt == self.widgetY then
+			table.remove(map, i)
+		end
+	end
 end
 
 return Vec2

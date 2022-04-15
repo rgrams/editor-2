@@ -44,14 +44,21 @@ function Float.onConfirm(self, wgt)
 	end
 end
 
-function Float.initRuu(self, ruu)
+function Float.initRuu(self, ruu, map)
 	self.ruu = ruu
 	self.widget = self.ruu:InputField(self.field, self.onConfirm, self.value)
 	self.widget:args(self, self.widget)
+	table.insert(map, self.widget)
 end
 
-function Float.destroyRuu(self)
+function Float.destroyRuu(self, map)
 	self.ruu:destroy(self.widget)
+	for i,wgt in ipairs(map) do
+		if wgt == self.widget then
+			table.remove(map, i)
+			break
+		end
+	end
 end
 
 return Float
