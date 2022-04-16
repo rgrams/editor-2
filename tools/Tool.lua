@@ -5,6 +5,7 @@ Tool.className = "Tool"
 local scenes = require "scenes"
 local EditorObject = require "objects.EditorObject"
 local objectFn = require "commands.functions.object-functions"
+local modkeys = require "modkeys"
 
 function Tool.set(self, ruu)
 	Tool.super.set(self, 1, 1, "C", "C", "fill")
@@ -77,7 +78,7 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 			local Class = EditorObject
 			scenes.active.history:perform("addObject", scene, Class, {}, properties)
 		elseif self.hoverObj then
-			local shouldToggle = Input.isPressed("shift")
+			local shouldToggle = modkeys.isPressed("shift")
 			local isSelected = self.hoverObj.isSelected
 			local selection = scenes.active.selection
 			local history = scenes.active.history
@@ -99,7 +100,7 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 			end
 		else -- Clicked on nothing.
 			local selection = scenes.active.selection
-			if selection[1] and not Input.isPressed("shift") then
+			if selection[1] and not modkeys.isPressed("shift") then
 				scenes.active.history:perform("clearSelection", selection)
 				self:updatePropertiesPanel()
 			end

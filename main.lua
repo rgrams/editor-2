@@ -2,6 +2,9 @@
 require "philtre.init"
 _G.gui = require "philtre.objects.gui.all"
 
+local modkeys = require "modkeys"
+_G.Input = require "input"
+
 local scenes = require "scenes"
 local scene
 local window
@@ -64,4 +67,12 @@ end
 function love.resize(w, h)
 	screenRect.w, screenRect.h = w, h
 	window:allocate(screenRect)
+end
+
+function love.keypressed(key, scancode, isrepeat)
+	modkeys.keypressed(key)
+end
+
+function love.keyreleased(key)
+	modkeys.keyreleased(key)
 end

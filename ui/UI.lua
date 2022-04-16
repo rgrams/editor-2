@@ -27,16 +27,12 @@ function UI.set(self)
 end
 
 function UI.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
-	if action == "undo/redo" and (change == 1 or isRepeat) then
-		if scenes.active and Input.isPressed("ctrl") then
-			if Input.isPressed("shift") then
-				scenes.active.history:redo()
-				wgt.object.propertyPanel:updateProperties(scenes.active.selection)
-			else
-				scenes.active.history:undo()
-				wgt.object.propertyPanel:updateProperties(scenes.active.selection)
-			end
-		end
+	if action == "undo" and (change == 1 or isRepeat) then
+		scenes.active.history:undo()
+		wgt.object.propertyPanel:updateProperties(scenes.active.selection)
+	elseif action == "redo" and (change == 1 or isRepeat) then
+		scenes.active.history:redo()
+		wgt.object.propertyPanel:updateProperties(scenes.active.selection)
 	end
 end
 
@@ -50,9 +46,6 @@ function UI.final(self)
 end
 
 function UI.input(self, action, value, change, ...)
-	if action == "next" and Input.isPressed("shift") then
-		action = "prev"
-	end
 	self.ruu:input(action, value, change, ...)
 end
 
