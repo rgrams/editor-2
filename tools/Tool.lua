@@ -7,6 +7,11 @@ local scenes = require "scenes"
 local EditorObject = require "objects.EditorObject"
 local objectFn = require "commands.functions.object-functions"
 local modkeys = require "modkeys"
+local list = require "lib.list"
+
+Tool.boxSelectAddKey = "shift"
+Tool.boxSelectToggleKey = "ctrl"
+Tool.boxSelectSubtractKey = "alt"
 
 function Tool.set(self, ruu)
 	Tool.super.set(self, 1, 1, "C", "C", "fill")
@@ -45,6 +50,27 @@ local function stopDrag(self)
 	self.startedDragCommand = false
 end
 
+local function getObjectsInBox(scene, lt, top, w, h)
+	local hitEnclosures = {}
+	for i,child in ipairs(scene.children) do
+		local cx, cy = child:toWorld(0, 0)
+		if cx >= lt and cx <= lt+w and cy >= top and cy <= top+h then
+			table.insert(hitEnclosures, child.enclosure)
+		end
+	end
+	return hitEnclosures
+end
+
+local function getBoxSelectMode(self)
+	local curModChord = modkeys.getString()
+	local mode = "set"
+	if     curModChord == self.boxSelectAddKey .. " "      then  mode = "add"
+	elseif curModChord == self.boxSelectToggleKey .. " "   then  mode = "toggle"
+	elseif curModChord == self.boxSelectSubtractKey .. " " then  mode = "subtract"
+	end
+	return mode
+end
+
 function Tool.drag(wgt, dx, dy, dragType)
 	local self = wgt.object
 	local scene = scenes.active
@@ -67,24 +93,32 @@ function Tool.drag(wgt, dx, dy, dragType)
 			scene.history:update(enclosures, "pos", totalDX, totalDY)
 			self:updatePropertiesPanel()
 		end
+
 	elseif dragType == "box select" then
 		self.isBoxSelecting = true
 		local lt, top = math.min(x, self.dragStartX), math.min(y, self.dragStartY)
 		local w, h = math.abs(x - self.dragStartX), math.abs(y - self.dragStartY)
-		local selectedEnclosures = {}
-		for i,child in ipairs(scene.children) do
-			local cx, cy = child:toWorld(0, 0)
-			if cx >= lt and cx <= lt+w and cy >= top and cy <= top+h then
-				table.insert(selectedEnclosures, child.enclosure)
-			end
+		local hitEnclosures = getObjectsInBox(scene, lt, top, w, h)
+		local mode = getBoxSelectMode(self)
+		local curSelection = self.originalSelection
+		local newSelection
+		if mode == "set" then
+			newSelection = hitEnclosures
+		elseif mode == "add" then
+			newSelection = list.getUnion(curSelection, hitEnclosures)
+		elseif mode == "toggle" then
+			newSelection = list.getDifference(curSelection, hitEnclosures)
+		elseif mode == "subtract" then
+			newSelection = list.getSubtraction(curSelection, hitEnclosures)
 		end
+
 		if not self.startedDragCommand then
 			self.startedDragCommand = true
-			scene.history:perform("setSelection", scene.selection, selectedEnclosures)
+			scene.history:perform("setSelection", scene.selection, newSelection)
 			self:updatePropertiesPanel()
 		else
-			scene.selection:setTo(selectedEnclosures)
-			scene.history:update(scene.selection, selectedEnclosures)
+			scene.selection:setTo(newSelection)
+			scene.history:update(scene.selection, newSelection)
 		end
 	end
 end
@@ -123,11 +157,12 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 			end
 		else -- Clicked on nothing.
 			local selection = scenes.active.selection
-			if selection[1] and not modkeys.isPressed("shift") then
+			if selection[1] and modkeys.getString() == "" then
 				scenes.active.history:perform("clearSelection", selection)
 				self:updatePropertiesPanel()
 			end
 			startDrag(self, "box select")
+			self.originalSelection = selection:copyList() or {}
 		end
 	end
 end
