@@ -200,6 +200,10 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 				local enclosures = scene.selection:copyList()
 				scene.history:perform("deleteObjects", scene, enclosures)
 				wgt.object:updatePropertiesPanel()
+
+				if not wgt.object.hoverObj.tree then
+					wgt.object.hoverObj = nil
+				end
 			end
 		end
 	end
