@@ -28,7 +28,7 @@ return {
 	{ "button", "lshift", "selection modifier", true },
 	{ "button", "rshift", "selection modifier", true },
 
-	{ "button", "k:q", "add" },
+	{ "button", "a", "add" },
 	{ "button", "ctrl z", "undo" },
 	{ "button", "ctrl shift z", "redo" },
 }

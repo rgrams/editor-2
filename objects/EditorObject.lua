@@ -77,6 +77,26 @@ function EditorObject.draw(self)
 	love.graphics.setColor(0.5, 0.5, 0.5, 1)
 	love.graphics.rectangle("line", -r, -r, r*2, r*2)
 	love.graphics.circle("line", 0, 0, 0.5, 4)
+
+	local children = self.children
+	if children then
+		for i=1,children.maxn or #children do
+			local child = children[i]
+			if child then
+				love.graphics.setColor(config.parentLineColor)
+				local frac = config.parentLineLenFrac
+				local x, y = child.pos.x*frac, child.pos.y*frac
+				love.graphics.line(0, 0, x, y)
+				local vx, vy = vec2.normalize(x, y)
+				local arrowLen = config.parentLineArrowLength
+				local arrowAngle = config.parentLineArrowAngle
+				vx, vy = -vx*arrowLen, -vy*arrowLen
+				local x2, y2 = vec2.rotate(vx, vy, arrowAngle)
+				local x3, y3 = vec2.rotate(vx, vy, -arrowAngle)
+				love.graphics.line(x2+x, y2+y, x, y, x3+x, y3+y)
+			end
+		end
+	end
 end
 
 -- Rotates around center, not top left corner.

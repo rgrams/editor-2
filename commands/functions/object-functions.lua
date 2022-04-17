@@ -1,7 +1,7 @@
 
 local M = {}
 
-function M.add(scene, Class, enclosure, properties, isSelected)
+function M.add(scene, Class, enclosure, properties, isSelected, parentEnclosure, children)
 	local object = Class()
 	enclosure[1] = object
 	object.enclosure = enclosure
@@ -12,7 +12,13 @@ function M.add(scene, Class, enclosure, properties, isSelected)
 		end
 	end
 
-	scene:add(object)
+	scene:add(object, parentEnclosure and parentEnclosure[1])
+
+	if children then
+		for i,childData in ipairs(children) do
+			M.add(unpack(childData))
+		end
+	end
 
 	if isSelected then
 		scene.selection:add(enclosure)
@@ -21,16 +27,35 @@ function M.add(scene, Class, enclosure, properties, isSelected)
 	return scene, enclosure
 end
 
+local function deleteChildren(scene, children)
+	if not children then  return false  end
+
+	local childCount = children.maxn or #children
+	if childCount == 0 then  return false  end
+
+	local undoArgs = {}
+	for i=1,childCount do
+		local object = children[i]
+		if object then
+			local args = { M.delete(scene, object.enclosure) }
+			table.insert(undoArgs, args)
+		end
+	end
+	return undoArgs
+end
+
 function M.delete(scene, enclosure)
 	local object = enclosure[1]
+	local Class = getmetatable(object)
 	local properties = object:getModifiedProperties() or false
 	local isSelected = object.isSelected
 	if isSelected then
 		scene.selection:remove(enclosure)
 	end
+	local parentEnclosure = object.parent.enclosure or false
+	local children = deleteChildren(scene, object.children)
 	object.tree:remove(object)
-	local Class = getmetatable(object)
-	return scene, Class, enclosure, properties, isSelected
+	return scene, Class, enclosure, properties, isSelected, parentEnclosure, children
 end
 
 function M.setProperty(enclosure, name, ...)

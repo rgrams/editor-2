@@ -19,4 +19,9 @@ M.latestSelectedHighlightColor = {1, 0.9, 0.45, 1}
 M.highlightLineWidth = 3
 M.highlightPadding = 3
 
+M.parentLineColor = {0, 1, 1, 0.3}
+M.parentLineLenFrac = 0.95
+M.parentLineArrowAngle = 0.4
+M.parentLineArrowLength = 20
+
 return M

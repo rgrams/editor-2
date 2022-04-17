@@ -1,6 +1,7 @@
 
 require "philtre.init"
 _G.gui = require "philtre.objects.gui.all"
+_G.vec2 = require "philtre.lib.vec2xy"
 
 local modkeys = require "modkeys"
 _G.Input = require "input"

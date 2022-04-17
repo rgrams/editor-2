@@ -4,7 +4,7 @@ local Obj = require "commands.functions.object-functions"
 local function addObjects(scene, argsList)
 	local enclosures = {}
 	for i,args in ipairs(argsList) do
-		local _,enclosure = Obj.add(scene, unpack(args))
+		local _,enclosure = Obj.add(unpack(args))
 		table.insert(enclosures, enclosure)
 	end
 	return scene, enclosures
@@ -13,8 +13,8 @@ end
 local function deleteObjects(scene, enclosures)
 	local undoArgs = {}
 	for i,enclosure in ipairs(enclosures) do
-		local _, Class, enc, prop, isSelected = Obj.delete(scene, enclosure)
-		table.insert(undoArgs, { Class, enc, prop, isSelected })
+		local args = { Obj.delete(scene, enclosure) }
+		table.insert(undoArgs, args)
 	end
 	return scene, undoArgs
 end
