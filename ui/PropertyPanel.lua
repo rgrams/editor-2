@@ -32,8 +32,8 @@ local function addPropertyWidget(self, selection, PropertyClass, ...)
 end
 
 local function removePropertyWidget(self, object)
-	self.tree:remove(object)
 	object:destroyRuu(self.wgtMap)
+	self.tree:remove(object)
 end
 
 function PropertyPanel.updateProperties(self, selection)
