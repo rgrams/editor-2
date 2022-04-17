@@ -44,6 +44,29 @@ local function deleteChildren(scene, children)
 	return undoArgs
 end
 
+local function dictContainsAncestor(dict, obj)
+	local p = obj.parent
+	while not dict[p] do
+		p = p.parent
+		if not p then  return false  end
+	end
+	return true
+end
+
+-- Removes objects from the list if any of their ancestors are also in the list.
+function M.removeDescendantsFromList(enclosures)
+	local objDict = {} -- Make a dict of the objects to remove for quick checking.
+	for i,enclosure in ipairs(enclosures) do
+		objDict[enclosure[1]] = true
+	end
+	for i=#enclosures,1,-1 do
+		local obj = enclosures[i][1]
+		if dictContainsAncestor(objDict, obj) then
+			table.remove(enclosures, i)
+		end
+	end
+end
+
 function M.delete(scene, enclosure)
 	local object = enclosure[1]
 	local Class = getmetatable(object)
@@ -56,6 +79,15 @@ function M.delete(scene, enclosure)
 	local children = deleteChildren(scene, object.children)
 	object.tree:remove(object)
 	return scene, Class, enclosure, properties, isSelected, parentEnclosure, children
+end
+
+function M.addToMultiple(scene, parentEnclosures, Class, properties, isSelected, children)
+	local newEnclosures = {}
+	for i,parentEnclosure in ipairs(parentEnclosures) do
+		local _, enc = M.add(scene, Class, {}, properties, isSelected, parentEnclosure, children)
+		table.insert(newEnclosures, enc)
+	end
+	return scene, newEnclosures
 end
 
 function M.setProperty(enclosure, name, ...)

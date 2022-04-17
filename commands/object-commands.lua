@@ -24,6 +24,7 @@ return {
 	deleteObject = { Obj.delete, Obj.add },
 	addObjects = { addObjects, deleteObjects },
 	deleteObjects = { deleteObjects, addObjects },
+	addObjectToMultiple = { Obj.addToMultiple, deleteObjects },
 	setProperty = { Obj.setProperty, Obj.setProperty },
 	setSamePropertyOnMultiple = { Obj.setSamePropertyOnMultiple, Obj.setMultiPropertiesOnMultiple },
 	setMultiPropertiesOnMultiple = { Obj.setMultiPropertiesOnMultiple, Obj.setMultiPropertiesOnMultiple },

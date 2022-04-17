@@ -140,7 +140,12 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 			local properties = { pos = { wx, wy } }
 			local scene = scenes.active
 			local Class = EditorObject
-			scenes.active.history:perform("addObject", scene, Class, {}, properties)
+			if scene.selection[1] then
+				local parentEnclosures = scene.selection:copyList()
+				scene.history:perform("addObjectToMultiple", scene, parentEnclosures, Class, properties, false, false)
+			else
+				scene.history:perform("addObject", scene, Class, {}, properties, false, false)
+			end
 		elseif self.hoverObj then
 			local shouldToggle = modkeys.isPressed("shift")
 			local isSelected = self.hoverObj.isSelected
@@ -221,12 +226,14 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		local scene = scenes.active
 		if scene then
 			if scene.selection[1] then
+				local self = wgt.object
 				local enclosures = scene.selection:copyList()
+				objectFn.removeDescendantsFromList(enclosures)
 				scene.history:perform("deleteObjects", scene, enclosures)
-				wgt.object:updatePropertiesPanel()
+				self:updatePropertiesPanel()
 
-				if not wgt.object.hoverObj.tree then
-					wgt.object.hoverObj = nil
+				if self.hoverObj and not self.hoverObj.tree then
+					self.hoverObj = nil
 				end
 			end
 		end
