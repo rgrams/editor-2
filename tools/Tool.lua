@@ -50,12 +50,18 @@ local function stopDrag(self)
 	self.startedDragCommand = false
 end
 
-local function getObjectsInBox(scene, lt, top, w, h)
-	local hitEnclosures = {}
-	for i,child in ipairs(scene.children) do
-		local cx, cy = child:toWorld(0, 0)
-		if cx >= lt and cx <= lt+w and cy >= top and cy <= top+h then
-			table.insert(hitEnclosures, child.enclosure)
+local function getObjectsInBox(parent, lt, top, w, h, hitEnclosures)
+	hitEnclosures = hitEnclosures or {}
+	for i=1,parent.children.maxn do
+		local child = parent.children[i]
+		if child then
+			local cx, cy = child:toWorld(0, 0)
+			if cx >= lt and cx <= lt+w and cy >= top and cy <= top+h then
+				table.insert(hitEnclosures, child.enclosure)
+			end
+			if child.children then
+				getObjectsInBox(child, lt, top, w, h, hitEnclosures)
+			end
 		end
 	end
 	return hitEnclosures
@@ -119,6 +125,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 		else
 			scene.selection:setTo(newSelection)
 			scene.history:update(scene.selection, newSelection)
+			self:updatePropertiesPanel()
 		end
 	end
 end
@@ -175,6 +182,27 @@ function Tool.release(wgt, depth, dontFire, mx, my, isKeyboard)
 	end
 end
 
+local function hitCheckChildren(children, x, y, minDist, closestObj)
+	minDist = minDist or math.huge
+	for i=1,children.maxn do
+		local child = children[i]
+		if child then
+			local hitDist = child:touchesPoint(x, y)
+			if hitDist and hitDist < minDist then
+				minDist, closestObj = hitDist, child
+			end
+			if child.children then
+				closestObj, minDist = hitCheckChildren(child.children, x, y, minDist, closestObj)
+			end
+		end
+	end
+	return closestObj, minDist
+end
+
+local function getObjectAt(scene, wx, wy)
+	return hitCheckChildren(scene.children, wx, wy)
+end
+
 function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
 	if action == wgt.ruu.MOUSE_MOVED then
 		local self = wgt.object
@@ -184,11 +212,7 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		local scene = scenes.active
 		if scene then
 			local wx, wy = Camera.current:screenToWorld(x, y)
-			for i,child in ipairs(scene.children) do
-				if child:touchesPoint(wx, wy) then
-					self.hoverObj = child
-				end
-			end
+			self.hoverObj = getObjectAt(scene, wx, wy)
 		end
 		if self.hoverObj then
 			self.hoverObj.isHovered = true

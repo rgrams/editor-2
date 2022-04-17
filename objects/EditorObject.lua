@@ -58,7 +58,9 @@ end
 function EditorObject.touchesPoint(self, wx, wy)
 	local lx, ly = self:toLocal(wx, wy)
 	local r = self.hitRadius
-	return lx >= -r and lx <= r and ly >= -r and ly <= r
+	if lx >= -r and lx <= r and ly >= -r and ly <= r then
+		return vec2.len2(lx, ly)
+	end
 end
 
 function EditorObject.draw(self)
