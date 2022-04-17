@@ -6,6 +6,7 @@ local config = require "config"
 local scenes = require "scenes"
 local BackgroundGrid = require "ui.BackgroundGrid"
 local Tool = require "tools.Tool"
+local objectFn = require "commands.functions.object-functions"
 
 local maxLineWidth = 1
 
@@ -56,6 +57,35 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 		end
 	elseif action == "scroll" then
 		wgt:scroll(depth, dx, dy)
+	elseif action == "cut" and change == 1 and scenes.active then
+		local scene = scenes.active
+		local selection = scene.selection
+		if selection[1] then
+			local enclosures = selection:copyList()
+			objectFn.removeDescendantsFromList(enclosures)
+			scene.history:perform("cut", scene, enclosures) -- Command sets clipboard (perform doesn't return).
+			return true
+		end
+	elseif action == "copy" and change == 1 and scenes.active then
+		local scene = scenes.active
+		local selection = scene.selection
+		if selection[1] then
+			local enclosures = selection:copyList()
+			objectFn.removeDescendantsFromList(enclosures)
+			_G.scene_clipboard = objectFn.copy(scene, enclosures)
+			return true
+		end
+	elseif action == "paste" and change == 1 and scenes.active then
+		local scene = scenes.active
+		local selection = scene.selection
+		if _G.scene_clipboard then
+			local parentEnclosures = selection:copyList() or false
+			local firstParent = parentEnclosures and parentEnclosures[1] or false
+			local argsList = objectFn.copyPasteDataFor(scene, firstParent, _G.scene_clipboard)
+			-- Do NOT want to put the mutable clipboard table into the command history.
+			scene.history:perform("paste", scene, parentEnclosures, argsList)
+			return true
+		end
 	end
 end
 

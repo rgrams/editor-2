@@ -1,15 +1,6 @@
 
 local Obj = require "commands.functions.object-functions"
 
-local function addObjects(scene, argsList)
-	local enclosures = {}
-	for i,args in ipairs(argsList) do
-		local _,enclosure = Obj.add(unpack(args))
-		table.insert(enclosures, enclosure)
-	end
-	return scene, enclosures
-end
-
 local function deleteObjects(scene, enclosures)
 	local undoArgs = {}
 	for i,enclosure in ipairs(enclosures) do
@@ -19,14 +10,22 @@ local function deleteObjects(scene, enclosures)
 	return scene, undoArgs
 end
 
+local function cut(scene, enclosures)
+	local _, undoArgs = deleteObjects(scene, enclosures)
+	_G.scene_clipboard = undoArgs
+	return scene, undoArgs
+end
+
 return {
 	addObject = { Obj.add, Obj.delete },
 	deleteObject = { Obj.delete, Obj.add },
-	addObjects = { addObjects, deleteObjects },
-	deleteObjects = { deleteObjects, addObjects },
+	addObjects = { Obj.addObjects, deleteObjects },
+	deleteObjects = { deleteObjects, Obj.addObjects },
 	addObjectToMultiple = { Obj.addToMultiple, deleteObjects },
 	setProperty = { Obj.setProperty, Obj.setProperty },
 	setSamePropertyOnMultiple = { Obj.setSamePropertyOnMultiple, Obj.setMultiPropertiesOnMultiple },
 	setMultiPropertiesOnMultiple = { Obj.setMultiPropertiesOnMultiple, Obj.setMultiPropertiesOnMultiple },
 	offsetPropertyOnMultiple = { Obj.offsetPropertyOnMultiple, Obj.setMultiPropertiesOnMultiple },
+	cut = { cut, Obj.addObjects },
+	paste = { Obj.paste, deleteObjects }
 }

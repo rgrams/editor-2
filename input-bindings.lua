@@ -31,4 +31,7 @@ return {
 	{ "button", "a", "add" },
 	{ "button", "ctrl z", "undo" },
 	{ "button", "ctrl shift z", "redo" },
+	{ "button", "ctrl x", "cut" },
+	{ "button", "ctrl c", "copy" },
+	{ "button", "ctrl v", "paste" },
 }
