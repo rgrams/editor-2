@@ -128,7 +128,8 @@ end
 function EditorObject.drawSelectionHighlight(self, node)
 	love.graphics.setLineWidth(config.highlightLineWidth)
 
-	local scrnX, scrnY = Camera.current:worldToScreen(self.pos.x, self.pos.y)
+	local objX, objY = self:toWorld(0, 0)
+	local scrnX, scrnY = Camera.current:worldToScreen(objX, objY)
 	local lx, ly = node:toLocal(scrnX, scrnY)
 	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
 
