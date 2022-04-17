@@ -65,7 +65,8 @@ end
 
 function EditorObject.draw(self)
 	love.graphics.setBlendMode("alpha")
-	local r = self.hitRadius
+	local lineWidth = 1
+	local r = self.hitRadius - lineWidth/2
 
 	if self.isHovered then
 		love.graphics.setColor(1, 1, 1, 0.03)
@@ -134,8 +135,7 @@ function EditorObject.drawSelectionHighlight(self, node)
 	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
 
 	love.graphics.setColor(config.selectedHighlightColor)
-	local objLineWidth = 1
-	local r = (self.hitRadius + objLineWidth/2) * Camera.current.zoom
+	local r = self.hitRadius * Camera.current.zoom
 	local pad = config.highlightPadding
 	local hw, hh = r*sx + pad, r*sy + pad
 	local x, y = lx - hw, ly - hh
