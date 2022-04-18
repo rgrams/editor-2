@@ -14,7 +14,6 @@ local yAxisColor = config.yAxisColor
 local xAxisColor = config.xAxisColor
 
 local maxGridLines = 48
-local emphasizeEvery = 4
 
 function BackgroundGrid.set(self)
 	BackgroundGrid.super.set(self)
@@ -44,7 +43,7 @@ function BackgroundGrid.draw(self)
 	local scale = 1 / Camera.current.zoom
 
 	local minSize = math.max(w_w, w_h) / maxGridLines
-	local n = roundUpToPower(minSize / snapIncr, 2)
+	local n = roundUpToPower(minSize / snapIncr, config.gridPower)
 	local s = snapIncr * n -- Grid cell world-size.
 	local pad = s / 12 -- Number text padding/offset
 
@@ -54,6 +53,8 @@ function BackgroundGrid.draw(self)
 
 	love.graphics.setLineWidth(scale)
 	love.graphics.setFont(self.font)
+
+	local emphasizeEvery = config.gridEmphasizeEvery
 
 	-- Vertical lines
 	for x=lt,rt do

@@ -4,6 +4,8 @@ local M = {}
 M.zoomRate = 0.1
 
 M.translateSnapIncrement = 4
+M.gridPower = 2
+M.gridEmphasizeEvery = 4
 
 M.viewportBackgroundColor = { 0.1, 0.1, 0.1 }
 M.gridColor = { 0.3, 0.3, 0.3, 0.06 }
