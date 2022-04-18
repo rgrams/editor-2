@@ -15,7 +15,7 @@ function Scale.getFromObject(self)
 end
 
 function Scale.setOnObject(self)
-	self.obj.sx, self.obj.sy = self.value.x, self.value.y
+	self.obj:setScale(self.value.x, self.value.y)
 end
 
 return Scale

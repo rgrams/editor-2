@@ -14,7 +14,7 @@ function Skew.getFromObject(self)
 end
 
 function Skew.setOnObject(self)
-	self.obj.kx, self.obj.ky = self.value.x, self.value.y
+	self.obj:setSkew(self.value.x, self.value.y)
 end
 
 return Skew

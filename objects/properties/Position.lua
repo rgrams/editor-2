@@ -8,4 +8,8 @@ Position.name = "pos"
 Position.displayName = "Position"
 Position.isOnObject = true
 
+function Position.setOnObject(self)
+	self.obj:setPosition(self.value)
+end
+
 return Position

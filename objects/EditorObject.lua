@@ -22,6 +22,58 @@ function EditorObject.set(self, x, y, angle, ...)
 		Scale(self),
 		Skew(self),
 	}
+	self.AABB = {}
+end
+
+function EditorObject.init(self)
+	self:updateTransform()
+	self:updateAABB()
+end
+
+function EditorObject.updateAABB(self)
+	local r = self.hitRadius
+	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
+	local AABB = self.AABB
+
+	if kx ~= 0 or ky ~= 0 then
+		-- Need to do full transform of all 4 corners.
+		local x1, y1 = self:toWorld(-r, -r)
+		local x2, y2 = self:toWorld(r, -r)
+		local x3, y3 = self:toWorld(r, r)
+		local x4, y4 = self:toWorld(-r, r)
+		local left = math.min(x1, x2, x3, x4)
+		local top = math.min(y1, y2, y3, y4)
+		local right = math.max(x1, x2, x3, x4)
+		local bottom = math.max(y1, y2, y3, y4)
+		AABB.w = right - left
+		AABB.h = bottom - top
+		AABB.lt, AABB.top, AABB.rt, AABB.bot = left, top, right, bottom
+	elseif angle ~= 0 then
+		-- Just need to rotate and scale.
+		local hw, hh = r*sx, r*sy
+		local x, y = self._to_world.x, self._to_world.y
+		local x1, y1 = vec2.rotate(-hw, -hh, angle)
+		local x2, y2 = vec2.rotate(hw, -hh, angle)
+		local x3, y3 = vec2.rotate(hw, hh, angle)
+		local x4, y4 = vec2.rotate(-hw, hh, angle)
+		x1, y1 = x + x1, y + y1
+		x2, y2 = x + x2, y + y2
+		x3, y3 = x + x3, y + y3
+		x4, y4 = x + x4, y + y4
+		local left = math.min(x1, x2, x3, x4)
+		local top = math.min(y1, y2, y3, y4)
+		local right = math.max(x1, x2, x3, x4)
+		local bottom = math.max(y1, y2, y3, y4)
+		AABB.w = right - left
+		AABB.h = bottom - top
+		AABB.lt, AABB.top, AABB.rt, AABB.bot = left, top, right, bottom
+	else
+		-- Just need to scale.
+		local hw, hh = r*sx, r*sy
+		local x, y = self._to_world.x, self._to_world.y
+		AABB.w, AABB.h = hw*2, hh*2
+		AABB.lt, AABB.top, AABB.rt, AABB.bot = x - hw, y - hh, x + hw, y + hh
+	end
 end
 
 function EditorObject.setProperty(self, name, ...)
@@ -33,6 +85,30 @@ function EditorObject.setProperty(self, name, ...)
 		end
 	end
 	return false
+end
+
+function EditorObject.setPosition(self, pos)
+	self.pos = pos
+	if self.parent then  self:updateTransform()  end
+	self:updateAABB()
+end
+
+function EditorObject.setAngle(self, angle)
+	self.angle = angle
+	if self.parent then  self:updateTransform()  end
+	self:updateAABB()
+end
+
+function EditorObject.setScale(self, sx, sy)
+	self.sx, self.sy = sx, sy
+	if self.parent then  self:updateTransform()  end
+	self:updateAABB()
+end
+
+function EditorObject.setSkew(self, kx, ky)
+	self.kx, self.ky = kx, ky
+	if self.parent then  self:updateTransform()  end
+	self:updateAABB()
 end
 
 function EditorObject.getProperty(self, name)
