@@ -187,42 +187,62 @@ local function drawRotatedRectangle(mode, x, y, width, height, angle)
 	love.graphics.pop()
 end
 
-local function drawSkewedRectangle() -- TODO
-	--[[
-	local dx, dy = math.cos(angle), math.sin(angle)
-	local pdx, pdy = -dy, dx
-	local wx, wy = hw*dx, hw*dy
-	local hx, hy = hh*pdx, hh*pdy
-	local x1, y1 = lx - wx - hx, ly - wy - hy
-	local x2, y2 = lx + wx - hx, ly + wy - hy
-	local x3, y3 = lx + wx + hx, ly + wy + hy
-	local x4, y4 = lx - wx + hx, ly - wy + hy
+local function drawSkewedRectangle(self, mode, pad, sx, sy, cam)
+	-- Get the skewed screen vectors for up and right in object-space.
+	-- Then normalize and scale them by `pad` in screen space.
+	-- (Screen-space is the same as world-space here except for translation - no rotation on camera.)
+	local wx, wy = self._to_world.x, self._to_world.y
+	local upX, upY = self:toWorld(0, 1)
+	upX, upY = vec2.normalize(upX - wx, upY - wy)
+	local rtX, rtY = self:toWorld(1, 0)
+	rtX, rtY = vec2.normalize(rtX - wx, rtY - wy)
+	upX, upY, rtX, rtY = upX*pad, upY*pad, rtX*pad, rtY*pad
+
+	local r = self.hitRadius
+	local x1, y1 = cam:worldToScreen( self:toWorld(-r, -r) )
+	local x2, y2 = cam:worldToScreen( self:toWorld(r, -r) )
+	local x3, y3 = cam:worldToScreen( self:toWorld(r, r) )
+	local x4, y4 = cam:worldToScreen( self:toWorld(-r, r) )
+	x1, y1 = x1 - rtX - upX, y1 - rtY - upY
+	x2, y2 = x2 + rtX - upX, y2 + rtY - upY
+	x3, y3 = x3 + rtX + upX, y3 + rtY + upY
+	x4, y4 = x4 - rtX + upX, y4 - rtY + upY
 	love.graphics.line(x1, y1, x2, y2, x3, y3, x4, y4, x1, y1)
-	--]]
 end
 
 -- In node-space, not self-space.
 function EditorObject.drawSelectionHighlight(self, node)
-	love.graphics.setLineWidth(config.highlightLineWidth)
 
-	local objX, objY = self:toWorld(0, 0)
-	local scrnX, scrnY = Camera.current:worldToScreen(objX, objY)
-	local lx, ly = node:toLocal(scrnX, scrnY)
-	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
+	love.graphics.push()
+	love.graphics.translate(-node._to_world.x, -node._to_world.y)
 
 	love.graphics.setColor(config.selectedHighlightColor)
-	local r = self.hitRadius * Camera.current.zoom
-	local pad = config.highlightPadding
-	local hw, hh = r*sx + pad, r*sy + pad
-	local x, y = lx - hw, ly - hh
+	love.graphics.setLineWidth(config.highlightLineWidth)
 
-	if angle ~= 0 then
-		drawRotatedRectangle("line", x, y, hw*2, hh*2, angle)
+	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
+
+	local pad = config.highlightPadding
+
+	if kx ~= 0 or ky ~= 0 then
+		drawSkewedRectangle(self, "line", pad, sx, sy, Camera.current)
 	else
-		love.graphics.rectangle("line", x, y, hw*2, hh*2)
+		local r = self.hitRadius * Camera.current.zoom
+		local objX, objY = self:toWorld(0, 0)
+		local scrnX, scrnY = Camera.current:worldToScreen(objX, objY)
+		local lx, ly = scrnX, scrnY
+
+		local hw, hh = r*sx + pad, r*sy + pad
+		local x, y = lx - hw, ly - hh
+
+		if angle ~= 0 then
+			drawRotatedRectangle("line", x, y, hw*2, hh*2, angle)
+		else
+			love.graphics.rectangle("line", x, y, hw*2, hh*2)
+		end
 	end
 
 	love.graphics.setLineWidth(1)
+	love.graphics.pop()
 end
 
 return EditorObject

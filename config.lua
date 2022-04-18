@@ -18,8 +18,8 @@ M.yAxisColor = { 0.4, 0.8, 0.4, 0.4 }
 M.hoverHighlightColor = {1, 0.9, 0.8, 1}
 M.selectedHighlightColor = {0.9, 0.5, 0.0, 0.9}
 M.latestSelectedHighlightColor = {1, 0.9, 0.45, 1}
-M.highlightLineWidth = 3
-M.highlightPadding = 3
+M.highlightLineWidth = 2
+M.highlightPadding = -1 -- Half of line width, so outer edge of line matches bounds.
 
 M.parentLineColor = {0, 1, 1, 0.3}
 M.parentLineLenFrac = 0.95
