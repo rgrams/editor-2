@@ -12,6 +12,9 @@ local list = require "lib.list"
 Tool.boxSelectAddKey = "shift"
 Tool.boxSelectToggleKey = "ctrl"
 Tool.boxSelectSubtractKey = "alt"
+Tool.cornerHandleSize = 8
+Tool.edgeHandleSize = 6
+Tool.pivotRadius = 4
 
 function Tool.set(self, ruu)
 	Tool.super.set(self, 1, 1, "C", "C", "fill")
@@ -240,6 +243,23 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 	end
 end
 
+local function addAABBs(enclosures)
+	local inf = math.huge
+	local lt, top, rt, bot = inf, inf, -inf, -inf
+	for i,enclosure in ipairs(enclosures) do
+		local obj = enclosure[1]
+		lt = math.min(lt, obj.AABB.lt)
+		top = math.min(top, obj.AABB.top)
+		rt = math.max(rt, obj.AABB.rt)
+		bot = math.max(bot, obj.AABB.bot)
+	end
+	return lt, top, rt, bot
+end
+
+local function centeredRect(mode, cx, cy, w, h)
+	love.graphics.rectangle(mode, cx-w/2, cy-w/2, w, h)
+end
+
 function Tool.draw(self)
 	if self.isBoxSelecting then
 		local sx1, sy1 = Camera.current:worldToScreen(self.dragStartX, self.dragStartY)
@@ -252,6 +272,36 @@ function Tool.draw(self)
 		love.graphics.rectangle("line", lx1, ly1, sw, sh)
 		love.graphics.setColor(col[1], col[2], col[3], 0.02)
 		love.graphics.rectangle("fill", lx1, ly1, sw, sh)
+	end
+
+	if scenes.active and scenes.active.selection[1] then
+		local lt, top, rt, bot = addAABBs(scenes.active.selection)
+		lt, top = self:toLocal( Camera.current:worldToScreen(lt, top) )
+		rt, bot = self:toLocal( Camera.current:worldToScreen(rt, bot) )
+
+		local w, h = rt - lt, bot - top
+		local cx, cy = lt + w/2, top + h/2
+
+		love.graphics.setColor(1, 1, 1, 0.1)
+		love.graphics.rectangle("line", lt, top, w, h)
+
+		local size = self.cornerHandleSize
+		centeredRect("line", lt, top, size, size)
+		centeredRect("line", rt, top, size, size)
+		centeredRect("line", rt, bot, size, size)
+		centeredRect("line", lt, bot, size, size)
+
+		size = self.edgeHandleSize
+		centeredRect("line", cx, top, size, size)
+		centeredRect("line", cx, bot, size, size)
+		centeredRect("line", rt, cy, size, size)
+		centeredRect("line", lt, cy, size, size)
+
+		local r = self.pivotRadius
+		love.graphics.circle("line", cx, cy, r, 12)
+		local r2 = r*2
+		love.graphics.line(cx - r2, cy, cx + r2, cy)
+		love.graphics.line(cx, cy - r2, cx, cy + r2)
 	end
 end
 
