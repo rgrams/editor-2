@@ -10,6 +10,8 @@ local function copyChildrenData(children)
 		if child then
 			-- Copy object data:
 			local data = {}
+			local Class = getmetatable(child)
+			data.class = Class.displayName
 			for _,property in ipairs(child.properties) do
 				data[property.name] = property:copyValue()
 			end

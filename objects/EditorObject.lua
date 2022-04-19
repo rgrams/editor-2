@@ -4,6 +4,7 @@ EditorObject.className = "EditorObject"
 
 local config = require "config"
 
+EditorObject.displayName = "Object"
 EditorObject.hitRadius = 16
 
 local Position = require "objects.properties.Position"
