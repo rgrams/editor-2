@@ -64,6 +64,9 @@ function Property.getValue(self)
 	return self.isOnObject and self.obj[self.name] or self.value
 end
 
+Property.copyValue = Property.getValue -- These will be separate for vector/table properties
+Property.setFromCopy = Property.setValue
+
 local _printStr = "(Prop[%s]: '%s', %s)"
 
 function Property.__tostring(self)

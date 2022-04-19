@@ -42,6 +42,15 @@ function Vec2Property.getValue(self)
 	return value.x, value.y
 end
 
+function Vec2Property.copyValue(self)
+	local x, y = self:getValue()
+	return { x = x, y = y }
+end
+
+function Vec2Property.setFromCopy(self, value)
+	self:setValue(value.x, value.y)
+end
+
 local _printStr = "(Prop[%s]: '%s', (%.3f, %.3f))"
 
 function Vec2Property.__tostring(self)
