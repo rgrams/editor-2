@@ -4,6 +4,7 @@ Dropdown.className = "Dropdown"
 
 local Ruu = require "ui.ruu.ruu"
 local Button = require "ui.widgets.Button"
+local menuBtnTheme = require "ui.widgets.themes.menu-button"
 
 local spacing = 1
 local pad = 2
@@ -20,6 +21,7 @@ function Dropdown.set(self, x, y, returnFn, btnTexts)
 	local maxX, maxY = winW - width, winH - height
 	x = math.max(minX, math.min(x, maxX))
 	y = math.max(minY, math.min(y, maxY))
+	x, y = math.floor(x), math.floor(y)
 	self:setPos(x, y)
 
 	self.returnFn = returnFn
@@ -31,12 +33,10 @@ function Dropdown.set(self, x, y, returnFn, btnTexts)
 end
 
 function Dropdown.init(self)
-	Dropdown.super.init(self)
-
 	-- Initialize Ruu stuff.
 	local wgtMap = {}
 	for i,btn in ipairs(self.children) do
-		local wgt = self.ruu:Button(btn, self.buttonClicked)
+		local wgt = self.ruu:Button(btn, self.buttonClicked, menuBtnTheme)
 		btn.widget = wgt
 		wgt:args(self, btn, wgt)
 		table.insert(wgtMap, { wgt })
@@ -44,6 +44,7 @@ function Dropdown.init(self)
 	self.ruu:mapNeighbors(wgtMap)
 	self.ruu:setFocus(self.children[1].widget)
 
+	Dropdown.super.init(self)
 	Input.enable(self)
 end
 
@@ -84,8 +85,10 @@ function Dropdown.input(self, action, value, change, ...)
 end
 
 function Dropdown.draw(self)
-	love.graphics.setColor(0.2, 0.2, 0.2, 1)
 	local w, h = self.w, self.h
+	love.graphics.setColor(0, 0, 0, 1)
+	love.graphics.rectangle("line", -w/2, -h/2, w, h)
+	love.graphics.setColor(0.2, 0.2, 0.2, 1)
 	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
 end
 
