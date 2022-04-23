@@ -77,11 +77,11 @@ function EditorObject.updateAABB(self)
 	end
 end
 
-function EditorObject.setProperty(self, name, ...)
+function EditorObject.setProperty(self, name, value)
 	local props = self.properties
 	for i,prop in ipairs(props) do
 		if prop.name == name then
-			prop:setValue(...)
+			prop:setValue(value)
 			return true
 		end
 	end
@@ -123,10 +123,10 @@ end
 function EditorObject.getModifiedProperties(self)
 	local properties
 	for i,prop in ipairs(self.properties) do
-		local values = { prop:getDiff() }
-		if values[1] then
+		local value = prop:getDiff()
+		if value then
 			properties = properties or {}
-			properties[prop.name] = values
+			properties[prop.name] = value
 		end
 	end
 	return properties

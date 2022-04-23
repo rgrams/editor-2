@@ -6,10 +6,10 @@ local Position = Vec2Property:extend()
 
 Position.name = "pos"
 Position.displayName = "Position"
-Position.isOnObject = true
 
-function Position.setOnObject(self)
-	self.obj:setPosition(self.value)
+function Position._setValidValue(self, value)
+	self.value = value
+	self.obj:setPosition(value)
 end
 
 return Position

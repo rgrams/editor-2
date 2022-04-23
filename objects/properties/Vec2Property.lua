@@ -18,44 +18,35 @@ function Vec2Property.getDefaultValue(self)
 end
 
 function Vec2Property.getDiff(self)
-	local curX, curY = self:getValue()
 	local default = self.DEFAULT_VALUE
-	local dx, dy = curX - default.x, curY - default.y
+	local dx, dy = self.value.x - default.x, self.value.y - default.y
 	if dx ~= 0 or dy ~= 0 then
-		return dx, dy
+		return { x = dx, y = dy }
 	end
 end
 
-function Vec2Property.isValid(self, x, y)
-	x, y = tonumber(x), tonumber(y)
+function Vec2Property.isValid(self, value)
+	local x, y = tonumber(value.x), tonumber(value.y)
 	if not (x or y) then
 		return false, "Property.setValue: Invalid vec2: '("..tostring(x)..", "..tostring(y)..")'. At least 'x' or 'y' must be a number."
 	end
-	local value = self.isOnObject and self.obj[self.name] or self.value
-	if x then  value.x = x  end
-	if y then  value.y = y  end
+	if not x then  value.x = self.value.x  end
+	if not y then  value.y = self.value.y  end
 	return value
 end
 
-function Vec2Property.getValue(self)
-	local value = self.isOnObject and self.obj[self.name] or self.value
-	return value.x, value.y
+function Vec2Property._setValidValue(self, value)
+	self.value.x, self.value.y = value.x, value.y
 end
 
 function Vec2Property.copyValue(self)
-	local x, y = self:getValue()
-	return { x = x, y = y }
-end
-
-function Vec2Property.setFromCopy(self, value)
-	self:setValue(value.x, value.y)
+	return { x = self.value.x, y = self.value.y }
 end
 
 local _printStr = "(Prop[%s]: '%s', (%.3f, %.3f))"
 
 function Vec2Property.__tostring(self)
-	local value = (self.isOnObject and self.obj) and self.obj[self.name] or self.value
-	value = value or self.DEFAULT_VALUE
+	local value = self.value or self.DEFAULT_VALUE -- So we can print the Class which has no `value`.
 	return _printStr:format(self.type, self.name, value.x, value.y)
 end
 

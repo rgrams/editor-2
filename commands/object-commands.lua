@@ -25,7 +25,7 @@ return {
 	setProperty = { Obj.setProperty, Obj.setProperty },
 	setSamePropertyOnMultiple = { Obj.setSamePropertyOnMultiple, Obj.setMultiPropertiesOnMultiple },
 	setMultiPropertiesOnMultiple = { Obj.setMultiPropertiesOnMultiple, Obj.setMultiPropertiesOnMultiple },
-	offsetPropertyOnMultiple = { Obj.offsetPropertyOnMultiple, Obj.setMultiPropertiesOnMultiple },
+	offsetVec2PropertyOnMultiple = { Obj.offsetVec2PropertyOnMultiple, Obj.setMultiPropertiesOnMultiple },
 	cut = { cut, Obj.addObjects },
 	paste = { Obj.paste, deleteObjects }
 }

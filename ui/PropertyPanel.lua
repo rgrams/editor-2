@@ -22,9 +22,9 @@ function PropertyPanel.set(self, ruu)
 	self.wgtMap = {}
 end
 
-local function addPropertyWidget(self, selection, PropertyClass, ...)
+local function addPropertyWidget(self, selection, PropertyClass, value)
 	local Class = propWidget[PropertyClass.type]
-	local object = Class(PropertyClass.name, ...)
+	local object = Class(PropertyClass.name, value)
 	object.PropertyClass = PropertyClass
 	self.tree:add(object, self)
 	object:setSelection(selection)
@@ -49,18 +49,18 @@ function PropertyPanel.updateProperties(self, selection)
 	end
 
 	-- Get list of properties that all objects have in common.
-	-- Need properties and values.
+	-- Need properties and value.
 	local commonProperties = {
 		includes = {} -- Lookup table by class.
-		-- { Class = , values = { ... } }
+		-- { Class = , value = value }
 	}
 
 	-- Copy property list from the first object.
 	local firstObj = selection[1][1]
 	for i,property in ipairs(firstObj.properties) do
 		local PropertyClass = getmetatable(property)
-		local values = { property:getValue() }
-		table.insert(commonProperties, { Class = PropertyClass, values = values })
+		local value = property:getValue()
+		table.insert(commonProperties, { Class = PropertyClass, value = value })
 		commonProperties.includes[PropertyClass] = 1
 	end
 
@@ -88,7 +88,7 @@ function PropertyPanel.updateProperties(self, selection)
 	end
 
 	for i,propData in ipairs(commonProperties) do
-		addPropertyWidget(self, selection, propData.Class, unpack(propData.values))
+		addPropertyWidget(self, selection, propData.Class, propData.value)
 	end
 	self.ruu:mapNextPrev(self.wgtMap)
 end

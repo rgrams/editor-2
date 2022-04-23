@@ -92,12 +92,12 @@ function Tool.drag(wgt, dx, dy, dragType)
 		if not self.startedDragCommand then
 			self.startedDragCommand = true
 			local enclosures = scene.selection:copyList()
-			scene.history:perform("offsetPropertyOnMultiple", enclosures, "pos", wdx, wdy)
+			scene.history:perform("offsetVec2PropertyOnMultiple", enclosures, "pos", wdx, wdy)
 			self:updatePropertiesPanel()
 		else
 			-- TODO: Make sure the last command in the history is still ours.
 			local enclosures = scene.selection:copyList()
-			objectFn.offsetPropertyOnMultiple(enclosures, "pos", wdx, wdy)
+			objectFn.offsetVec2PropertyOnMultiple(enclosures, "pos", wdx, wdy)
 			local totalDX, totalDY = x - self.dragStartX, y - self.dragStartY
 			scene.history:update(enclosures, "pos", totalDX, totalDY)
 			self:updatePropertiesPanel()
@@ -140,7 +140,7 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 
 		if Input.isPressed("add") then
 			local wx, wy = Camera.current:screenToWorld(mx, my)
-			local properties = { pos = { wx, wy } }
+			local properties = { pos = { x = wx, y = wy } }
 			local scene = scenes.active
 			local Class = EditorObject
 			if scene.selection[1] then

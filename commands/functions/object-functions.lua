@@ -7,8 +7,8 @@ function M.add(scene, Class, enclosure, properties, isSelected, parentEnclosure,
 	object.enclosure = enclosure
 
 	if properties then
-		for name,values in pairs(properties) do
-			object:setProperty(name, unpack(values))
+		for name,value in pairs(properties) do
+			object:setProperty(name, value)
 		end
 	end
 
@@ -155,17 +155,17 @@ function M.paste(scene, parentEnclosures, copiedArgsList)
 	return scene, newEnclosures
 end
 
-function M.setProperty(enclosure, name, ...)
+function M.setProperty(enclosure, name, value)
 	local object = enclosure[1]
-	local oldValues = { object:getProperty(name) }
-	object:setProperty(name, ...)
-	return enclosure, name, unpack(oldValues)
+	local oldValue = object:getProperty(name)
+	object:setProperty(name, value)
+	return enclosure, name, oldValue
 end
 
-function M.setSamePropertyOnMultiple(enclosures, name, ...)
+function M.setSamePropertyOnMultiple(enclosures, name, value)
 	local undoArgList = {}
 	for i,enclosure in ipairs(enclosures) do
-		local undoArgs = { M.setProperty(enclosure, name, ...) }
+		local undoArgs = { M.setProperty(enclosure, name, value) }
 		table.insert(undoArgList, undoArgs)
 	end
 	return undoArgList
@@ -180,20 +180,15 @@ function M.setMultiPropertiesOnMultiple(argList)
 	return undoArgList
 end
 
-function M.offsetPropertyOnMultiple(enclosures, name, ...)
-	local deltas = { ... }
+function M.offsetVec2PropertyOnMultiple(enclosures, name, dx, dy)
+	dx, dy = dx or 0, dy or 0
 	local undoArgList = {}
 	for _,enclosure in ipairs(enclosures) do
 		local object = enclosure[1]
-		local oldValues = { object:getProperty(name) }
-		local newValues = {}
-		for i,oldValue in ipairs(oldValues) do
-			newValues[i] = oldValue + deltas[i]
-		end
-		object:setProperty(name, unpack(newValues))
-		local undoArgs = oldValues
-		table.insert(undoArgs, 1, name)
-		table.insert(undoArgs, 1, enclosure) -- { enclosure, name, ... }
+		local oldValue = object:getProperty(name)
+		local newValue = { x = oldValue.x + dx, y = oldValue.y + dy }
+		object:setProperty(name, newValue)
+		local undoArgs = { enclosure, name, oldValue }
 		table.insert(undoArgList, undoArgs)
 	end
 	return undoArgList

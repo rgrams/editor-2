@@ -13,7 +13,7 @@ local function copyChildrenData(children)
 			local Class = getmetatable(child)
 			data.class = Class.displayName
 			for _,property in ipairs(child.properties) do
-				data[property.name] = property:copyValue()
+				data[property.name] = property:getValue()
 			end
 			if child.children then
 				data.children = copyChildrenData(child.children)

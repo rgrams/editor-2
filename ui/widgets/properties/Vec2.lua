@@ -19,12 +19,12 @@ local function Sublabel(text)
 	return label
 end
 
-function Vec2.set(self, name, x, y)
+function Vec2.set(self, name, value)
 	Vec2.super.set(self, spacing, false, -1, width, height)
 	self:mode("fill", "none")
 	self.propertyName = name
-	self.xValue = x or 0
-	self.yValue = y or 0
+	self.xValue = value.x or 0
+	self.yValue = value.y or 0
 	self.children = {
 		gui.Text(name, font, width, "W", "W", "left"):setPos(2),
 		Sublabel("x"),
@@ -60,7 +60,7 @@ function Vec2.onConfirm(self, wgt, axis)
 		local x, y = false, false -- Can't have nil values in command args.
 		if axis == "x" then  x = value
 		else  y = value  end
-		scene.history:perform(cmd, enclosures, self.propertyName, x, y)
+		scene.history:perform(cmd, enclosures, self.propertyName, { x = x, y = y })
 	end
 end
 

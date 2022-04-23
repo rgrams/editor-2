@@ -5,30 +5,11 @@ local Property = Class:extend()
 Property.type = "float"
 Property.name = "property"
 Property.displayName = "Property"
-Property.isOnObject = false
 Property.DEFAULT_VALUE = 0
 
-function Property.set(self, obj, isOnObject)
+function Property.set(self, obj)
 	self.obj = obj
-	self.isOnObject = isOnObject
-	if self.isOnObject then
-		self.value = self:getFromObject()
-	else
-		self.value = self:getDefaultValue()
-	end
-end
-
-function Property.getFromObject(self)
-	local val = self.obj[self.name]
-	if not val then
-		val = self:getDefaultValue()
-		self.obj[self.name] = val
-	end
-	return val
-end
-
-function Property.setOnObject(self)
-	self.obj[self.name] = self.value
+	self.value = self:getDefaultValue()
 end
 
 function Property.getDefaultValue(self)
@@ -49,29 +30,24 @@ function Property.isValid(self, value)
 	return validValue, errMsg
 end
 
-function Property.setValue(self, ...)
-	local validValue, errMsg = self:isValid(...)
+function Property.setValue(self, value)
+	local validValue, errMsg = self:isValid(value)
 	if not validValue then
 		return errMsg
 	end
-	self.value = validValue
-	if self.isOnObject then
-		self:setOnObject()
-	end
+	self:_setValidValue(validValue)
 end
 
 function Property.getValue(self)
-	return self.isOnObject and self.obj[self.name] or self.value
+	return self.value
 end
 
 Property.copyValue = Property.getValue -- These will be separate for vector/table properties
-Property.setFromCopy = Property.setValue
 
 local _printStr = "(Prop[%s]: '%s', %s)"
 
 function Property.__tostring(self)
-	local value = (self.isOnObject and self.obj) and self.obj[self.name] or self.value
-	value = value or self.DEFAULT_VALUE
+	local value = self.value or self.DEFAULT_VALUE -- So we can print the Class which has no `value`.
 	return _printStr:format(self.type, self.name, tostring(value))
 end
 

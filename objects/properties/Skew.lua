@@ -6,15 +6,10 @@ local Skew = Vec2Property:extend()
 
 Skew.name = "skew"
 Skew.displayName = "Skew"
-Skew.isOnObject = true
 
-function Skew.getFromObject(self)
-	local kx, ky = self.obj.kx, self.obj.ky
-	return { x = kx, y = ky }
-end
-
-function Skew.setOnObject(self)
-	self.obj:setSkew(self.value.x, self.value.y)
+function Skew._setValidValue(self, value)
+	self.value = value
+	self.obj:setSkew(value.x, value.y)
 end
 
 return Skew
