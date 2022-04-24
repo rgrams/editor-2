@@ -19,7 +19,6 @@ function Viewport.set(self, ruu)
 	self.widget.scroll = Viewport.scroll
 	self.widget.ruuInput = Viewport.ruuInput
 	self.widget.drag = Viewport.drag
-	ruu.isHoverAction["pan camera"] = true
 	self.children = {
 		Tool(ruu)
 	}

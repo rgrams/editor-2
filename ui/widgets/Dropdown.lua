@@ -10,8 +10,8 @@ local spacing = 1
 local pad = 2
 local width = Button.width + pad*2
 
-function Dropdown.set(self, x, y, returnFn, btnTexts)
-	local height = #btnTexts * (Button.height + spacing) - spacing + pad*2
+function Dropdown.set(self, x, y, items)
+	local height = #items * (Button.height + spacing) - spacing + pad*2
 	Dropdown.super.set(self, spacing, false, -1, width, height, "NW", "NW")
 	self:pad(pad, pad)
 
@@ -24,11 +24,11 @@ function Dropdown.set(self, x, y, returnFn, btnTexts)
 	x, y = math.floor(x), math.floor(y)
 	self:setPos(x, y)
 
-	self.returnFn = returnFn
+	self.items = items -- item = { text=, fn=, args= }
 	self.ruu = Ruu()
 	self.children = {}
-	for i,text in ipairs(btnTexts) do
-		self:addButtonObject(text)
+	for i,item in ipairs(items) do
+		self:addButtonObject(item.text)
 	end
 end
 
@@ -36,9 +36,9 @@ function Dropdown.init(self)
 	-- Initialize Ruu stuff.
 	local wgtMap = {}
 	for i,btn in ipairs(self.children) do
-		local wgt = self.ruu:Button(btn, self.buttonClicked, menuBtnTheme)
+		local wgt = self.ruu:Button(btn, self.confirm, menuBtnTheme)
 		btn.widget = wgt
-		wgt:args(self, btn, wgt)
+		wgt:args(self, btn, wgt, self.items[i])
 		table.insert(wgtMap, { wgt })
 	end
 	self.ruu:mapNeighbors(wgtMap)
@@ -57,14 +57,10 @@ function Dropdown.addButtonObject(self, btnText)
 	table.insert(self.children, btn)
 end
 
-function Dropdown.buttonClicked(self, btn, wgt)
-	self:confirm(btn.text.text)
-end
-
-function Dropdown.confirm(self, text)
+function Dropdown.confirm(self, btn, wgt, item)
 	self:close()
-	if self.returnFn then
-		self.returnFn(text)
+	if item.fn then
+		item.fn(unpack(item.args))
 	end
 end
 

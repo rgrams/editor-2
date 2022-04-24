@@ -33,6 +33,14 @@ function love.load()
 	local config = require "config"
 	love.graphics.setBackgroundColor(config.viewportBackgroundColor)
 
+	-- Load editor object classes.
+	for i,filename in ipairs(love.filesystem.getDirectoryItems("objects")) do
+		local info = love.filesystem.getInfo("objects/"..filename)
+		if info and info.type == "file" and filename:sub(-4) == ".lua" then
+			require("objects."..filename:sub(1, -5))
+		end
+	end
+
 	scene = SceneTree(layers, defaultLayer)
 
 	scene:add(mod(Camera(0, 0, 0, {800,600}, "expand view"), {name="MyCamera"}))

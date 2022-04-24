@@ -8,7 +8,7 @@ local classList = require "objects.class-list"
 EditorObject.displayName = "Object"
 EditorObject.hitRadius = 16
 
-classList[EditorObject.displayName] = EditorObject
+classList.add(EditorObject.displayName, EditorObject)
 
 local Position = require "objects.properties.Position"
 local Angle = require "objects.properties.Angle"

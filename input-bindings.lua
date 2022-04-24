@@ -2,6 +2,7 @@
 return {
 	{ "cursor", "mouse moved" },
 	{ "button", "M:1", "click", true },
+	{ "button", "M:2", "right click", true },
 	{ "button", "M:3", "pan camera", true },
 	{ "button", "M:wheely+", "zoom camera" },
 	{ "button", "M:wheely-", "zoom camera" },
@@ -28,7 +29,8 @@ return {
 	{ "button", "lshift", "selection modifier", true },
 	{ "button", "rshift", "selection modifier", true },
 
-	{ "button", "a", "add" },
+	{ "button", "a", "add modifier" },
+	{ "button", "shift a", "add" },
 	{ "button", "ctrl z", "undo" },
 	{ "button", "ctrl shift z", "redo" },
 	{ "button", "ctrl x", "cut" },

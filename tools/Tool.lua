@@ -8,6 +8,8 @@ local EditorObject = require "objects.EditorObject"
 local objectFn = require "commands.functions.object-functions"
 local modkeys = require "modkeys"
 local list = require "lib.list"
+local Dropdown = require "ui.widgets.Dropdown"
+local classList = require "objects.class-list"
 
 Tool.boxSelectAddKey = "shift"
 Tool.boxSelectToggleKey = "ctrl"
@@ -25,6 +27,7 @@ function Tool.set(self, ruu)
 	self.widget.press = self.press
 	self.widget.release = self.release
 	self.widget.drag = self.drag
+	self.lastAddClass = EditorObject
 end
 
 function Tool.init(self)
@@ -133,22 +136,27 @@ function Tool.drag(wgt, dx, dy, dragType)
 	end
 end
 
+function Tool.addAt(self, Class, wx, wy)
+	self.lastAddClass = Class
+	local properties = { pos = { x = wx, y = wy } }
+	local scene = scenes.active
+	if scene.selection[1] then
+		local parentEnclosures = scene.selection:copyList()
+		scene.history:perform("addObjectToMultiple", scene, parentEnclosures, Class, properties, false, false)
+	else
+		scene.history:perform("addObject", scene, Class, {}, properties, false, false)
+	end
+end
+
 function Tool.press(wgt, depth, mx, my, isKeyboard)
 	if depth ~= 1 then  return  end
 	if scenes.active and not isKeyboard then
 		local self = wgt.object
 
-		if Input.isPressed("add") then
+		if Input.isPressed("add modifier") then
 			local wx, wy = Camera.current:screenToWorld(mx, my)
-			local properties = { pos = { x = wx, y = wy } }
-			local scene = scenes.active
-			local Class = EditorObject
-			if scene.selection[1] then
-				local parentEnclosures = scene.selection:copyList()
-				scene.history:perform("addObjectToMultiple", scene, parentEnclosures, Class, properties, false, false)
-			else
-				scene.history:perform("addObject", scene, Class, {}, properties, false, false)
-			end
+			wgt.object:addAt(self.lastAddClass, wx, wy)
+
 		elseif self.hoverObj then
 			local shouldToggle = modkeys.isPressed("shift")
 			local isSelected = self.hoverObj.isSelected
@@ -240,6 +248,20 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 				end
 			end
 		end
+	elseif action == "add" and change == 1 then
+		local self = wgt.object
+		local items = {}
+		local fn = self.addAt
+		local mx, my = love.mouse.getPosition()
+		local wx, wy = Camera.current:screenToWorld(mx, my)
+		for i,Class in ipairs(classList) do
+			local name = classList.getName(Class)
+			local item = { text = name, fn = fn, args = {self, Class, wx, wy} }
+			table.insert(items, item)
+		end
+		local dropdown = Dropdown(mx, my, items)
+		local guiRoot = self.tree:get("/Window")
+		self.tree:add(dropdown, guiRoot)
 	end
 end
 

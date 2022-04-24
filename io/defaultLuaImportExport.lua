@@ -45,7 +45,7 @@ function M.export(scene, filepath, options)
 end
 
 local function makeAddObjArgs(scene, obj, parentEnclosure)
-	local Class = classList[obj.class]
+	local Class = classList.get(obj.class)
 	local enclosure = {}
 	local properties = {}
 	for name,value in pairs(obj) do
