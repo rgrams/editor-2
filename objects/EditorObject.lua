@@ -3,9 +3,12 @@ local EditorObject = Object:extend()
 EditorObject.className = "EditorObject"
 
 local config = require "config"
+local classList = require "objects.class-list"
 
 EditorObject.displayName = "Object"
 EditorObject.hitRadius = 16
+
+classList[EditorObject.displayName] = EditorObject
 
 local Position = require "objects.properties.Position"
 local Angle = require "objects.properties.Angle"

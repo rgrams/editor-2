@@ -34,21 +34,20 @@ function UI.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
 		scenes.active.history:redo()
 		wgt.object.propertyPanel:updateProperties(scenes.active.selection)
 	elseif action == "export" and change == 1 then
-		print("export")
 		if scenes.active then
 			local outputPath = love.filesystem.getSourceBaseDirectory() .. "/editor-2/output_test.lua"
-			print(outputPath)
-			local file, errMsg = io.open(outputPath, "w")
-			if not file then
-				print(errMsg)
-				return
-			end
 
 			local exporter = require "io.defaultLuaImportExport"
-			exporter.export(scenes.active, file)
-
-			file:close()
+			exporter.export(scenes.active, outputPath)
 		end
+	end
+end
+
+function love.filedropped(file)
+	if scenes.active then
+		local filepath = file:getFilename()
+		local importer = require "io.defaultLuaImportExport"
+		importer.import(scenes.active, filepath)
 	end
 end
 
