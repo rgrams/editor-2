@@ -7,7 +7,7 @@ local Angle = Property:extend()
 Angle.name = "angle"
 Angle.displayName = "Angle"
 
-function Property.set(self, obj)
+function Angle.set(self, obj)
 	self.obj = obj
 	self.value = obj.angle
 end
