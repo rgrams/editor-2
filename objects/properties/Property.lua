@@ -38,6 +38,10 @@ function Property.setValue(self, value)
 	self:_setValidValue(validValue)
 end
 
+function Property._setValidValue(self, value)
+	self.value = value
+end
+
 function Property.getValue(self)
 	return self.value
 end
