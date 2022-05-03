@@ -6,6 +6,7 @@ local headerFont = { "assets/font/OpenSans-Semibold.ttf", 17 }
 local propWidget = {
 	float = require "ui.widgets.properties.Float",
 	vec2 = require "ui.widgets.properties.Vec2",
+	file = require "ui.widgets.properties.File",
 }
 
 local spacing = 2

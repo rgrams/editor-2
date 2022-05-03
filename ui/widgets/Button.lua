@@ -6,10 +6,12 @@ Button.font = {"assets/font/OpenSans-Semibold.ttf", 15}
 Button.width = 96
 Button.height = 24
 
-function Button.set(self, text)
-	Button.super.set(self, self.width, self.height)
+function Button.set(self, text, width, textAlign)
+	width = width or self.width
+	textAlign = textAlign or "left"
+	Button.super.set(self, width, self.height)
 	self.children = {
-		gui.Text(text or "text", self.font, self.width-6, "C", "C", "left"):setPos(0, -1)
+		gui.Text(text or "text", self.font, width-6, "C", "C", textAlign):setPos(0, -1)
 	}
 	self.text = self.children[1]
 	self.text.color = {0, 0, 0, 1}
