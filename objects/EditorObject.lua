@@ -78,6 +78,15 @@ function EditorObject.updateAABB(self)
 		AABB.w, AABB.h = hw*2, hh*2
 		AABB.lt, AABB.top, AABB.rt, AABB.bot = x - hw, y - hh, x + hw, y + hh
 	end
+
+	if self.children then
+		for i=1,self.children.maxn do
+			local child = self.children[i]
+			if child then
+				child:updateAABB()
+			end
+		end
+	end
 end
 
 function EditorObject.setProperty(self, name, value)
