@@ -30,11 +30,11 @@ function EditorObject.set(self, x, y, angle, ...)
 end
 
 function EditorObject.init(self)
-	self:updateTransform()
 	self:updateAABB()
 end
 
 function EditorObject.updateAABB(self)
+	if self.parent then  self:updateTransform()  end
 	local r = self.hitRadius
 	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
 	local AABB = self.AABB
@@ -102,25 +102,21 @@ end
 
 function EditorObject.setPosition(self, pos)
 	self.pos = pos
-	if self.parent then  self:updateTransform()  end
 	self:updateAABB()
 end
 
 function EditorObject.setAngle(self, angle)
 	self.angle = angle
-	if self.parent then  self:updateTransform()  end
 	self:updateAABB()
 end
 
 function EditorObject.setScale(self, sx, sy)
 	self.sx, self.sy = sx, sy
-	if self.parent then  self:updateTransform()  end
 	self:updateAABB()
 end
 
 function EditorObject.setSkew(self, kx, ky)
 	self.kx, self.ky = kx, ky
-	if self.parent then  self:updateTransform()  end
 	self:updateAABB()
 end
 
