@@ -36,5 +36,6 @@ return {
 	{ "button", "ctrl x", "cut" },
 	{ "button", "ctrl c", "copy" },
 	{ "button", "ctrl v", "paste" },
-	{ "button", "ctrl e", "export" },
+	{ "button", "ctrl s", "save" },
+	{ "button", "ctrl o", "open" },
 }
