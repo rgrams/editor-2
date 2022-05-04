@@ -3,7 +3,7 @@ local M = {}
 
 M.zoomRate = 0.1
 
-M.translateSnapIncrement = 4
+M.translateSnapIncrement = 8
 M.gridPower = 2
 M.gridEmphasizeEvery = 4
 

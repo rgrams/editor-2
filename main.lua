@@ -1,5 +1,6 @@
 
 require "philtre.init"
+require "philtre.lib.math-patch"
 _G.gui = require "philtre.objects.gui.all"
 _G.vec2 = require "philtre.lib.vec2xy"
 _G.scene_clipboard = nil

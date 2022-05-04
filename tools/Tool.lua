@@ -17,6 +17,10 @@ Tool.boxSelectSubtractKey = "alt"
 Tool.cornerHandleSize = 8
 Tool.edgeHandleSize = 6
 Tool.pivotRadius = 4
+Tool.snapKey = "ctrl"
+Tool.snapX = config.translateSnapIncrement
+Tool.snapY = config.translateSnapIncrement
+Tool.dragInWorldSpace = true
 
 function Tool.set(self, ruu)
 	Tool.super.set(self, 1, 1, "C", "C", "fill")
@@ -83,26 +87,78 @@ local function getBoxSelectMode(self)
 	return mode
 end
 
+local function getDragStartOffsets(inWorldSpace)
+	local scene = scenes.active
+	local dragStartOffsets = {}
+	local enclosures
+	if inWorldSpace then
+		enclosures = scene.selection:copyList()
+		objectFn.removeDescendantsFromList(enclosures)
+	else
+		enclosures = scene.selection
+	end
+	for i,enclosure in ipairs(enclosures) do
+		local obj = enclosure[1]
+		local x, y
+		if inWorldSpace then
+			x, y = obj._to_world.x, obj._to_world.y
+		else
+			x, y = obj.pos.x, obj.pos.y
+		end
+		dragStartOffsets[i] = {
+			enclosure = enclosure,
+			startX = x,
+			startY = y
+		}
+	end
+	return dragStartOffsets
+end
+
+local function getDragArgList(startOffsets, dx, dy, inWorldSpace, rx, ry)
+	local argList = {}
+	local shouldRound = rx and ry
+	for i,data in ipairs(startOffsets) do
+		local _x = data.startX + dx
+		local _y = data.startY + dy
+		if inWorldSpace then
+			local obj = data.enclosure[1]
+			_x, _y = obj.parent:toLocal(_x, _y)
+		end
+		if shouldRound then
+			_x, _y = math.round(_x, rx), math.round(_y, ry)
+		end
+		local args = { data.enclosure, "pos", { x = _x, y = _y } }
+		argList[i] = args
+	end
+	return argList
+end
+
 function Tool.drag(wgt, dx, dy, dragType)
 	local self = wgt.object
 	local scene = scenes.active
 
 	local x, y = Camera.current:screenToWorld(self.ruu.mx, self.ruu.my)
-	local wdx, wdy = x - self.lastDragX, y - self.lastDragY
 	self.lastDragX, self.lastDragY = x, y
 
 	if dragType == "drag selection" then
+		local totalDX, totalDY = x - self.dragStartX, y - self.dragStartY
+		local inWorldSpace = self.dragInWorldSpace
+		local roundX, roundY
+		if modkeys.isPressed(self.snapKey) then
+			roundX, roundY = self.snapX, self.snapY
+		end
+
 		if not self.startedDragCommand then
 			self.startedDragCommand = true
-			local enclosures = scene.selection:copyList()
-			scene.history:perform("offsetVec2PropertyOnMultiple", enclosures, "pos", wdx, wdy)
+			self.dragStartOffsets = getDragStartOffsets(inWorldSpace)
+			local argList = getDragArgList(self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
+			scene.history:perform("setMultiPropertiesOnMultiple", argList)
 			self:updatePropertiesPanel()
 		else
 			-- TODO: Make sure the last command in the history is still ours.
-			local enclosures = scene.selection:copyList()
-			objectFn.offsetVec2PropertyOnMultiple(enclosures, "pos", wdx, wdy)
-			local totalDX, totalDY = x - self.dragStartX, y - self.dragStartY
-			scene.history:update(enclosures, "pos", totalDX, totalDY)
+			local argList = getDragArgList(self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
+			objectFn.setMultiPropertiesOnMultiple(argList)
+			scene.history:update(argList)
 			self:updatePropertiesPanel()
 		end
 
