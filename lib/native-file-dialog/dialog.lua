@@ -30,7 +30,7 @@ ffi.cdef[[
 
 local dialog = {}
 
-function dialog.save(filters, default_path)
+function dialog.save(default_path, filters)
 	local out_path = ffi.new 'char*[1]'
 	local r = nfd.NFD_SaveDialog(filters, default_path, out_path)
 	if r == nfd.NFD_OKAY then
@@ -44,7 +44,7 @@ function dialog.save(filters, default_path)
 	return nil
 end
 
-function dialog.open(filters, default_path, isOpenMultiple)
+function dialog.open(default_path, isOpenMultiple, filters)
 	local out_path = ffi.new 'char*[1]'
 	local r = nfd.NFD_OpenDialog(filters, default_path, out_path)
 	if r == nfd.NFD_OKAY then
