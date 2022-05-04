@@ -26,13 +26,14 @@ end
 
 function Property.isValid(self, value)
 	local validValue = tonumber(value)
+	local isValid = validValue
 	local errMsg = not validValue and "Property.setValue: Invalid value: "..tostring(value)..". Must be a number."
-	return validValue, errMsg
+	return isValid, validValue, errMsg
 end
 
 function Property.setValue(self, value)
-	local validValue, errMsg = self:isValid(value)
-	if not validValue then
+	local isValid, validValue, errMsg = self:isValid(value)
+	if not isValid then
 		return errMsg
 	end
 	self:_setValidValue(validValue)

@@ -13,9 +13,9 @@ function File.isValid(self, value)
 	local file, errMsg = io.open(value, "r")
 	if file then
 		file:close()
-		return value
+		return true, value
 	else
-		return nil, errMsg
+		return false, nil, errMsg
 	end
 end
 

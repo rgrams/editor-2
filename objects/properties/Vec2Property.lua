@@ -28,11 +28,11 @@ end
 function Vec2Property.isValid(self, value)
 	local x, y = tonumber(value.x), tonumber(value.y)
 	if not (x or y) then
-		return false, "Property.setValue: Invalid vec2: '("..tostring(x)..", "..tostring(y)..")'. At least 'x' or 'y' must be a number."
+		return false, nil, "Property.setValue: Invalid vec2: '("..tostring(x)..", "..tostring(y)..")'. At least 'x' or 'y' must be a number."
 	end
 	if not x then  value.x = self.value.x  end
 	if not y then  value.y = self.value.y  end
-	return value
+	return true, value
 end
 
 function Vec2Property._setValidValue(self, value)
