@@ -7,7 +7,8 @@ local config = require "config"
 local classList = require "objects.class-list"
 
 EditorSprite.displayName = "Sprite"
-EditorSprite.hitRadius = 16
+EditorObject.hitWidth = 32
+EditorObject.hitHeight = 32
 
 classList.add(EditorSprite.displayName, EditorSprite)
 
@@ -36,19 +37,24 @@ function EditorSprite.setImage(self, image)
 	self.image = image
 	if image then
 		local iw, ih = self.image:getDimensions()
+		self.hitWidth, self.hitHeight = iw, ih
 		self.ox, self.oy = -iw/2, -ih/2
+	else
+		self.hitWidth, self.hitHeight = 32, 32
 	end
 	if self.parent then  self:updateTransform()  end
 	self:updateAABB()
 end
 
 function EditorSprite.draw(self)
-	EditorSprite.super.draw(self)
-	love.graphics.circle("line", 0, 0, self.hitRadius/2, 8)
 	if self.image then
 		love.graphics.setColor(1, 1, 1)
 		love.graphics.draw(self.image, self.ox, self.oy)
+	else
+		love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
+		love.graphics.circle("line", 0, 0, self.hitWidth/4, 8)
 	end
+	EditorSprite.super.draw(self)
 end
 
 return EditorSprite

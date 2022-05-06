@@ -6,7 +6,8 @@ local config = require "config"
 local classList = require "objects.class-list"
 
 EditorObject.displayName = "Object"
-EditorObject.hitRadius = 16
+EditorObject.hitWidth = 32
+EditorObject.hitHeight = 32
 
 classList.add(EditorObject.displayName, EditorObject)
 
@@ -35,16 +36,16 @@ end
 
 function EditorObject.updateAABB(self)
 	if self.parent then  self:updateTransform()  end
-	local r = self.hitRadius
+	local hw, hh = self.hitWidth/2, self.hitHeight/2
 	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
 	local AABB = self.AABB
 
 	if kx ~= 0 or ky ~= 0 then
 		-- Need to do full transform of all 4 corners.
-		local x1, y1 = self:toWorld(-r, -r)
-		local x2, y2 = self:toWorld(r, -r)
-		local x3, y3 = self:toWorld(r, r)
-		local x4, y4 = self:toWorld(-r, r)
+		local x1, y1 = self:toWorld(-hw, -hh)
+		local x2, y2 = self:toWorld(hw, -hh)
+		local x3, y3 = self:toWorld(hw, hh)
+		local x4, y4 = self:toWorld(-hw, hh)
 		local left = math.min(x1, x2, x3, x4)
 		local top = math.min(y1, y2, y3, y4)
 		local right = math.max(x1, x2, x3, x4)
@@ -54,12 +55,12 @@ function EditorObject.updateAABB(self)
 		AABB.lt, AABB.top, AABB.rt, AABB.bot = left, top, right, bottom
 	elseif angle ~= 0 then
 		-- Just need to rotate and scale.
-		local hw, hh = r*sx, r*sy
+		local _hw, _hh = hw*sx, hh*sy
 		local x, y = self._to_world.x, self._to_world.y
-		local x1, y1 = vec2.rotate(-hw, -hh, angle)
-		local x2, y2 = vec2.rotate(hw, -hh, angle)
-		local x3, y3 = vec2.rotate(hw, hh, angle)
-		local x4, y4 = vec2.rotate(-hw, hh, angle)
+		local x1, y1 = vec2.rotate(-_hw, -_hh, angle)
+		local x2, y2 = vec2.rotate(_hw, -_hh, angle)
+		local x3, y3 = vec2.rotate(_hw, _hh, angle)
+		local x4, y4 = vec2.rotate(-_hw, _hh, angle)
 		x1, y1 = x + x1, y + y1
 		x2, y2 = x + x2, y + y2
 		x3, y3 = x + x3, y + y3
@@ -73,10 +74,10 @@ function EditorObject.updateAABB(self)
 		AABB.lt, AABB.top, AABB.rt, AABB.bot = left, top, right, bottom
 	else
 		-- Just need to scale.
-		local hw, hh = r*sx, r*sy
+		local _hw, _hh = hw*sx, hh*sy
 		local x, y = self._to_world.x, self._to_world.y
-		AABB.w, AABB.h = hw*2, hh*2
-		AABB.lt, AABB.top, AABB.rt, AABB.bot = x - hw, y - hh, x + hw, y + hh
+		AABB.w, AABB.h = _hw*2, _hh*2
+		AABB.lt, AABB.top, AABB.rt, AABB.bot = x - _hw, y - _hh, x + _hw, y + _hh
 	end
 
 	if self.children then
@@ -142,8 +143,8 @@ end
 
 function EditorObject.touchesPoint(self, wx, wy)
 	local lx, ly = self:toLocal(wx, wy)
-	local r = self.hitRadius
-	if lx >= -r and lx <= r and ly >= -r and ly <= r then
+	local hw, hh = self.hitWidth/2, self.hitHeight/2
+	if lx >= -hw and lx <= hw and ly >= -hh and ly <= hh then
 		return vec2.len2(lx, ly)
 	end
 end
@@ -151,19 +152,19 @@ end
 function EditorObject.draw(self)
 	love.graphics.setBlendMode("alpha")
 	local lineWidth = 1
-	local r = self.hitRadius - lineWidth/2
+	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2
 
 	if self.isHovered then
 		love.graphics.setColor(1, 1, 1, 0.03)
-		love.graphics.rectangle("fill", -r, -r, r*2, r*2)
+		love.graphics.rectangle("fill", -hw, -hh, hw*2, hh*2)
 	end
 
 	love.graphics.setColor(config.xAxisColor)
-	love.graphics.line(0, 0, r, 0)
+	love.graphics.line(0, 0, hw, 0)
 	love.graphics.setColor(config.yAxisColor)
-	love.graphics.line(0, 0, 0, -r)
-	love.graphics.setColor(0.5, 0.5, 0.5, 1)
-	love.graphics.rectangle("line", -r, -r, r*2, r*2)
+	love.graphics.line(0, 0, 0, -hh)
+	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
+	love.graphics.rectangle("line", -hw, -hh, hw*2, hh*2)
 	love.graphics.circle("line", 0, 0, 0.5, 4)
 
 	local children = self.children
@@ -207,11 +208,11 @@ local function drawSkewedRectangle(self, mode, pad, sx, sy, cam)
 	rtX, rtY = vec2.normalize(rtX - wx, rtY - wy)
 	upX, upY, rtX, rtY = upX*pad, upY*pad, rtX*pad, rtY*pad
 
-	local r = self.hitRadius
-	local x1, y1 = cam:worldToScreen( self:toWorld(-r, -r) )
-	local x2, y2 = cam:worldToScreen( self:toWorld(r, -r) )
-	local x3, y3 = cam:worldToScreen( self:toWorld(r, r) )
-	local x4, y4 = cam:worldToScreen( self:toWorld(-r, r) )
+	local hw, hh = self.hitWidth/2, self.hitHeight/2
+	local x1, y1 = cam:worldToScreen( self:toWorld(-hw, -hh) )
+	local x2, y2 = cam:worldToScreen( self:toWorld(hw, -hh) )
+	local x3, y3 = cam:worldToScreen( self:toWorld(hw, hh) )
+	local x4, y4 = cam:worldToScreen( self:toWorld(-hw, hh) )
 	x1, y1 = x1 - rtX - upX, y1 - rtY - upY
 	x2, y2 = x2 + rtX - upX, y2 + rtY - upY
 	x3, y3 = x3 + rtX + upX, y3 + rtY + upY
@@ -235,12 +236,13 @@ function EditorObject.drawSelectionHighlight(self, node)
 	if kx ~= 0 or ky ~= 0 then
 		drawSkewedRectangle(self, "line", pad, sx, sy, Camera.current)
 	else
-		local r = self.hitRadius * Camera.current.zoom
+		local zoom = Camera.current.zoom
+		local hw, hh = self.hitWidth/2 * zoom, self.hitHeight/2 * zoom
 		local objX, objY = self:toWorld(0, 0)
 		local scrnX, scrnY = Camera.current:worldToScreen(objX, objY)
 		local lx, ly = scrnX, scrnY
 
-		local hw, hh = r*sx + pad, r*sy + pad
+		hw, hh = hw*sx + pad, hh*sy + pad
 		local x, y = lx - hw, ly - hh
 
 		if angle ~= 0 then
