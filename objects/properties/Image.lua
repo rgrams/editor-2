@@ -16,7 +16,10 @@ Image.DEFAULT_VALUE = false
 -- NOTE: property `value` is the filepath. Store the actual image separately.
 
 function Image.isValid(self, filepath)
-	local image = imageCache[filepath] or fileUtil.loadImageFromAbsolutePath(filepath)
+	local image
+	if filepath then -- Can be false.
+		image = imageCache[filepath] or fileUtil.loadImageFromAbsolutePath(filepath)
+	end
 	if image then
 		imageCache[filepath] = image
 	end
