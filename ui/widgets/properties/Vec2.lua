@@ -22,6 +22,7 @@ end
 function Vec2.set(self, name, value)
 	Vec2.super.set(self, spacing, false, -1, width, height)
 	self:mode("fill", "none")
+	self.layer = "gui"
 	self.propertyName = name
 	self.xValue = value.x or 0
 	self.yValue = value.y or 0
@@ -66,22 +67,40 @@ end
 
 function Vec2.initRuu(self, ruu, map)
 	self.ruu = ruu
+	self.panel = self.ruu:Panel(self)
 	self.widgetX = self.ruu:InputField(self.fieldX, self.onConfirm, self.xValue)
 	self.widgetY = self.ruu:InputField(self.fieldY, self.onConfirm, self.yValue)
 	self.widgetX:args(self, self.widgetX, "x")
 	self.widgetY:args(self, self.widgetY, "y")
 	table.insert(map, self.widgetX)
 	table.insert(map, self.widgetY)
+	self.widgets = {
+		[self.widgetX] = true,
+		[self.widgetY] = true
+	}
 end
 
 function Vec2.destroyRuu(self, map)
-	self.ruu:destroy(self.widgetX)
-	self.ruu:destroy(self.widgetY)
+	self.ruu:destroy(self.panel) -- Panel is not in navigation map.
 	for i=#map,1,-1 do
 		local wgt = map[i]
-		if wgt == self.widgetX or wgt == self.widgetY then
+		if self.widgets[wgt] then
+			self.widgets[wgt] = nil
+			self.ruu:destroy(wgt)
 			table.remove(map, i)
+			if not next(self.widgets) then
+				break
+			end
 		end
+	end
+end
+
+function Vec2.draw(self)
+	if self.panel and self.panel.isFocused then
+		love.graphics.setColor(1, 1, 1, 0.5)
+		local lineWidth = 1
+		local w, h = self.w - lineWidth, self.h - lineWidth
+		love.graphics.rectangle("line", -w/2, -h/2, w, h)
 	end
 end
 

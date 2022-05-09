@@ -16,6 +16,7 @@ local dialogBtnWidth = 24
 function File.set(self, name, value)
 	File.super.set(self, spacing, false, -1, width, height)
 	self:mode("fill", "none")
+	self.layer = "gui"
 	self.propertyName = name
 	self.value = value or ""
 
@@ -61,6 +62,7 @@ end
 
 function File.initRuu(self, ruu, map)
 	self.ruu = ruu
+	self.panel = self.ruu:Panel(self)
 	self.fieldWgt = self.ruu:InputField(self.field, self.onConfirm, self.value, fileFieldTheme)
 	self.fieldWgt:args(self, self.fieldWgt)
 	self.fieldWgt.alignRightOnUnfocus = true
@@ -68,23 +70,33 @@ function File.initRuu(self, ruu, map)
 	self.buttonWgt = self.ruu:Button(self.button, self.buttonPressed)
 	self.buttonWgt:args(self)
 	table.insert(map, self.buttonWgt)
+	self.widgets = {
+		[self.fieldWgt] = true,
+		[self.buttonWgt] = true
+	}
 end
 
 function File.destroyRuu(self, map)
-	self.ruu:destroy(self.fieldWgt)
-	self.ruu:destroy(self.buttonWgt)
+	self.ruu:destroy(self.panel) -- Panel is not in navigation map.
 	for i=#map,1,-1 do
 		local wgt = map[i]
-		if wgt == self.fieldWgt then
+		if self.widgets[wgt] then
+			self.widgets[wgt] = nil
+			self.ruu:destroy(wgt)
 			table.remove(map, i)
-			self.fieldWgt = nil
-		elseif wgt == self.buttonWgt then
-			table.remove(map, i)
-			self.buttonWgt = nil
+			if not next(self.widgets) then
+				break
+			end
 		end
-		if not self.fieldWgt and not self.buttonWgt then
-			return
-		end
+	end
+end
+
+function File.draw(self)
+	if self.panel and self.panel.isFocused then
+		love.graphics.setColor(1, 1, 1, 0.5)
+		local lineWidth = 1
+		local w, h = self.w - lineWidth, self.h - lineWidth
+		love.graphics.rectangle("line", -w/2, -h/2, w, h)
 	end
 end
 

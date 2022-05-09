@@ -12,6 +12,7 @@ local height = 26
 function Float.set(self, name, value)
 	Float.super.set(self, spacing, false, -1, width, height)
 	self:mode("fill", "none")
+	self.layer = "gui"
 	self.propertyName = name
 	self.value = value or 0
 	self.label = gui.Text(name, font, width, "W", "W", "left"):setPos(2)
@@ -46,18 +47,36 @@ end
 
 function Float.initRuu(self, ruu, map)
 	self.ruu = ruu
-	self.widget = self.ruu:InputField(self.field, self.onConfirm, self.value)
-	self.widget:args(self, self.widget)
-	table.insert(map, self.widget)
+	self.panel = self.ruu:Panel(self)
+	self.wgt = self.ruu:InputField(self.field, self.onConfirm, self.value)
+	self.wgt:args(self, self.wgt)
+	table.insert(map, self.wgt)
+	self.widgets = {
+		[self.wgt] = true
+	}
 end
 
 function Float.destroyRuu(self, map)
-	self.ruu:destroy(self.widget)
-	for i,wgt in ipairs(map) do
-		if wgt == self.widget then
+	self.ruu:destroy(self.panel) -- Panel is not in navigation map.
+	for i=#map,1,-1 do
+		local wgt = map[i]
+		if self.widgets[wgt] then
+			self.widgets[wgt] = nil
+			self.ruu:destroy(wgt)
 			table.remove(map, i)
-			break
+			if not next(self.widgets) then
+				break
+			end
 		end
+	end
+end
+
+function Float.draw(self)
+	if self.panel and self.panel.isFocused then
+		love.graphics.setColor(1, 1, 1, 0.5)
+		local lineWidth = 1
+		local w, h = self.w - lineWidth, self.h - lineWidth
+		love.graphics.rectangle("line", -w/2, -h/2, w, h)
 	end
 end
 
