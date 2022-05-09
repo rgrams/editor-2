@@ -363,6 +363,7 @@ function Tool.draw(self)
 		love.graphics.setColor(1, 1, 1, 0.1)
 		love.graphics.rectangle("line", lt, top, w, h)
 
+		--[[
 		local size = self.cornerHandleSize
 		centeredRect("line", lt, top, size, size)
 		centeredRect("line", rt, top, size, size)
@@ -380,6 +381,7 @@ function Tool.draw(self)
 		local r2 = r*2
 		love.graphics.line(cx - r2, cy, cx + r2, cy)
 		love.graphics.line(cx, cy - r2, cx, cy + r2)
+		--]]
 	end
 end
 
