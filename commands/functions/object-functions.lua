@@ -194,23 +194,32 @@ function M.offsetVec2PropertyOnMultiple(enclosures, name, dx, dy)
 	return undoArgList
 end
 
-function M.addProperty(enclosure, Class, name)
-	name = enclosure[1]:addProperty(Class, name) -- `name` can be nil and the class default is used.
+function M.addProperty(enclosure, Class, name, value)
+	assert(name, "object-functions.addProperty - `name` can not be nil.")
+	local obj = enclosure[1]
+	if not Class or obj:getPropertyObj(name) then
+		return enclosure, name
+	end
+	name = enclosure[1]:addProperty(Class, name, value) -- `name` can be nil and the class default is used.
 	return enclosure, name
 end
 
 function M.removeProperty(enclosure, name)
 	local obj = enclosure[1]
-	local property = obj:getPropertyObj()
+	local property = obj:getPropertyObj(name)
+	if not property then
+		return enclosure
+	end
+	local value = property:getValue()
 	local Class = getmetatable(property)
 	obj:removeProperty(name)
-	return enclosure, Class, name
+	return enclosure, Class, name, value
 end
 
-function M.addSamePropertyToMultiple(enclosures, Class, name)
+function M.addSamePropertyToMultiple(enclosures, Class, name, value)
 	local undoArgList = {}
 	for i,enclosure in ipairs(enclosures) do
-		local undoArgs = { M.addProperty(enclosure, Class, name) }
+		local undoArgs = { M.addProperty(enclosure, Class, name, value) }
 		undoArgList[i] = undoArgs
 	end
 	return undoArgList
@@ -220,6 +229,15 @@ function M.addPropertyToMultiple(argList)
 	local undoArgList = {}
 	for i,args in ipairs(argList) do
 		local undoArgs = { M.addProperty(unpack(args)) }
+		undoArgList[i] = undoArgs
+	end
+	return undoArgList
+end
+
+function M.removeSamePropertyFromMultiple(enclosures, name)
+	local undoArgList = {}
+	for i,enclosure in ipairs(enclosures) do
+		local undoArgs = { M.removeProperty(enclosure, name) }
 		undoArgList[i] = undoArgs
 	end
 	return undoArgList

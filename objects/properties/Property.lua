@@ -8,7 +8,7 @@ Property.DEFAULT_VALUE = 0
 
 function Property.set(self, obj, name)
 	self.obj = obj
-	self.name = name
+	self.name = name or self.name
 	self.value = self:getDefaultValue()
 end
 

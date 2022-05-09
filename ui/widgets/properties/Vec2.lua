@@ -44,6 +44,22 @@ function Vec2.setSelection(self, selection)
 	self.selection = selection
 end
 
+function Vec2.ruuInput(wgt, depth, action, value, change)
+	if action == "delete" and change == 1 then
+		local self = wgt.object
+		if not self.selection then
+			print("Error: PropertyWidget[Vec2].delete - No selection known.")
+		else
+			local scene = self.selection.scene
+			local cmd = "removeSamePropertyFromMultiple"
+			local enclosures = self.selection:copyList()
+			scene.history:perform(cmd, enclosures, self.propertyName)
+			local propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
+			propertyPanel:updateProperties(self.selection)
+		end
+	end
+end
+
 function Vec2.onConfirm(self, wgt, axis)
 	if wgt.text == wgt.oldText then
 		return
@@ -68,6 +84,7 @@ end
 function Vec2.initRuu(self, ruu, map)
 	self.ruu = ruu
 	self.panel = self.ruu:Panel(self)
+	self.panel.ruuInput = self.ruuInput
 	self.widgetX = self.ruu:InputField(self.fieldX, self.onConfirm, self.xValue)
 	self.widgetY = self.ruu:InputField(self.fieldY, self.onConfirm, self.yValue)
 	self.widgetX:args(self, self.widgetX, "x")

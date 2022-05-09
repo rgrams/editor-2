@@ -23,6 +23,22 @@ function Float.set(self, name, value)
 	self.field.color = { 0.65, 0.65, 0.65, 1 }
 end
 
+function Float.ruuInput(wgt, depth, action, value, change)
+	if action == "delete" and change == 1 then
+		local self = wgt.object
+		if not self.selection then
+			print("Error: PropertyWidget[Float].delete - No selection known.")
+		else
+			local scene = self.selection.scene
+			local cmd = "removeSamePropertyFromMultiple"
+			local enclosures = self.selection:copyList()
+			scene.history:perform(cmd, enclosures, self.propertyName)
+			local propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
+			propertyPanel:updateProperties(self.selection)
+		end
+	end
+end
+
 function Float.setSelection(self, selection)
 	self.selection = selection
 end
@@ -48,6 +64,7 @@ end
 function Float.initRuu(self, ruu, map)
 	self.ruu = ruu
 	self.panel = self.ruu:Panel(self)
+	self.panel.ruuInput = self.ruuInput
 	self.wgt = self.ruu:InputField(self.field, self.onConfirm, self.value)
 	self.wgt:args(self, self.wgt)
 	table.insert(map, self.wgt)

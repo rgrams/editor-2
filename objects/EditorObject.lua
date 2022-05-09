@@ -34,9 +34,12 @@ function EditorObject.init(self)
 	self:updateAABB()
 end
 
-function EditorObject.addProperty(self, Class, name)
+function EditorObject.addProperty(self, Class, name, value)
 	local property = Class(self, name)
 	name = property.name
+	if value ~= nil then
+		property:setValue(value)
+	end
 	self.propertyMap[name] = property
 	table.insert(self.properties, property)
 	return name

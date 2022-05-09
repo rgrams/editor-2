@@ -37,6 +37,20 @@ function File.setSelection(self, selection)
 	self.selection = selection
 end
 
+function File.ruuInput(wgt, depth, action, value, change)
+	if action == "delete" and change == 1 then
+		local self = wgt.object
+		if not self.selection then
+			print("Error: PropertyWidget[File].delete - No selection known.")
+		else
+			local scene = self.selection.scene
+			local cmd = "removeSamePropertyFromMultiple"
+			local enclosures = self.selection:copyList()
+			scene.history:perform(cmd, enclosures, self.propertyName)
+		end
+	end
+end
+
 function File.onConfirm(self, wgt)
 	if wgt.text == wgt.oldText then
 		return
@@ -49,6 +63,8 @@ function File.onConfirm(self, wgt)
 		local cmd = "setSamePropertyOnMultiple"
 		local enclosures = self.selection:copyList()
 		scene.history:perform(cmd, enclosures, self.propertyName, value)
+		local propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
+		propertyPanel:updateProperties(self.selection)
 	end
 end
 
@@ -63,6 +79,7 @@ end
 function File.initRuu(self, ruu, map)
 	self.ruu = ruu
 	self.panel = self.ruu:Panel(self)
+	self.panel.ruuInput = self.ruuInput
 	self.fieldWgt = self.ruu:InputField(self.field, self.onConfirm, self.value, fileFieldTheme)
 	self.fieldWgt:args(self, self.fieldWgt)
 	self.fieldWgt.alignRightOnUnfocus = true
