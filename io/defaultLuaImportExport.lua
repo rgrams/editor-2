@@ -2,8 +2,7 @@
 local M = {}
 
 local objToStr = require "philtre.lib.object-to-string"
-local objectFn = require "commands.functions.object-functions"
-local classList = require "objects.class-list"
+local classList = _G.objClassList
 
 local function copyChildrenData(children)
 	local output = {}
@@ -45,12 +44,12 @@ function M.export(scene, filepath, options)
 end
 
 local function makeAddObjArgs(scene, obj, parentEnclosure)
-	local Class = classList.get(obj.class)
+	local Class = classList:get(obj.class)
 	local enclosure = {}
 	local properties = {}
 	for name,value in pairs(obj) do
 		if name ~= "class" and name ~= "children" then
-			properties[name] = value
+			properties[name] = { value }
 		end
 	end
 	local isSelected = false

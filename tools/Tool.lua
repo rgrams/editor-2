@@ -9,7 +9,7 @@ local objectFn = require "commands.functions.object-functions"
 local modkeys = require "modkeys"
 local list = require "lib.list"
 local Dropdown = require "ui.widgets.Dropdown"
-local classList = require "objects.class-list"
+local classList = _G.objClassList
 
 Tool.boxSelectAddKey = "shift"
 Tool.boxSelectToggleKey = "ctrl"
@@ -311,7 +311,7 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		local mx, my = love.mouse.getPosition()
 		local wx, wy = Camera.current:screenToWorld(mx, my)
 		for i,Class in ipairs(classList) do
-			local name = classList.getName(Class)
+			local name = classList:getName(Class)
 			local item = { text = name, fn = fn, args = {self, Class, wx, wy} }
 			table.insert(items, item)
 		end

@@ -8,6 +8,9 @@ _G.scene_clipboard = nil
 local modkeys = require "modkeys"
 _G.Input = require "input"
 
+local IndexedList = require "lib.IndexedList"
+_G.objClassList = IndexedList()
+
 local scenes = require "scenes"
 local scene
 local window

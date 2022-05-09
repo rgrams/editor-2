@@ -3,13 +3,12 @@ local EditorObject = Object:extend()
 EditorObject.className = "EditorObject"
 
 local config = require "config"
-local classList = require "objects.class-list"
 
 EditorObject.displayName = "Object"
 EditorObject.hitWidth = 32
 EditorObject.hitHeight = 32
 
-classList.add(EditorObject.displayName, EditorObject)
+_G.objClassList:add(EditorObject, EditorObject.displayName)
 
 local Position = require "objects.properties.Position"
 local Angle = require "objects.properties.Angle"
@@ -35,6 +34,7 @@ function EditorObject.init(self)
 end
 
 function EditorObject.addProperty(self, Class, name, value)
+	if not Class then  print(name, value)  return  end
 	local property = Class(self, name)
 	name = property.name
 	if value ~= nil then

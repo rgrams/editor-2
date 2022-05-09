@@ -3,14 +3,11 @@ local EditorObject = require "objects.EditorObject"
 local EditorSprite = EditorObject:extend()
 EditorSprite.className = "EditorSprite"
 
-local config = require "config"
-local classList = require "objects.class-list"
-
 EditorSprite.displayName = "Sprite"
 EditorObject.hitWidth = 32
 EditorObject.hitHeight = 32
 
-classList.add(EditorSprite.displayName, EditorSprite)
+_G.objClassList:add(EditorSprite, EditorSprite.displayName)
 
 local Position = require "objects.properties.Position"
 local Angle = require "objects.properties.Angle"
