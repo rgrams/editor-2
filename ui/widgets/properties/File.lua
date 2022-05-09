@@ -47,6 +47,8 @@ function File.ruuInput(wgt, depth, action, value, change)
 			local cmd = "removeSamePropertyFromMultiple"
 			local enclosures = self.selection:copyList()
 			scene.history:perform(cmd, enclosures, self.propertyName)
+			local propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
+			propertyPanel:updateProperties(self.selection)
 		end
 	end
 end
@@ -63,8 +65,6 @@ function File.onConfirm(self, wgt)
 		local cmd = "setSamePropertyOnMultiple"
 		local enclosures = self.selection:copyList()
 		scene.history:perform(cmd, enclosures, self.propertyName, value)
-		local propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
-		propertyPanel:updateProperties(self.selection)
 	end
 end
 
