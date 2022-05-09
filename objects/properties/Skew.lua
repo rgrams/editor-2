@@ -1,8 +1,8 @@
 
 local _basePath = (...):gsub("Skew$", "")
-local Vec2Property = require(_basePath .. "Vec2Property")
+local Vec2 = require(_basePath .. "Vec2")
 
-local Skew = Vec2Property:extend()
+local Skew = Vec2:extend()
 
 Skew.name = "skew"
 

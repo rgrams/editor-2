@@ -1,8 +1,8 @@
 
 local _basePath = (...):gsub("Position$", "")
-local Vec2Property = require(_basePath .. "Vec2Property")
+local Vec2 = require(_basePath .. "Vec2")
 
-local Position = Vec2Property:extend()
+local Position = Vec2:extend()
 
 Position.name = "pos"
 
