@@ -34,6 +34,104 @@ function EditorObject.init(self)
 	self:updateAABB()
 end
 
+function EditorObject.setProperty(self, name, value)
+	local props = self.properties
+	for i,prop in ipairs(props) do
+		if prop.name == name then
+			prop:setValue(value)
+			return true
+		end
+	end
+	return false
+end
+
+function EditorObject.getProperty(self, name)
+	for i,prop in ipairs(self.properties) do
+		if prop.name == name then
+			return prop:getValue()
+		end
+	end
+end
+
+function EditorObject.getModifiedProperties(self)
+	local properties
+	for i,prop in ipairs(self.properties) do
+		local value = prop:getDiff()
+		if value then
+			properties = properties or {}
+			properties[prop.name] = value
+		end
+	end
+	return properties
+end
+
+function EditorObject.setPosition(self, pos)
+	self.pos = pos
+	self:updateAABB()
+end
+
+function EditorObject.setAngle(self, angle)
+	self.angle = angle
+	self:updateAABB()
+end
+
+function EditorObject.setScale(self, sx, sy)
+	self.sx, self.sy = sx, sy
+	self:updateAABB()
+end
+
+function EditorObject.setSkew(self, kx, ky)
+	self.kx, self.ky = kx, ky
+	self:updateAABB()
+end
+
+function EditorObject.touchesPoint(self, wx, wy)
+	local lx, ly = self:toLocal(wx, wy)
+	local hw, hh = self.hitWidth/2, self.hitHeight/2
+	if lx >= -hw and lx <= hw and ly >= -hh and ly <= hh then
+		return vec2.len2(lx, ly)
+	end
+end
+
+function EditorObject.draw(self)
+	love.graphics.setBlendMode("alpha")
+	local lineWidth = 1
+	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2
+
+	if self.isHovered then
+		love.graphics.setColor(1, 1, 1, 0.03)
+		love.graphics.rectangle("fill", -hw, -hh, hw*2, hh*2)
+	end
+
+	love.graphics.setColor(config.xAxisColor)
+	love.graphics.line(0, 0, hw, 0)
+	love.graphics.setColor(config.yAxisColor)
+	love.graphics.line(0, 0, 0, -hh)
+	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
+	love.graphics.rectangle("line", -hw, -hh, hw*2, hh*2)
+	love.graphics.circle("line", 0, 0, 0.5, 4)
+
+	local children = self.children
+	if children then
+		for i=1,children.maxn or #children do
+			local child = children[i]
+			if child then
+				love.graphics.setColor(config.parentLineColor)
+				local frac = config.parentLineLenFrac
+				local x, y = child.pos.x*frac, child.pos.y*frac
+				love.graphics.line(0, 0, x, y)
+				local vx, vy = vec2.normalize(x, y)
+				local arrowLen = config.parentLineArrowLength
+				local arrowAngle = config.parentLineArrowAngle
+				vx, vy = -vx*arrowLen, -vy*arrowLen
+				local x2, y2 = vec2.rotate(vx, vy, arrowAngle)
+				local x3, y3 = vec2.rotate(vx, vy, -arrowAngle)
+				love.graphics.line(x2+x, y2+y, x, y, x3+x, y3+y)
+			end
+		end
+	end
+end
+
 function EditorObject.updateAABB(self)
 	if self.parent then  self:updateTransform()  end
 	local hw, hh = self.hitWidth/2, self.hitHeight/2
@@ -85,104 +183,6 @@ function EditorObject.updateAABB(self)
 			local child = self.children[i]
 			if child then
 				child:updateAABB()
-			end
-		end
-	end
-end
-
-function EditorObject.setProperty(self, name, value)
-	local props = self.properties
-	for i,prop in ipairs(props) do
-		if prop.name == name then
-			prop:setValue(value)
-			return true
-		end
-	end
-	return false
-end
-
-function EditorObject.setPosition(self, pos)
-	self.pos = pos
-	self:updateAABB()
-end
-
-function EditorObject.setAngle(self, angle)
-	self.angle = angle
-	self:updateAABB()
-end
-
-function EditorObject.setScale(self, sx, sy)
-	self.sx, self.sy = sx, sy
-	self:updateAABB()
-end
-
-function EditorObject.setSkew(self, kx, ky)
-	self.kx, self.ky = kx, ky
-	self:updateAABB()
-end
-
-function EditorObject.getProperty(self, name)
-	for i,prop in ipairs(self.properties) do
-		if prop.name == name then
-			return prop:getValue()
-		end
-	end
-end
-
-function EditorObject.getModifiedProperties(self)
-	local properties
-	for i,prop in ipairs(self.properties) do
-		local value = prop:getDiff()
-		if value then
-			properties = properties or {}
-			properties[prop.name] = value
-		end
-	end
-	return properties
-end
-
-function EditorObject.touchesPoint(self, wx, wy)
-	local lx, ly = self:toLocal(wx, wy)
-	local hw, hh = self.hitWidth/2, self.hitHeight/2
-	if lx >= -hw and lx <= hw and ly >= -hh and ly <= hh then
-		return vec2.len2(lx, ly)
-	end
-end
-
-function EditorObject.draw(self)
-	love.graphics.setBlendMode("alpha")
-	local lineWidth = 1
-	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2
-
-	if self.isHovered then
-		love.graphics.setColor(1, 1, 1, 0.03)
-		love.graphics.rectangle("fill", -hw, -hh, hw*2, hh*2)
-	end
-
-	love.graphics.setColor(config.xAxisColor)
-	love.graphics.line(0, 0, hw, 0)
-	love.graphics.setColor(config.yAxisColor)
-	love.graphics.line(0, 0, 0, -hh)
-	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
-	love.graphics.rectangle("line", -hw, -hh, hw*2, hh*2)
-	love.graphics.circle("line", 0, 0, 0.5, 4)
-
-	local children = self.children
-	if children then
-		for i=1,children.maxn or #children do
-			local child = children[i]
-			if child then
-				love.graphics.setColor(config.parentLineColor)
-				local frac = config.parentLineLenFrac
-				local x, y = child.pos.x*frac, child.pos.y*frac
-				love.graphics.line(0, 0, x, y)
-				local vx, vy = vec2.normalize(x, y)
-				local arrowLen = config.parentLineArrowLength
-				local arrowAngle = config.parentLineArrowAngle
-				vx, vy = -vx*arrowLen, -vy*arrowLen
-				local x2, y2 = vec2.rotate(vx, vy, arrowAngle)
-				local x3, y3 = vec2.rotate(vx, vy, -arrowAngle)
-				love.graphics.line(x2+x, y2+y, x, y, x3+x, y3+y)
 			end
 		end
 	end
