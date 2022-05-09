@@ -10,7 +10,6 @@ local imageCache = {}
 
 Image.type = "image"
 Image.name = "image"
-Image.displayName = "Image"
 Image.DEFAULT_VALUE = false
 
 -- NOTE: property `value` is the filepath. Store the actual image separately.

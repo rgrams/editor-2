@@ -5,7 +5,6 @@ local Property = require(_basePath .. "Property")
 local Angle = Property:extend()
 
 Angle.name = "angle"
-Angle.displayName = "Angle"
 
 function Angle.set(self, obj)
 	self.obj = obj

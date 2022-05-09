@@ -4,7 +4,6 @@ local Property = Class:extend()
 
 Property.type = "float"
 Property.name = "property"
-Property.displayName = "Property"
 Property.DEFAULT_VALUE = 0
 
 function Property.set(self, obj)

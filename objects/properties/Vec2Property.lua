@@ -6,7 +6,6 @@ local Vec2Property = Property:extend()
 
 Vec2Property.type = "vec2"
 Vec2Property.name = "vec2"
-Vec2Property.displayName = "Vec2Property"
 Vec2Property.DEFAULT_VALUE = { x = 0, y = 0 }
 
 function Vec2Property.getDefaultValue(self)

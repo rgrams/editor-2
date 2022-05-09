@@ -6,7 +6,6 @@ local File = Property:extend()
 
 File.type = "file"
 File.name = "file"
-File.displayName = "File"
 File.DEFAULT_VALUE = ""
 
 function File.isValid(self, value)

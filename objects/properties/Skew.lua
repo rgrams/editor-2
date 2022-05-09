@@ -5,7 +5,6 @@ local Vec2Property = require(_basePath .. "Vec2Property")
 local Skew = Vec2Property:extend()
 
 Skew.name = "skew"
-Skew.displayName = "Skew"
 
 function Skew._setValidValue(self, value)
 	self.value = value

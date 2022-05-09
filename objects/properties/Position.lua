@@ -5,7 +5,6 @@ local Vec2Property = require(_basePath .. "Vec2Property")
 local Position = Vec2Property:extend()
 
 Position.name = "pos"
-Position.displayName = "Position"
 
 function Position._setValidValue(self, value)
 	self.value = value
