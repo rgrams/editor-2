@@ -23,14 +23,14 @@ function EditorSprite.set(self, x, y, angle, ...)
 	self.enclosure = { self } -- TODO: Placeholder. Should be in `addObject` command.
 	self.isSelected = false
 	self.isHovered = false
-	self.properties = {
-		Position(self),
-		Angle(self),
-		Scale(self),
-		Skew(self),
-		Image(self),
-	}
 	self.AABB = {}
+	self.properties = {}
+	self.propertyMap = {}
+	self:addProperty(Position)
+	self:addProperty(Angle)
+	self:addProperty(Scale)
+	self:addProperty(Skew)
+	self:addProperty(Image)
 end
 
 function EditorSprite.setImage(self, image)

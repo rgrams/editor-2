@@ -21,45 +21,67 @@ function EditorObject.set(self, x, y, angle, ...)
 	self.enclosure = { self } -- TODO: Placeholder. Should be in `addObject` command.
 	self.isSelected = false
 	self.isHovered = false
-	self.properties = {
-		Position(self),
-		Angle(self),
-		Scale(self),
-		Skew(self),
-	}
 	self.AABB = {}
+	self.properties = {}
+	self.propertyMap = {}
+	self:addProperty(Position)
+	self:addProperty(Angle)
+	self:addProperty(Scale)
+	self:addProperty(Skew)
 end
 
 function EditorObject.init(self)
 	self:updateAABB()
 end
 
-function EditorObject.setProperty(self, name, value)
-	local props = self.properties
-	for i,prop in ipairs(props) do
-		if prop.name == name then
-			prop:setValue(value)
-			return true
+function EditorObject.addProperty(self, Class, name)
+	local property = Class(self, name)
+	name = property.name
+	self.propertyMap[name] = property
+	table.insert(self.properties, property)
+	return name
+end
+
+function EditorObject.removeProperty(self, name)
+	if self:getPropertyObj(name) then
+		self.propertyMap[name] = nil
+		for i,property in ipairs(self.properties) do
+			if property.name == name then
+				table.remove(self.properties, i)
+				return true
+			end
 		end
 	end
-	return false
+end
+
+function EditorObject.setProperty(self, name, value)
+	local property = self:getPropertyObj(name)
+	if property then
+		property:setValue(value)
+		return true
+	else
+		return false
+	end
+end
+
+function EditorObject.getPropertyObj(self, name)
+	return self.propertyMap[name]
 end
 
 function EditorObject.getProperty(self, name)
-	for i,prop in ipairs(self.properties) do
-		if prop.name == name then
-			return prop:getValue()
-		end
+	local property = self:getPropertyObj(name)
+	if property then
+		return property:getValue()
 	end
 end
 
 function EditorObject.getModifiedProperties(self)
 	local properties
-	for i,prop in ipairs(self.properties) do
-		local value = prop:getDiff()
+	for i,property in ipairs(self.properties) do
+		local value = property:getDiff()
 		if value then
 			properties = properties or {}
-			properties[prop.name] = value
+			properties[property.name] = value
 		end
 	end
 	return properties
