@@ -194,7 +194,7 @@ end
 
 function Tool.addAt(self, Class, wx, wy)
 	self.lastAddClass = Class
-	local properties = { pos = { x = wx, y = wy } }
+	local properties = { pos = { { x = wx, y = wy } } }
 	local scene = scenes.active
 	if scene.selection[1] then
 		local parentEnclosures = scene.selection:copyList()

@@ -71,6 +71,10 @@ function EditorObject.getPropertyObj(self, name)
 	return self.propertyMap[name]
 end
 
+function EditorObject.hasProperty(self, name)
+	return not not self.propertyMap[name]
+end
+
 function EditorObject.getProperty(self, name)
 	local property = self:getPropertyObj(name)
 	if property then
@@ -84,7 +88,8 @@ function EditorObject.getModifiedProperties(self)
 		local value = property:getDiff()
 		if value then
 			properties = properties or {}
-			properties[property.name] = value
+			local Class = getmetatable(property)
+			properties[property.name] = { value, Class }
 		end
 	end
 	return properties
