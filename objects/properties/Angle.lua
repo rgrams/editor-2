@@ -6,11 +6,6 @@ local Angle = Property:extend()
 
 Angle.name = "angle"
 
-function Angle.set(self, obj)
-	self.obj = obj
-	self.value = obj.angle
-end
-
 function Angle._setValidValue(self, angle)
 	self.value = angle
 	self.obj:setAngle(angle)

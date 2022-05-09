@@ -6,8 +6,9 @@ Property.type = "float"
 Property.name = "property"
 Property.DEFAULT_VALUE = 0
 
-function Property.set(self, obj)
+function Property.set(self, obj, name)
 	self.obj = obj
+	self.name = name
 	self.value = self:getDefaultValue()
 end
 
