@@ -8,6 +8,8 @@ File.type = "file"
 File.name = "file"
 File.DEFAULT_VALUE = ""
 
+_G.propClassList:add(File, File.type)
+
 function File.isValid(self, value)
 	local file, errMsg = io.open(value, "r")
 	if file then

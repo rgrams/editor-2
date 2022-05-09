@@ -8,6 +8,8 @@ Vec2.type = "vec2"
 Vec2.name = "vec2"
 Vec2.DEFAULT_VALUE = { x = 0, y = 0 }
 
+_G.propClassList:add(Vec2, Vec2.type)
+
 function Vec2.getDefaultValue(self)
 	local value = {}
 	for k,v in pairs(self.DEFAULT_VALUE) do

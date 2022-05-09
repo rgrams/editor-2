@@ -6,6 +6,8 @@ Property.type = "float"
 Property.name = "property"
 Property.DEFAULT_VALUE = 0
 
+_G.propClassList:add(Property, Property.type)
+
 function Property.set(self, obj, name)
 	self.obj = obj
 	self.name = name or self.name

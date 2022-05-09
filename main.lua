@@ -10,6 +10,7 @@ _G.Input = require "input"
 
 local IndexedList = require "lib.IndexedList"
 _G.objClassList = IndexedList()
+_G.propClassList = IndexedList()
 
 local scenes = require "scenes"
 local scene
@@ -26,6 +27,16 @@ local defaultLayer = "default"
 
 local guiDebugDrawEnabled = false
 
+local function requireModulesInFolder(folderPath) -- path should include trailing slash
+	local requireFolderPath = folderPath:gsub("[\\/]", ".")
+	for i,filename in ipairs(love.filesystem.getDirectoryItems(folderPath)) do
+		local info = love.filesystem.getInfo(folderPath..filename)
+		if info and info.type == "file" and filename:sub(-4) == ".lua" then
+			require(requireFolderPath..filename:sub(1, -5))
+		end
+	end
+end
+
 function love.load()
 	math.randomseed(love.timer.getTime() * 10000)
 	math.random()  math.random()  math.random()
@@ -37,13 +48,11 @@ function love.load()
 	local config = require "config"
 	love.graphics.setBackgroundColor(config.viewportBackgroundColor)
 
+	-- Load property classes.
+	requireModulesInFolder("objects/properties/")
+
 	-- Load editor object classes.
-	for i,filename in ipairs(love.filesystem.getDirectoryItems("objects")) do
-		local info = love.filesystem.getInfo("objects/"..filename)
-		if info and info.type == "file" and filename:sub(-4) == ".lua" then
-			require("objects."..filename:sub(1, -5))
-		end
-	end
+	requireModulesInFolder("objects/")
 
 	scene = SceneTree(layers, defaultLayer)
 

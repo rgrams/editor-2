@@ -12,11 +12,7 @@ local propWidget = {
 	file = require "ui.widgets.properties.File",
 	image = require "ui.widgets.properties.File",
 }
-local propClass = {
-	float = require "objects.properties.Property",
-	vec2 = require "objects.properties.Vec2",
-	file = require "objects.properties.File",
-}
+local propClass = _G.propClassList
 
 local spacing = 2
 
@@ -48,7 +44,7 @@ end
 function PropertyPanel.addProperty(self, propType, propName)
 	local selection = scenes.active.selection
 	local enclosures = selection:copyList()
-	local Class = propClass[propType]
+	local Class = propClass:get(propType)
 	scenes.active.history:perform("addSamePropertyToMultiple", enclosures, Class, propName)
 	self:updateProperties(selection)
 end

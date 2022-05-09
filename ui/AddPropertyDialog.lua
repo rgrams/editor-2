@@ -9,7 +9,6 @@ local Dropdown = require "ui.widgets.Dropdown"
 local headerFont = { "assets/font/OpenSans-Semibold.ttf", 17 }
 local spacing = 2
 
-
 function AddPropDialog.set(self, callback, callbackArgs)
 	AddPropDialog.super.set(self, spacing, false, nil, 400, 125)
 	self.callback = callback
