@@ -82,12 +82,20 @@ function M.import(scene, filepath, options)
 		print(result)
 		return
 	end
-	local data = result()
+	local isSuccess, data = pcall(result)
+	if not isSuccess then
+		print("Error executing loaded lua code: "..tostring(data))
+		return
+	end
 
 	local argsList = {}
 
 	-- Just need to add the objects at the base level, any children will be added along with.
 	for i,obj in ipairs(data) do
+		if not obj.class then
+			print("   Error parsing objects: No object class property found.")
+			return
+		end
 		table.insert(argsList, makeAddObjArgs(scene, obj, false))
 	end
 
@@ -96,9 +104,7 @@ function M.import(scene, filepath, options)
 		table.insert(existingEnclosures, child.enclosure)
 	end
 	scene.history:perform("deleteObjects", scene, existingEnclosures)
-
 	scene.history:perform("addObjects", scene, argsList)
-	-- objectFn.addObjects(scene, argsList)
 end
 
 return M
