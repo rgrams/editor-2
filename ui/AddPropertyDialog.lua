@@ -76,13 +76,13 @@ function AddPropDialog.close(self)
 end
 
 function AddPropDialog.confirm(self)
-	local propName = self.inputFld.widget.text
 	local propType = self.typeBtn.text.text
+	local propName = self.inputFld.widget.text
 	self:close()
 	if self.callback then
 		local args = self.callbackArgs or {}
-		table.insert(args, propName)
 		table.insert(args, propType)
+		table.insert(args, propName)
 		self.callback(unpack(args))
 	end
 end

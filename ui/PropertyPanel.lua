@@ -2,12 +2,20 @@
 local PropertyPanel = gui.Column:extend()
 PropertyPanel.className = "PropertyPanel"
 
+local scenes = require "scenes"
+local AddPropertyDialog = require "ui.AddPropertyDialog"
+
 local headerFont = { "assets/font/OpenSans-Semibold.ttf", 17 }
 local propWidget = {
 	float = require "ui.widgets.properties.Float",
 	vec2 = require "ui.widgets.properties.Vec2",
 	file = require "ui.widgets.properties.File",
 	image = require "ui.widgets.properties.File",
+}
+local propClass = {
+	float = require "objects.properties.Property",
+	vec2 = require "objects.properties.Vec2",
+	file = require "objects.properties.File",
 }
 
 local spacing = 2
@@ -21,13 +29,33 @@ function PropertyPanel.set(self, ruu)
 	self.layer = "gui"
 	self.ruu = ruu
 	self.widget = self.ruu:Panel(self)
+	self.widget.ruuInput = self.ruuInput
 	self.wgtMap = {}
 end
 
-local function addPropertyWidget(self, selection, PropertyClass, value)
-	local Class = propWidget[PropertyClass.type]
-	local object = Class(PropertyClass.name, value)
-	object.PropertyClass = PropertyClass
+function PropertyPanel.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
+	if action == "add property" and change == 1 then
+		if scenes.active and scenes.active.selection[1] then
+			local self = wgt.object
+			local guiRoot = self.tree:get("/Window")
+			local dialog = AddPropertyDialog(self.addProperty, { self })
+			self.tree:add(dialog, guiRoot)
+			return true
+		end
+	end
+end
+
+function PropertyPanel.addProperty(self, propType, propName)
+	local selection = scenes.active.selection
+	local enclosures = selection:copyList()
+	local Class = propClass[propType]
+	scenes.active.history:perform("addSamePropertyToMultiple", enclosures, Class, propName)
+	self:updateProperties(selection)
+end
+
+local function addPropertyWidget(self, selection, PropClass, name, value)
+	local Class = propWidget[PropClass.type]
+	local object = Class(name, value)
 	self.tree:add(object, self)
 	object:setSelection(selection)
 	object:initRuu(self.ruu, self.wgtMap)
@@ -53,17 +81,19 @@ function PropertyPanel.updateProperties(self, selection)
 	-- Get list of properties that all objects have in common.
 	-- Need properties and value.
 	local commonProperties = {
-		includes = {} -- Lookup table by class.
+		votes = {}, -- Lookup table by name.
+		classes = {}
 		-- { Class = , value = value }
 	}
 
 	-- Copy property list from the first object.
 	local firstObj = selection[1][1]
 	for i,property in ipairs(firstObj.properties) do
-		local PropertyClass = getmetatable(property)
+		local Class, name = getmetatable(property), property.name
 		local value = property:getValue()
-		table.insert(commonProperties, { Class = PropertyClass, value = value })
-		commonProperties.includes[PropertyClass] = 1
+		table.insert(commonProperties, { Class = Class, name = name, value = value })
+		commonProperties.votes[name] = 1
+		commonProperties.classes[name] = Class
 	end
 
 	-- Loop through all other objects to check which properties are shared.
@@ -71,10 +101,10 @@ function PropertyPanel.updateProperties(self, selection)
 		local obj = selection[objI][1]
 		-- Loop once and "vote" for properties that this object has.
 		for i,property in ipairs(obj.properties) do
-			local PropertyClass = getmetatable(property)
-			local votes = commonProperties.includes[PropertyClass]
-			if votes then
-				commonProperties.includes[PropertyClass] = votes + 1
+			local name = property.name
+			local votes = commonProperties.votes[name]
+			if votes and commonProperties.classes[name] == getmetatable(property) then
+				commonProperties.votes[name] = votes + 1
 			end
 		end
 	end
@@ -82,15 +112,14 @@ function PropertyPanel.updateProperties(self, selection)
 	-- If not all objects "voted" for a property, remove it from the list.
 	local requiredVotes = #selection
 	for i=#commonProperties,1,-1 do
-		local Class = commonProperties[i].Class
-		if commonProperties.includes[Class] < requiredVotes then
+		local name = commonProperties[i].name
+		if commonProperties.votes[name] < requiredVotes then
 			table.remove(commonProperties, i)
-			commonProperties.includes[Class] = nil
 		end
 	end
 
 	for i,propData in ipairs(commonProperties) do
-		addPropertyWidget(self, selection, propData.Class, propData.value)
+		addPropertyWidget(self, selection, propData.Class, propData.name, propData.value)
 	end
 	self.ruu:mapNextPrev(self.wgtMap)
 end

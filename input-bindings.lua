@@ -38,4 +38,5 @@ return {
 	{ "button", "ctrl v", "paste" },
 	{ "button", "ctrl s", "save" },
 	{ "button", "ctrl o", "open" },
+	{ "button", "ctrl shift a", "add property" },
 }

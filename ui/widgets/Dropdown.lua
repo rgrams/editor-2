@@ -10,6 +10,7 @@ local spacing = 1
 local pad = 2
 local width = Button.width + pad*2
 
+ -- item = { text=, fn=, args= }
 function Dropdown.set(self, x, y, items)
 	local height = #items * (Button.height + spacing) - spacing + pad*2
 	Dropdown.super.set(self, spacing, false, -1, width, height, "NW", "NW")
@@ -24,7 +25,7 @@ function Dropdown.set(self, x, y, items)
 	x, y = math.floor(x), math.floor(y)
 	self:setPos(x, y)
 
-	self.items = items -- item = { text=, fn=, args= }
+	self.items = items
 	self.ruu = Ruu()
 	self.children = {}
 	for i,item in ipairs(items) do

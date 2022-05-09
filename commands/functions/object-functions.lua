@@ -194,4 +194,44 @@ function M.offsetVec2PropertyOnMultiple(enclosures, name, dx, dy)
 	return undoArgList
 end
 
+function M.addProperty(enclosure, Class, name)
+	name = enclosure[1]:addProperty(Class, name) -- `name` can be nil and the class default is used.
+	return enclosure, name
+end
+
+function M.removeProperty(enclosure, name)
+	local obj = enclosure[1]
+	local property = obj:getPropertyObj()
+	local Class = getmetatable(property)
+	obj:removeProperty(name)
+	return enclosure, Class, name
+end
+
+function M.addSamePropertyToMultiple(enclosures, Class, name)
+	local undoArgList = {}
+	for i,enclosure in ipairs(enclosures) do
+		local undoArgs = { M.addProperty(enclosure, Class, name) }
+		undoArgList[i] = undoArgs
+	end
+	return undoArgList
+end
+
+function M.addPropertyToMultiple(argList)
+	local undoArgList = {}
+	for i,args in ipairs(argList) do
+		local undoArgs = { M.addProperty(unpack(args)) }
+		undoArgList[i] = undoArgs
+	end
+	return undoArgList
+end
+
+function M.removePropertyFromMultiple(argList)
+	local undoArgList = {}
+	for i,args in ipairs(argList) do
+		local undoArgs = { M.removeProperty(unpack(args)) }
+		undoArgList[i] = undoArgs
+	end
+	return undoArgList
+end
+
 return M
