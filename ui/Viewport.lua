@@ -27,6 +27,7 @@ end
 function Viewport.init(self)
 	Viewport.super.init(self)
 	self.tree:add(BackgroundGrid(self))
+	self.ruu:setFocus(self.children[1].widget)
 end
 
 function Viewport.allocate(self, ...)

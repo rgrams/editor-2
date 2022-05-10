@@ -63,6 +63,7 @@ end
 function UI.init(self)
 	UI.super.init(self)
 	Input.enable(self)
+	self.ruu:mouseMoved(love.mouse.getPosition()) -- NOTE: Always gives 0, 0 :/
 end
 
 function UI.final(self)
