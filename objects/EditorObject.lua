@@ -34,7 +34,7 @@ function EditorObject.init(self)
 end
 
 function EditorObject.addProperty(self, Class, name, value)
-	if not Class then  print(name, value)  return  end
+	assert(Class, "EditorObject.addProperty - No class given for property: '"..tostring(name).."', value: '"..tostring(value).."'.")
 	local property = Class(self, name)
 	name = property.name
 	if value ~= nil then

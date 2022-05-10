@@ -8,9 +8,12 @@ local fileUtil = require "lib.file-util"
 
 local imageCache = {}
 
-Image.type = "image"
+Image.widgetName = "image"
+Image.className = "image"
 Image.name = "image"
 Image.DEFAULT_VALUE = false
+
+_G.propClassList:add(Image, Image.className)
 
 -- NOTE: property `value` is the filepath. Store the actual image separately.
 

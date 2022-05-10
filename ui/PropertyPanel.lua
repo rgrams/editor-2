@@ -50,7 +50,7 @@ function PropertyPanel.addProperty(self, propType, propName)
 end
 
 local function addPropertyWidget(self, selection, PropClass, name, value)
-	local Class = propWidget[PropClass.type]
+	local Class = propWidget[PropClass.widgetName]
 	local object = Class(name, value)
 	self.tree:add(object, self)
 	object:setSelection(selection)

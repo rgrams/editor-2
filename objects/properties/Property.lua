@@ -2,11 +2,12 @@
 local Class = require "philtre.modules.base-class"
 local Property = Class:extend()
 
-Property.type = "float"
+Property.widgetName = "float"
+Property.className = "float"
 Property.name = "property"
 Property.DEFAULT_VALUE = 0
 
-_G.propClassList:add(Property, Property.type)
+_G.propClassList:add(Property, Property.className)
 
 function Property.set(self, obj, name)
 	self.obj = obj

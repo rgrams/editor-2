@@ -3,6 +3,7 @@ local M = {}
 
 local objToStr = require "philtre.lib.object-to-string"
 local classList = _G.objClassList
+local propClassList = _G.propClassList
 
 local function copyChildrenData(children)
 	local output = {}
@@ -14,7 +15,10 @@ local function copyChildrenData(children)
 			local Class = getmetatable(child)
 			data.class = Class.displayName
 			for _,property in ipairs(child.properties) do
-				data[property.name] = property:getValue()
+				data[property.name] = {
+					value = property:getValue(),
+					type = property.className
+				}
 			end
 			if child.children then
 				data.children = copyChildrenData(child.children)
@@ -49,7 +53,9 @@ local function makeAddObjArgs(scene, obj, parentEnclosure)
 	local properties = {}
 	for name,value in pairs(obj) do
 		if name ~= "class" and name ~= "children" then
-			properties[name] = { value }
+			local property = value
+			local propertyClass = propClassList:get(property.type)
+			properties[name] = { property.value, propertyClass }
 		end
 	end
 	local isSelected = false

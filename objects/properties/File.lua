@@ -4,11 +4,12 @@ local Property = require(_basePath .. "Property")
 
 local File = Property:extend()
 
-File.type = "file"
+File.widgetName = "file"
+File.className = "file"
 File.name = "file"
 File.DEFAULT_VALUE = ""
 
-_G.propClassList:add(File, File.type)
+_G.propClassList:add(File, File.className)
 
 function File.isValid(self, value)
 	local file, errMsg = io.open(value, "r")
