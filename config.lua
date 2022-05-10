@@ -4,6 +4,7 @@ local M = {}
 M.zoomRate = 0.1
 
 M.translateSnapIncrement = 8
+M.rotateSnapIncrement = math.rad(15)
 M.gridPower = 2
 M.gridEmphasizeEvery = 4
 

@@ -17,6 +17,7 @@ Tool.boxSelectSubtractKey = "alt"
 Tool.cornerHandleSize = 8
 Tool.edgeHandleSize = 6
 Tool.pivotRadius = 4
+Tool.rotateKey = "alt"
 Tool.snapKey = "ctrl"
 Tool.snapX = config.translateSnapIncrement
 Tool.snapY = config.translateSnapIncrement
@@ -56,6 +57,7 @@ end
 local function stopDrag(self)
 	self.isDragging = false
 	self.isBoxSelecting = false
+	self.isRotateDragging = false
 	self.ruu:stopDraggingWidget(self.widget)
 	self.startedDragCommand = false
 end
@@ -133,6 +135,32 @@ local function getDragArgList(startOffsets, dx, dy, inWorldSpace, rx, ry)
 	return argList
 end
 
+local function getRotDragStartOffsets()
+	local scene = scenes.active
+	local dragStartOffsets = {}
+	local enclosures = scene.selection
+	for i,enclosure in ipairs(enclosures) do
+		dragStartOffsets[i] = {
+			enclosure = enclosure,
+			startAngle = enclosure[1].angle
+		}
+	end
+	return dragStartOffsets
+end
+
+local function getRotDragArgList(startOffsets, da, roundIncr)
+	local argList = {}
+	for i,data in ipairs(startOffsets) do
+		local angle = data.startAngle + da
+		if roundIncr then
+			angle = math.round(angle, roundIncr)
+		end
+		local args = { data.enclosure, "angle", angle }
+		argList[i] = args
+	end
+	return argList
+end
+
 function Tool.drag(wgt, dx, dy, dragType)
 	local self = wgt.object
 	local scene = scenes.active
@@ -140,7 +168,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 	local x, y = Camera.current:screenToWorld(self.ruu.mx, self.ruu.my)
 	self.lastDragX, self.lastDragY = x, y
 
-	if dragType == "drag selection" then
+	if dragType == "translate selection" then
 		local totalDX, totalDY = x - self.dragStartX, y - self.dragStartY
 		local inWorldSpace = self.dragInWorldSpace
 		local roundX, roundY
@@ -157,6 +185,26 @@ function Tool.drag(wgt, dx, dy, dragType)
 		else
 			-- TODO: Make sure the last command in the history is still ours.
 			local argList = getDragArgList(self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
+			objectFn.setMultiPropertiesOnMultiple(argList)
+			scene.history:update(argList)
+			self:updatePropertiesPanel()
+		end
+
+	elseif dragType == "rotate selection" then
+		self.isRotateDragging = true
+		local totalDX, totalDY = x - self.dragStartX + 1, y - self.dragStartY
+		local angle = math.atan2(totalDY, totalDX)
+		local roundIncr = modkeys.isPressed(self.snapKey) and config.rotateSnapIncrement
+
+		if not self.startedDragCommand then
+			self.startedDragCommand = true
+			self.dragStartOffsets = getRotDragStartOffsets()
+			local argList = getRotDragArgList(self.dragStartOffsets, angle, roundIncr)
+			scene.history:perform("setMultiPropertiesOnMultiple", argList)
+			self:updatePropertiesPanel()
+		else
+			-- TODO: Make sure the last command in the history is still ours.
+			local argList = getRotDragArgList(self.dragStartOffsets, angle, roundIncr)
 			objectFn.setMultiPropertiesOnMultiple(argList)
 			scene.history:update(argList)
 			self:updatePropertiesPanel()
@@ -242,7 +290,9 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 				self:updatePropertiesPanel()
 			end
 			if self.hoverObj.isSelected then
-				startDrag(self, "drag selection")
+				local isRotate = modkeys.isPressed(self.rotateKey)
+				local dragType = isRotate and "rotate selection" or "translate selection"
+				startDrag(self, dragType)
 			end
 		else -- Clicked on nothing.
 			local selection = scenes.active.selection
@@ -360,6 +410,35 @@ function Tool.draw(self)
 		love.graphics.rectangle("line", lx1, ly1, sw, sh)
 		love.graphics.setColor(col[1], col[2], col[3], 0.02)
 		love.graphics.rectangle("fill", lx1, ly1, sw, sh)
+	elseif self.isRotateDragging then
+		local sx1, sy1 = Camera.current:worldToScreen(self.dragStartX - 1, self.dragStartY)
+		local sx2, sy2 = Camera.current:worldToScreen(self.lastDragX, self.lastDragY)
+		local lx1, ly1 = self:toLocal(sx1, sy1)
+		local lx2, ly2 = self:toLocal(sx2, sy2)
+		local dx, dy = lx2 - lx1, ly2 - ly1
+		local r = vec2.len(dx, dy)
+		local angle1, angle2 = 0, math.atan2(dy, dx)
+		local isSnapped = modkeys.isPressed(self.snapKey)
+		local snapAngle = angle2
+		if isSnapped then
+			angle2 = math.round(angle2, config.rotateSnapIncrement)
+			snapAngle = angle2
+		end
+		local segments = math.abs(angle2)/0.1 + 1
+		if angle2 < 0 then
+			angle1, angle2 = angle2, angle1
+		end
+		local col = config.selectedHighlightColor
+		love.graphics.setColor(col)
+		love.graphics.arc("line", "open", lx1, ly1, r, angle1, angle2, segments)
+		love.graphics.line(lx1, ly1, lx1 + r, ly1) -- Straight horizontal.
+		local x2, y2 = lx2, ly2
+		if isSnapped then
+			x2, y2 = lx1 + math.cos(snapAngle)*r, ly1 + math.sin(snapAngle)*r
+		end
+		love.graphics.line(lx1, ly1, x2, y2) -- Angle.
+		love.graphics.setColor(col[1], col[2], col[3], 0.02)
+		love.graphics.arc("fill", lx1, ly1, r, angle1, angle2, segments)
 	end
 
 	if scenes.active and scenes.active.selection[1] then
