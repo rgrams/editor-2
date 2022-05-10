@@ -194,13 +194,23 @@ end
 
 function Tool.addAt(self, Class, wx, wy)
 	self.lastAddClass = Class
-	local properties = { pos = { { x = wx, y = wy } } }
 	local scene = scenes.active
+	local isSelected = false -- Lets you quickly create multiple objects without parenting exponentially.
 	if scene.selection[1] then
-		local parentEnclosures = scene.selection:copyList()
-		scene.history:perform("addObjectToMultiple", scene, parentEnclosures, Class, properties, false, false)
+		local argsList = {}
+		for i,parentEnclosure in ipairs(scene.selection) do
+			local parentObj = parentEnclosure[1]
+			local lx, ly = parentObj:toLocal(wx, wy)
+			local properties = { pos = { { x = lx, y = ly } } }
+			local args = {
+				scene, Class, {}, properties, isSelected, parentEnclosure
+			}
+			argsList[i] = args
+		end
+		scene.history:perform("addObjects", scene, argsList)
 	else
-		scene.history:perform("addObject", scene, Class, {}, properties, false, false)
+		local properties = { pos = { { x = wx, y = wy } } }
+		scene.history:perform("addObject", scene, Class, {}, properties, isSelected, false)
 	end
 end
 
