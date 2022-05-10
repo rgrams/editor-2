@@ -28,17 +28,24 @@ function Vec2.getDiff(self)
 end
 
 function Vec2.isValid(self, value)
+	-- NOTE: Don't modify `value`, it's a table that could be used on other object/properties.
 	local x, y = tonumber(value.x), tonumber(value.y)
 	if not (x or y) then
-		return false, nil, "Property.setValue: Invalid vec2: '("..tostring(x)..", "..tostring(y)..")'. At least 'x' or 'y' must be a number."
+		return false, nil, nil, "Property.setValue: Invalid vec2: '("..tostring(x)..", "..tostring(y)..")'. At least 'x' or 'y' must be a number."
 	end
-	if not x then  value.x = self.value.x  end
-	if not y then  value.y = self.value.y  end
-	return true, value
+	return true, x or self.value.x, y or self.value.y
 end
 
-function Vec2._setValidValue(self, value)
-	self.value.x, self.value.y = value.x, value.y
+function Vec2.setValue(self, value)
+	local isValid, validX, validY, errMsg = self:isValid(value)
+	if not isValid then
+		return errMsg
+	end
+	self:_setValidValue(validX, validY)
+end
+
+function Vec2._setValidValue(self, x, y)
+	self.value.x, self.value.y = x, y
 end
 
 function Vec2.copyValue(self)

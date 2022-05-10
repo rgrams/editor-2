@@ -9,9 +9,9 @@ Position.className = "position"
 
 _G.propClassList:add(Position, Position.className)
 
-function Position._setValidValue(self, value)
-	self.value = value
-	self.obj:setPosition(value)
+function Position._setValidValue(self, x, y)
+	Position.super._setValidValue(self, x, y)
+	self.obj:setPosition(self.value)
 end
 
 return Position

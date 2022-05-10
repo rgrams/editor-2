@@ -61,9 +61,6 @@ function Vec2.ruuInput(wgt, depth, action, value, change)
 end
 
 function Vec2.onConfirm(self, wgt, axis)
-	if wgt.text == wgt.oldText then
-		return
-	end
 	local value = tonumber(wgt.text)
 	if not value then
 		return true -- Reject input.
@@ -74,7 +71,7 @@ function Vec2.onConfirm(self, wgt, axis)
 		local scene = self.selection.scene
 		local cmd = "setSamePropertyOnMultiple"
 		local enclosures = self.selection:copyList()
-		local x, y = false, false -- Can't have nil values in command args.
+		local x, y
 		if axis == "x" then  x = value
 		else  y = value  end
 		scene.history:perform(cmd, enclosures, self.propertyName, { x = x, y = y })

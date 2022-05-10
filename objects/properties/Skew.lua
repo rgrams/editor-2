@@ -9,9 +9,9 @@ Skew.className = "skew"
 
 _G.propClassList:add(Skew, Skew.className)
 
-function Skew._setValidValue(self, value)
-	self.value = value
-	self.obj:setSkew(value.x, value.y)
+function Skew._setValidValue(self, x, y)
+	Skew.super._setValidValue(self, x, y)
+	self.obj:setSkew(x, y)
 end
 
 return Skew

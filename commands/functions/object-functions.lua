@@ -163,8 +163,12 @@ end
 
 function M.setProperty(enclosure, name, value)
 	local object = enclosure[1]
-	local oldValue = object:getProperty(name)
-	object:setProperty(name, value)
+	local property = object:getPropertyObj(name)
+	local oldValue
+	if property then
+		oldValue = property:copyValue()
+		property:setValue(value)
+	end
 	return enclosure, name, oldValue
 end
 

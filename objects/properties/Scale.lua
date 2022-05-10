@@ -10,9 +10,9 @@ Scale.DEFAULT_VALUE = { x = 1, y = 1 }
 
 _G.propClassList:add(Scale, Scale.className)
 
-function Scale._setValidValue(self, value)
-	self.value = value
-	self.obj:setScale(value.x, value.y)
+function Scale._setValidValue(self, x, y)
+	Scale.super._setValidValue(self, x, y)
+	self.obj:setScale(x, y)
 end
 
 return Scale
