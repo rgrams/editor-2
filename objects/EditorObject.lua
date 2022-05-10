@@ -15,6 +15,13 @@ local Angle = require "objects.properties.Angle"
 local Scale = require "objects.properties.Scale"
 local Skew = require "objects.properties.Skew"
 
+EditorObject.isBuiltinProperty = {
+	[Position.name] = true,
+	[Angle.name] = true,
+	[Scale.name] = true,
+	[Skew.name] = true,
+}
+
 function EditorObject.set(self, x, y, angle, ...)
 	EditorObject.super.set(self, x, y, angle, ...)
 	self.enclosure = { self } -- TODO: Placeholder. Should be in `addObject` command.
@@ -46,7 +53,7 @@ function EditorObject.addProperty(self, Class, name, value)
 end
 
 function EditorObject.removeProperty(self, name)
-	if self:getPropertyObj(name) then
+	if not self.isBuiltinProperty[name] and self:getPropertyObj(name) then
 		self.propertyMap[name] = nil
 		for i,property in ipairs(self.properties) do
 			if property.name == name then
@@ -85,8 +92,13 @@ end
 function EditorObject.getModifiedProperties(self)
 	local properties
 	for i,property in ipairs(self.properties) do
-		local value = property:getDiff()
-		if value then
+		local value
+		if self.isBuiltinProperty[property.name] then
+			value = property:getDiff()
+		else
+			value = property:getValue()
+		end
+		if value ~= nil then
 			properties = properties or {}
 			local Class = getmetatable(property)
 			properties[property.name] = { value, Class }

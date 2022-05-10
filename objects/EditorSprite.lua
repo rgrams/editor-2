@@ -15,6 +15,14 @@ local Scale = require "objects.properties.Scale"
 local Skew = require "objects.properties.Skew"
 local Image = require "objects.properties.Image"
 
+EditorSprite.isBuiltinProperty = {
+	[Position.name] = true,
+	[Angle.name] = true,
+	[Scale.name] = true,
+	[Skew.name] = true,
+	[Image.name] = true,
+}
+
 function EditorSprite.set(self, x, y, angle, ...)
 	Object.set(self, x, y, angle, ...)
 	self.enclosure = { self } -- TODO: Placeholder. Should be in `addObject` command.
