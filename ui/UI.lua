@@ -34,30 +34,6 @@ function UI.set(self)
 	self.propertyPanel = self.children[2]
 end
 
-function UI.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
-	if action == "undo" and (change == 1 or isRepeat) then
-		scenes.active.history:undo()
-		wgt.object.propertyPanel:updateProperties(scenes.active.selection)
-	elseif action == "redo" and (change == 1 or isRepeat) then
-		scenes.active.history:redo()
-		wgt.object.propertyPanel:updateProperties(scenes.active.selection)
-	elseif action == "save" and change == 1 then
-		if scenes.active then
-			local filepath = fileDialog.save(lastSaveFolder)
-			if not filepath then  return  end
-			lastSaveFolder = fileUtil.splitFilepath(filepath)
-			local exporter = require "io.defaultLuaImportExport"
-			exporter.export(scenes.active, filepath)
-		end
-	elseif action == "open" and change == 1 then
-		local filepath = fileDialog.open(lastOpenFolder)
-		if not filepath then  return  end
-		lastOpenFolder = fileUtil.splitFilepath(filepath)
-		local importer = require "io.defaultLuaImportExport"
-		importer.import(scenes.active, filepath)
-	end
-end
-
 function love.filedropped(file)
 	if scenes.active then
 		local filepath = file:getFilename()
@@ -77,8 +53,31 @@ function UI.final(self)
 	Input.disable(self)
 end
 
-function UI.input(self, action, value, change, ...)
-	self.ruu:input(action, value, change, ...)
+function UI.input(self, action, value, change, rawChange, isRepeat, ...)
+	local r = self.ruu:input(action, value, change, rawChange, isRepeat, ...)
+	if r then  return r  end
+
+	if action == "undo" and (change == 1 or isRepeat) then
+		scenes.active.history:undo()
+		self.propertyPanel:updateProperties(scenes.active.selection)
+	elseif action == "redo" and (change == 1 or isRepeat) then
+		scenes.active.history:redo()
+		self.propertyPanel:updateProperties(scenes.active.selection)
+	elseif action == "save" and change == 1 then
+		if scenes.active then
+			local filepath = fileDialog.save(lastSaveFolder)
+			if not filepath then  return  end
+			lastSaveFolder = fileUtil.splitFilepath(filepath)
+			local exporter = require "io.defaultLuaImportExport"
+			exporter.export(scenes.active, filepath)
+		end
+	elseif action == "open" and change == 1 then
+		local filepath = fileDialog.open(lastOpenFolder)
+		if not filepath then  return  end
+		lastOpenFolder = fileUtil.splitFilepath(filepath)
+		local importer = require "io.defaultLuaImportExport"
+		importer.import(scenes.active, filepath)
+	end
 end
 
 return UI
