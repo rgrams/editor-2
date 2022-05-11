@@ -76,6 +76,7 @@ local SKIP_ACTIONS = -1
 
 --------------------  Handling Input  --------------------
 function Input.rawInput(device, id, rawValue, ...)
+	_G.shouldRedraw = true
 	local oldRawValue = rawValues[device][id] or 0
 	rawValues[device][id] = rawValue
 	local rawChange

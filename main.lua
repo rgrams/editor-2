@@ -1,4 +1,5 @@
 
+require "run"
 require "philtre.init"
 require "philtre.lib.math-patch"
 _G.gui = require "philtre.objects.gui.all"
@@ -90,6 +91,7 @@ end
 function love.resize(w, h)
 	screenRect.w, screenRect.h = w, h
 	window:allocate(screenRect)
+	_G.shouldRedraw = true
 end
 
 function love.keypressed(key, scancode, isrepeat)

@@ -57,6 +57,7 @@ function love.filedropped(file)
 		local filepath = file:getFilename()
 		local importer = require "io.defaultLuaImportExport"
 		importer.import(scenes.active, filepath)
+		_G.shouldRedraw = true
 	end
 end
 
