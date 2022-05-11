@@ -44,11 +44,9 @@ function Image._setValidValue(self, filepath, image)
 	end
 end
 
-function Image.getDiff(self)
+function Image.isAtDefault(self)
 	local curVal = self:getValue()
-	if curVal and curVal ~= self.DEFAULT_VALUE then -- `nil` and `false` considered equal
-		return curVal
-	end
+	return curVal and curVal ~= self.DEFAULT_VALUE -- `nil` and `false` considered equal
 end
 
 return Image

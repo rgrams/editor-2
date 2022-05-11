@@ -94,7 +94,9 @@ function EditorObject.getModifiedProperties(self)
 	for i,property in ipairs(self.properties) do
 		local value
 		if self.isBuiltinProperty[property.name] then
-			value = property:getDiff()
+			if not property:isAtDefault() then
+				value = property:getValue()
+			end
 		else
 			value = property:getValue()
 		end

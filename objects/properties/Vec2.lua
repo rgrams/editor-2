@@ -19,12 +19,8 @@ function Vec2.getDefaultValue(self)
 	return value
 end
 
-function Vec2.getDiff(self)
-	local default = self.DEFAULT_VALUE
-	local dx, dy = self.value.x - default.x, self.value.y - default.y
-	if dx ~= 0 or dy ~= 0 then
-		return { x = dx, y = dy }
-	end
+function Vec2.isAtDefault(self)
+	return self.value.x == self.DEFAULT_VALUE.x and self.value.y == self.DEFAULT_VALUE.y
 end
 
 function Vec2.isValid(self, value)

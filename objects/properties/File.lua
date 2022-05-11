@@ -21,11 +21,4 @@ function File.isValid(self, value)
 	end
 end
 
-function File.getDiff(self)
-	local curVal = self:getValue()
-	if curVal ~= self.DEFAULT_VALUE then
-		return curVal
-	end
-end
-
 return File

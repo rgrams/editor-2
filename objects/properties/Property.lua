@@ -19,12 +19,9 @@ function Property.getDefaultValue(self)
 	return self.DEFAULT_VALUE
 end
 
-function Property.getDiff(self)
+function Property.isAtDefault(self)
 	local curVal = self:getValue()
-	local diff = curVal - self.DEFAULT_VALUE
-	if diff ~= 0 then
-		return diff
-	end
+	return curVal == self.DEFAULT_VALUE
 end
 
 function Property.isValid(self, value)
