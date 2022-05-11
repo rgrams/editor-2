@@ -142,7 +142,7 @@ local function getRotDragStartOffsets()
 	for i,enclosure in ipairs(enclosures) do
 		dragStartOffsets[i] = {
 			enclosure = enclosure,
-			startAngle = enclosure[1].angle
+			startAngle = enclosure[1]:getProperty("angle") or 0
 		}
 	end
 	return dragStartOffsets
@@ -193,7 +193,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 	elseif dragType == "rotate selection" then
 		self.isRotateDragging = true
 		local totalDX, totalDY = x - self.dragStartX + 1, y - self.dragStartY
-		local angle = math.atan2(totalDY, totalDX)
+		local angle = math.deg(math.atan2(totalDY, totalDX))
 		local roundIncr = modkeys.isPressed(self.snapKey) and config.rotateSnapIncrement
 
 		if not self.startedDragCommand then
@@ -421,7 +421,7 @@ function Tool.draw(self)
 		local isSnapped = modkeys.isPressed(self.snapKey)
 		local snapAngle = angle2
 		if isSnapped then
-			angle2 = math.round(angle2, config.rotateSnapIncrement)
+			angle2 = math.round(angle2, math.rad(config.rotateSnapIncrement))
 			snapAngle = angle2
 		end
 		local segments = math.abs(angle2)/0.1 + 1
