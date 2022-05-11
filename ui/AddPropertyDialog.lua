@@ -53,6 +53,7 @@ function AddPropDialog.set(self, callback, callbackArgs)
 
 	self.typeDropdownItems = { -- item = { text=, fn=, args= }
 		{ text = "float", fn = self.setType, args = {self, "float" } },
+		{ text = "bool", fn = self.setType, args = {self, "bool" } },
 		{ text = "vec2", fn = self.setType, args = {self, "vec2" } },
 		{ text = "file", fn = self.setType, args = {self, "file" } },
 	}

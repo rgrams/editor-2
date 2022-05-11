@@ -11,6 +11,7 @@ local propWidget = {
 	vec2 = require "ui.widgets.properties.Vec2",
 	file = require "ui.widgets.properties.File",
 	image = require "ui.widgets.properties.File",
+	bool = require "ui.widgets.properties.Bool"
 }
 local propClass = _G.propClassList
 
