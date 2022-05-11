@@ -171,7 +171,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 	if dragType == "translate selection" then
 		local totalDX, totalDY = x - self.dragStartX, y - self.dragStartY
 		local inWorldSpace = self.dragInWorldSpace
-		local roundX, roundY
+		local roundX, roundY = config.roundAllPropsTo, config.roundAllPropsTo
 		if modkeys.isPressed(self.snapKey) then
 			roundX, roundY = self.snapX, self.snapY
 		end
@@ -194,7 +194,10 @@ function Tool.drag(wgt, dx, dy, dragType)
 		self.isRotateDragging = true
 		local totalDX, totalDY = x - self.dragStartX + 1, y - self.dragStartY
 		local angle = math.deg(math.atan2(totalDY, totalDX))
-		local roundIncr = modkeys.isPressed(self.snapKey) and config.rotateSnapIncrement
+		local roundIncr = config.roundAllPropsTo
+		if modkeys.isPressed(self.snapKey) then
+			roundIncr = config.rotateSnapIncrement
+		end
 
 		if not self.startedDragCommand then
 			self.startedDragCommand = true

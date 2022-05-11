@@ -5,6 +5,7 @@ M.zoomRate = 0.1
 
 M.translateSnapIncrement = 8
 M.rotateSnapIncrement = 15
+M.roundAllPropsTo = 0.001
 M.gridPower = 2
 M.gridEmphasizeEvery = 4
 
