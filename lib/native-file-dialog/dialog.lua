@@ -4,6 +4,13 @@ local OS = love.system.getOS()
 
 local libPath
 
+local sourceDir = love.filesystem.getSource()
+
+if not sourceDir:sub(-1, -1):match("[\\/]") then
+	-- If the source dir and working dir match, then it omits the trailing separator.
+	sourceDir = sourceDir .. "/"
+end
+
 if OS == "Linux" then
 	libPath = "lib/native-file-dialog/nfd.so"
 elseif OS == "Windows" then
@@ -11,6 +18,8 @@ elseif OS == "Windows" then
 elseif OS == "OS X" then
 	libPath = "lib/native-file-dialog/libnfd.dylib"
 end
+
+libPath = sourceDir .. libPath
 
 local nfd = ffi.load(libPath)
 ffi.cdef[[
