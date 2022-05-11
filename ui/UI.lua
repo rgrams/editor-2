@@ -7,6 +7,10 @@ local Viewport = require "ui.Viewport"
 local PropertyPanel = require "ui.PropertyPanel"
 local scenes = require "scenes"
 local fileDialog = require "lib.native-file-dialog.dialog"
+local fileUtil = require "lib.file-util"
+
+local lastOpenFolder
+local lastSaveFolder
 
 Ruu.isHoverAction["pan camera"] = true
 Ruu.isHoverAction["right click"] = true
@@ -39,14 +43,16 @@ function UI.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
 		wgt.object.propertyPanel:updateProperties(scenes.active.selection)
 	elseif action == "save" and change == 1 then
 		if scenes.active then
-			local filepath = fileDialog.save()
+			local filepath = fileDialog.save(lastSaveFolder)
 			if not filepath then  return  end
+			lastSaveFolder = fileUtil.splitFilepath(filepath)
 			local exporter = require "io.defaultLuaImportExport"
 			exporter.export(scenes.active, filepath)
 		end
 	elseif action == "open" and change == 1 then
-		local filepath = fileDialog.open()
+		local filepath = fileDialog.open(lastOpenFolder)
 		if not filepath then  return  end
+		lastOpenFolder = fileUtil.splitFilepath(filepath)
 		local importer = require "io.defaultLuaImportExport"
 		importer.import(scenes.active, filepath)
 	end

@@ -6,6 +6,9 @@ local InputField = require "ui.widgets.InputField"
 local Button = require "ui.widgets.Button"
 local fileDialog = require "lib.native-file-dialog.dialog"
 local fileFieldTheme = require "ui.widgets.themes.filepath-inputField"
+local fileUtil = require "lib.file-util"
+
+local lastOpenFolder
 
 local font = { "assets/font/OpenSans-Semibold.ttf", 15 }
 local spacing = 2
@@ -69,8 +72,9 @@ function File.onConfirm(self, wgt)
 end
 
 function File.buttonPressed(self)
-	local path = fileDialog.open()
+	local path = fileDialog.open(lastOpenFolder)
 	if path then
+		lastOpenFolder = fileUtil.splitFilepath(path)
 		self.fieldWgt:setText(path)
 		self:onConfirm(self.fieldWgt)
 	end
