@@ -72,7 +72,7 @@ end
 function Dropdown.input(self, action, value, change, ...)
 	self.ruu:input(action, value, change, ...)
 	if action == Ruu.CLICK and change == 1 then
-		if not self.ruu.hoveredWidgets[1] then
+		if not self.ruu.hoveredWgts[1] then
 			self:close()
 		end
 	elseif action == Ruu.CANCEL and change == 1 then
