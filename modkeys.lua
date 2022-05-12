@@ -39,7 +39,8 @@ function M.getString()
 	return str
 end
 
-function M.keypressed(key)
+function M.keypressed(key, isRepeat)
+	if isRepeat then  return  end
 	local modkey = map[key]
 	if modkey then
 		presses[modkey] = presses[modkey] + 1

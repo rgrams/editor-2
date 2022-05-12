@@ -94,8 +94,8 @@ function love.resize(w, h)
 	_G.shouldRedraw = true
 end
 
-function love.keypressed(key, scancode, isrepeat)
-	modkeys.keypressed(key)
+function love.keypressed(key, scancode, isRepeat)
+	modkeys.keypressed(key, isRepeat)
 end
 
 function love.keyreleased(key)
