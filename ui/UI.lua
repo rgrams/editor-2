@@ -34,15 +34,6 @@ function UI.set(self)
 	self.propertyPanel = self.children[2]
 end
 
-function love.filedropped(file)
-	if scenes.active then
-		local filepath = file:getFilename()
-		local importer = require "io.defaultLuaImportExport"
-		importer.import(scenes.active, filepath)
-		_G.shouldRedraw = true
-	end
-end
-
 function UI.init(self)
 	UI.super.init(self)
 	Input.enable(self)

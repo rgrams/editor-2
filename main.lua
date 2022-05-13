@@ -103,3 +103,30 @@ end
 function love.keyreleased(key)
 	modkeys.keyreleased(key)
 end
+
+local fileUtil = require "lib.file-util"
+
+function love.filedropped(file)
+	if scenes.active then
+		local scene = scenes.active
+		local filepath = file:getFilename()
+		local _, _, ext = fileUtil.splitFilepath(filepath)
+		if ext == ".png" or ext == ".jpg" then
+			local image = fileUtil.loadImageFromAbsolutePath(filepath)
+			if image then
+				local Class = require "objects.EditorSprite"
+				local x, y = Camera.current:screenToWorld(love.mouse.getPosition())
+				local properties = {
+					image = { filepath },
+					pos = { { x = x, y = y } }
+				}
+				scene.history:perform("addObject", scene, Class, {}, properties)
+				_G.shouldRedraw = true
+				return
+			end
+		end
+		local importer = require "io.defaultLuaImportExport"
+		importer.import(scene, filepath)
+		_G.shouldRedraw = true
+	end
+end
