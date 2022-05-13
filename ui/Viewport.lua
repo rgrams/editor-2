@@ -22,6 +22,7 @@ function Viewport.set(self, ruu)
 	self.children = {
 		Tool(ruu)
 	}
+	self.tool = self.children[1]
 end
 
 function Viewport.init(self)
@@ -64,6 +65,7 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 			local enclosures = selection:copyList()
 			objectFn.removeDescendantsFromList(enclosures)
 			scene.history:perform("cut", scene, enclosures) -- Command sets clipboard (perform doesn't return).
+			wgt.object.tool:objectsUpdated()
 			return true
 		end
 	elseif action == "copy" and change == 1 and scenes.active then
@@ -84,6 +86,7 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 			local argsList = objectFn.copyPasteDataFor(scene, firstParent, _G.scene_clipboard)
 			-- Do NOT want to put the mutable clipboard table into the command history.
 			scene.history:perform("paste", scene, parentEnclosures, argsList)
+			wgt.object.tool:objectsUpdated()
 			return true
 		end
 	end

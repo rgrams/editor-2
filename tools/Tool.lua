@@ -352,6 +352,12 @@ function Tool.release(wgt, depth, dontFire, mx, my, isKeyboard)
 	end
 end
 
+function Tool.objectsUpdated(self)
+	if not self.isDragging then
+		updateHover(self)
+	end
+end
+
 function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
 	if action == wgt.ruu.MOUSE_MOVED then
 		local self = wgt.object
