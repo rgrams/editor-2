@@ -243,6 +243,40 @@ function Tool.drag(wgt, dx, dy, dragType)
 	end
 end
 
+local function hitCheckChildren(children, x, y, minDist, closestObj)
+	minDist = minDist or math.huge
+	for i=1,children.maxn do
+		local child = children[i]
+		if child then
+			local hitDist = child:touchesPoint(x, y)
+			if hitDist and hitDist < minDist then
+				minDist, closestObj = hitDist, child
+			end
+			if child.children then
+				closestObj, minDist = hitCheckChildren(child.children, x, y, minDist, closestObj)
+			end
+		end
+	end
+	return closestObj, minDist
+end
+
+local function updateHover(self, mx, my)
+	if self.hoverObj then
+		self.hoverObj.isHovered = false
+	end
+	self.hoverObj = nil
+	if scenes.active then
+		if not (mx and my) then
+			mx, my = love.mouse.getPosition()
+		end
+		local wx, wy = Camera.current:screenToWorld(mx, my)
+		self.hoverObj = hitCheckChildren(scenes.active.children, wx, wy)
+		if self.hoverObj then
+			self.hoverObj.isHovered = true
+		end
+	end
+end
+
 function Tool.addAt(self, Class, wx, wy)
 	self.lastAddClass = Class
 	local scene = scenes.active
@@ -263,6 +297,7 @@ function Tool.addAt(self, Class, wx, wy)
 		local properties = { pos = { { x = wx, y = wy } } }
 		scene.history:perform("addObject", scene, Class, {}, properties, isSelected, false)
 	end
+	updateHover(self)
 end
 
 function Tool.press(wgt, depth, mx, my, isKeyboard)
@@ -317,41 +352,11 @@ function Tool.release(wgt, depth, dontFire, mx, my, isKeyboard)
 	end
 end
 
-local function hitCheckChildren(children, x, y, minDist, closestObj)
-	minDist = minDist or math.huge
-	for i=1,children.maxn do
-		local child = children[i]
-		if child then
-			local hitDist = child:touchesPoint(x, y)
-			if hitDist and hitDist < minDist then
-				minDist, closestObj = hitDist, child
-			end
-			if child.children then
-				closestObj, minDist = hitCheckChildren(child.children, x, y, minDist, closestObj)
-			end
-		end
-	end
-	return closestObj, minDist
-end
-
-local function getObjectAt(scene, wx, wy)
-	return hitCheckChildren(scene.children, wx, wy)
-end
-
 function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
 	if action == wgt.ruu.MOUSE_MOVED then
 		local self = wgt.object
 		if self.isDragging then  return  end
-		if self.hoverObj then  self.hoverObj.isHovered = false  end
-		self.hoverObj = nil
-		local scene = scenes.active
-		if scene then
-			local wx, wy = Camera.current:screenToWorld(x, y)
-			self.hoverObj = getObjectAt(scene, wx, wy)
-		end
-		if self.hoverObj then
-			self.hoverObj.isHovered = true
-		end
+		updateHover(self, x, y)
 	elseif action == "delete" and change == 1 then
 		local scene = scenes.active
 		if scene then
@@ -361,10 +366,7 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 				objectFn.removeDescendantsFromList(enclosures)
 				scene.history:perform("deleteObjects", scene, enclosures)
 				self:updatePropertiesPanel()
-
-				if self.hoverObj and not self.hoverObj.tree then
-					self.hoverObj = nil
-				end
+				updateHover(self)
 			end
 		end
 	elseif action == "add" and change == 1 then
