@@ -1,4 +1,6 @@
 
+io.stdout:setvbuf("no")
+
 require "run"
 require "philtre.init"
 require "philtre.lib.math-patch"
