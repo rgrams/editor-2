@@ -1,6 +1,14 @@
 
 local M = {}
 
+function M.contains(list, val)
+	for i=1,#list do
+		if list[i] == val then
+			return i
+		end
+	end
+end
+
 -- Get a - b.
 -- AKA: Get the list of items that are -only- in `a`, -not- in `b`.
 function M.getSubtraction(a, b)

@@ -16,7 +16,7 @@ local width = 100
 local height = 26
 local dialogBtnWidth = 24
 
-function File.set(self, name, value)
+function File.set(self, name, value, PropClass)
 	File.super.set(self, spacing, false, -1, width, height)
 	self:mode("fill", "none")
 	self.layer = "gui"

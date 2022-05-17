@@ -3,7 +3,7 @@ local Class = require "philtre.modules.base-class"
 local Property = Class:extend()
 
 Property.widgetName = "float"
-Property.className = "float"
+Property.className = "float" -- For add-property menu and import/export.
 Property.name = "property"
 Property.DEFAULT_VALUE = 0
 

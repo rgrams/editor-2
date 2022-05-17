@@ -11,7 +11,8 @@ local propWidget = {
 	vec2 = require "ui.widgets.properties.Vec2",
 	file = require "ui.widgets.properties.File",
 	image = require "ui.widgets.properties.File",
-	bool = require "ui.widgets.properties.Bool"
+	bool = require "ui.widgets.properties.Bool",
+	enum = require "ui.widgets.properties.Enum",
 }
 local propClass = _G.propClassList
 
@@ -52,7 +53,7 @@ end
 
 local function addPropertyWidget(self, selection, PropClass, name, value)
 	local Class = propWidget[PropClass.widgetName]
-	local object = Class(name, value)
+	local object = Class(name, value, PropClass)
 	self.tree:add(object, self)
 	object:setSelection(selection)
 	object:initRuu(self.ruu, self.wgtMap)

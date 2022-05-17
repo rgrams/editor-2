@@ -9,7 +9,7 @@ local spacing = 2
 local width = 100
 local height = 26
 
-function Float.set(self, name, value)
+function Float.set(self, name, value, PropClass)
 	Float.super.set(self, spacing, false, -1, width, height)
 	self:mode("fill", "none")
 	self.layer = "gui"

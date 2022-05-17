@@ -19,7 +19,7 @@ local function Sublabel(text)
 	return label
 end
 
-function Vec2.set(self, name, value)
+function Vec2.set(self, name, value, PropClass)
 	Vec2.super.set(self, spacing, false, -1, width, height)
 	self:mode("fill", "none")
 	self.layer = "gui"

@@ -1,34 +1,40 @@
 
-local Bool = gui.Row:extend()
-Bool.className = "Bool"
+local Enum = gui.Row:extend()
+Enum.className = "Enum"
 
-local Checkbox = require "ui.widgets.Checkbox"
-local checkboxTheme = require "ui.widgets.themes.checkbox"
+local Button = require "ui.widgets.Button"
+local Dropdown = require "ui.widgets.Dropdown"
 
 local font = { "assets/font/OpenSans-Semibold.ttf", 15 }
 local spacing = 2
 local width = 100
 local height = 26
 
-function Bool.set(self, name, value, PropClass)
-	Bool.super.set(self, spacing, false, -1, width, height)
+function Enum.set(self, name, value, PropClass)
+	Enum.super.set(self, spacing, false, -1, width, height)
 	self:mode("fill", "none")
 	self.layer = "gui"
 	self.propertyName = name
 	self.value = value
 	self.label = gui.Text(name, font, width, "W", "W", "left"):setPos(2)
 	self.label.color = { 0.6, 0.6, 0.6, 1 }
-	self.checkbox = Checkbox()
-	self.children = { self.label, self.checkbox }
+	self.button = Button(value, nil, "center")
+	self.children = { self.label, self.button }
 	self.label.isGreedy = true
-	self.checkbox.color = { 1.65, 0.65, 0.65, 1 }
+	self.button.color = { 1.65, 0.65, 0.65, 1 }
+
+	local items = {} -- item = { text=, fn=, args= }
+	self.dropdownItems = items
+	for i,val in ipairs(PropClass.validValues) do
+		items[i] = { text = val, fn = self.setValue, args = { self, val } }
+	end
 end
 
-function Bool.ruuInput(wgt, depth, action, value, change)
+function Enum.ruuInput(wgt, depth, action, value, change)
 	if action == "delete" and change == 1 then
 		local self = wgt.object
 		if not self.selection then
-			print("Error: PropertyWidget[Bool].delete - No selection known.")
+			print("Error: PropertyWidget[Enum].delete - No selection known.")
 		else
 			local scene = self.selection.scene
 			local cmd = "removeSamePropertyFromMultiple"
@@ -40,14 +46,14 @@ function Bool.ruuInput(wgt, depth, action, value, change)
 	end
 end
 
-function Bool.setSelection(self, selection)
+function Enum.setSelection(self, selection)
 	self.selection = selection
 end
 
-function Bool.onToggle(self, wgt)
-	local value = wgt.isChecked
+function Enum.setValue(self, value)
+	self.button.text.text = value
 	if not self.selection then
-		print("Error: PropertyWidget[Bool].onToggle - No selection known.")
+		print("Error: PropertyWidget[Enum].setValue - No selection known.")
 	else
 		local scene = self.selection.scene
 		local cmd = "setSamePropertyOnMultiple"
@@ -56,11 +62,19 @@ function Bool.onToggle(self, wgt)
 	end
 end
 
-function Bool.initRuu(self, ruu, map)
+function Enum.onButtonPress(self, wgt)
+	local btn = wgt.object
+	local x, y = btn:toWorld(-btn.w/2, -btn.h/2)
+	local dropdown = Dropdown(x, y, self.dropdownItems)
+	local guiRoot = self.tree:get("/Window")
+	self.tree:add(dropdown, guiRoot)
+end
+
+function Enum.initRuu(self, ruu, map)
 	self.ruu = ruu
 	self.panel = self.ruu:Panel(self)
 	self.panel.ruuInput = self.ruuInput
-	self.wgt = self.ruu:ToggleButton(self.checkbox, self.onToggle, self.value, checkboxTheme)
+	self.wgt = self.ruu:Button(self.button, self.onButtonPress)
 	self.wgt:args(self, self.wgt)
 	table.insert(map, self.wgt)
 	self.widgets = {
@@ -68,7 +82,7 @@ function Bool.initRuu(self, ruu, map)
 	}
 end
 
-function Bool.destroyRuu(self, map)
+function Enum.destroyRuu(self, map)
 	self.ruu:destroy(self.panel) -- Panel is not in navigation map.
 	for i=#map,1,-1 do
 		local wgt = map[i]
@@ -83,7 +97,7 @@ function Bool.destroyRuu(self, map)
 	end
 end
 
-function Bool.draw(self)
+function Enum.draw(self)
 	if self.panel and self.panel.isFocused then
 		love.graphics.setColor(1, 1, 1, 0.5)
 		local lineWidth = 1
@@ -92,4 +106,4 @@ function Bool.draw(self)
 	end
 end
 
-return Bool
+return Enum
