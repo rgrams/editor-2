@@ -4,8 +4,6 @@ local EditorSprite = EditorObject:extend()
 EditorSprite.className = "EditorSprite"
 
 EditorSprite.displayName = "Sprite"
-EditorObject.hitWidth = 32
-EditorObject.hitHeight = 32
 
 _G.objClassList:add(EditorSprite, EditorSprite.displayName)
 
@@ -23,8 +21,8 @@ EditorSprite.isBuiltinProperty = {
 	[Image.name] = true,
 }
 
-function EditorSprite.set(self, x, y, angle, ...)
-	Object.set(self, x, y, angle, ...)
+function EditorSprite.set(self)
+	Object.set(self)
 	self.enclosure = { self } -- TODO: Placeholder. Should be in `addObject` command.
 	self.isSelected = false
 	self.isHovered = false
