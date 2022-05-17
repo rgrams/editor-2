@@ -33,8 +33,8 @@ end
 
 function Viewport.allocate(self, ...)
 	Viewport.super.allocate(self, ...)
-	-- TODO: Debug what's going on with Node allocations and make this non-hard-coded.
-	Camera.current:setViewport(0, 0, self.w, self.h)
+	local left, top = self._to_world.x - self.w/2, self._to_world.y - self.h/2
+	Camera.current:setViewport(left, top, self.w, self.h)
 end
 
 function Viewport.scroll(wgt, depth, dx, dy)
