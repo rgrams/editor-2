@@ -2,9 +2,9 @@
 local Class = require "philtre.modules.base-class"
 local Property = Class:extend()
 
-Property.widgetName = "float"
-Property.className = "float" -- For add-property menu and import/export.
 Property.name = "property"
+Property.className = "float" -- For add-property menu and import/export.
+Property.WidgetClass = require("ui.widgets.properties.Float")
 Property.DEFAULT_VALUE = 0
 
 _G.propClassList:add(Property, Property.className)

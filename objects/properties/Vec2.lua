@@ -2,9 +2,9 @@
 local Property = require(GetRequireFolder(...) .. "Property")
 local Vec2 = Property:extend()
 
-Vec2.widgetName = "vec2"
-Vec2.className = "vec2"
 Vec2.name = "vec2"
+Vec2.className = "vec2"
+Vec2.WidgetClass = require("ui.widgets.properties.Vec2")
 Vec2.DEFAULT_VALUE = { x = 0, y = 0 }
 
 _G.propClassList:add(Vec2, Vec2.className)

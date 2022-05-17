@@ -4,7 +4,7 @@ local Bool = Property:extend()
 
 Bool.name = "bool"
 Bool.className = "bool"
-Bool.widgetName = "bool"
+Bool.WidgetClass = require("ui.widgets.properties.Bool")
 Bool.DEFAULT_VALUE = "false"
 
 _G.propClassList:add(Bool, Bool.className)

@@ -2,9 +2,9 @@
 local Property = require(GetRequireFolder(...) .. "Property")
 local File = Property:extend()
 
-File.widgetName = "file"
-File.className = "file"
 File.name = "file"
+File.className = "file"
+File.WidgetClass = require("ui.widgets.properties.File")
 File.DEFAULT_VALUE = ""
 
 _G.propClassList:add(File, File.className)

@@ -6,14 +6,6 @@ local scenes = require "scenes"
 local AddPropertyDialog = require "ui.AddPropertyDialog"
 
 local headerFont = { "assets/font/OpenSans-Semibold.ttf", 17 }
-local propWidget = {
-	float = require "ui.widgets.properties.Float",
-	vec2 = require "ui.widgets.properties.Vec2",
-	file = require "ui.widgets.properties.File",
-	image = require "ui.widgets.properties.File",
-	bool = require "ui.widgets.properties.Bool",
-	enum = require "ui.widgets.properties.Enum",
-}
 local propClass = _G.propClassList
 
 local spacing = 2
@@ -52,8 +44,7 @@ function PropertyPanel.addProperty(self, propType, propName)
 end
 
 local function addPropertyWidget(self, selection, PropClass, name, value)
-	local Class = propWidget[PropClass.widgetName]
-	local object = Class(name, value, PropClass)
+	local object = PropClass.WidgetClass(name, value, PropClass)
 	self.tree:add(object, self)
 	object:setSelection(selection)
 	object:initRuu(self.ruu, self.wgtMap)

@@ -6,9 +6,9 @@ local fileUtil = require "lib.file-util"
 
 local imageCache = {}
 
-Image.widgetName = "image"
-Image.className = "image"
 Image.name = "image"
+Image.className = "image"
+Image.WidgetClass = require("ui.widgets.properties.File")
 Image.DEFAULT_VALUE = false
 
 _G.propClassList:add(Image, Image.className)

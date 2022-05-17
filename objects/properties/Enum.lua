@@ -5,8 +5,8 @@ local Enum = Property:extend()
 local list = require "lib.list"
 
 Enum.name = "enum"
-Enum.widgetName = "enum"
 Enum.className = "enum"
+Enum.WidgetClass = require("ui.widgets.properties.Enum")
 Enum.validValues = { "one", "two", "three" }
 Enum.DEFAULT_VALUE = Enum.validValues[1]
 
