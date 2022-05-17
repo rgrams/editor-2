@@ -1,46 +1,14 @@
 
-local Float = gui.Row:extend()
+local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
+local Float = BaseClass:extend()
 Float.className = "Float"
 
 local InputField = require "ui.widgets.InputField"
 
-local font = { "assets/font/OpenSans-Semibold.ttf", 15 }
-local spacing = 2
-local width = 100
-local height = 26
-
 function Float.set(self, name, value, PropClass)
-	Float.super.set(self, spacing, false, -1, width, height)
-	self:mode("fill", "none")
-	self.layer = "gui"
-	self.propertyName = name
-	self.value = value or 0
-	self.label = gui.Text(name, font, width, "W", "W", "left"):setPos(2)
-	self.label.color = { 0.6, 0.6, 0.6, 1 }
+	Float.super.set(self, name, value, PropClass)
 	self.field = InputField(self.value)
-	self.children = { self.label, self.field }
-	self.label.isGreedy = true
-	self.field.color = { 0.65, 0.65, 0.65, 1 }
-end
-
-function Float.ruuInput(wgt, depth, action, value, change)
-	if action == "delete" and change == 1 then
-		local self = wgt.object
-		if not self.selection then
-			print("Error: PropertyWidget[Float].delete - No selection known.")
-		else
-			local scene = self.selection.scene
-			local cmd = "removeSamePropertyFromMultiple"
-			local enclosures = self.selection:copyList()
-			scene.history:perform(cmd, enclosures, self.propertyName)
-			local propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
-			propertyPanel:updateProperties(self.selection)
-		end
-	end
-end
-
-function Float.setSelection(self, selection)
-	self.selection = selection
+	table.insert(self.children, self.field)
 end
 
 function Float.onConfirm(self, wgt)
@@ -61,40 +29,11 @@ function Float.onConfirm(self, wgt)
 	end
 end
 
-function Float.initRuu(self, ruu, map)
-	self.ruu = ruu
-	self.panel = self.ruu:Panel(self)
-	self.panel.ruuInput = self.ruuInput
+function Float.initRuu(self, ruu, navList)
+	Float.super.initRuu(self, ruu, navList)
 	self.wgt = self.ruu:InputField(self.field, self.onConfirm, self.value)
 	self.wgt:args(self, self.wgt)
-	table.insert(map, self.wgt)
-	self.widgets = {
-		[self.wgt] = true
-	}
-end
-
-function Float.destroyRuu(self, map)
-	self.ruu:destroy(self.panel) -- Panel is not in navigation map.
-	for i=#map,1,-1 do
-		local wgt = map[i]
-		if self.widgets[wgt] then
-			self.widgets[wgt] = nil
-			self.ruu:destroy(wgt)
-			table.remove(map, i)
-			if not next(self.widgets) then
-				break
-			end
-		end
-	end
-end
-
-function Float.draw(self)
-	if self.panel and self.panel.isFocused then
-		love.graphics.setColor(1, 1, 1, 0.5)
-		local lineWidth = 1
-		local w, h = self.w - lineWidth, self.h - lineWidth
-		love.graphics.rectangle("line", -w/2, -h/2, w, h)
-	end
+	self:addWidget(self.wgt)
 end
 
 return Float
