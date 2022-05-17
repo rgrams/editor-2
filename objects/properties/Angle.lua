@@ -1,7 +1,5 @@
 
-local _basePath = (...):gsub("Angle$", "")
-local Property = require(_basePath .. "Property")
-
+local Property = require(GetRequireFolder(...) .. "Property")
 local Angle = Property:extend()
 
 Angle.name = "angle"

@@ -1,7 +1,5 @@
 
-local _basePath = (...):gsub("Image$", "")
-local Property = require(_basePath .. "Property")
-
+local Property = require(GetRequireFolder(...) .. "Property")
 local Image = Property:extend()
 
 local fileUtil = require "lib.file-util"

@@ -1,9 +1,8 @@
 
-local _basePath = (...):gsub("Enum$", "")
-local Property = require(_basePath .. "Property")
+local Property = require(GetRequireFolder(...) .. "Property")
+local Enum = Property:extend()
 
 local list = require "lib.list"
-local Enum = Property:extend()
 
 Enum.name = "enum"
 Enum.widgetName = "enum"

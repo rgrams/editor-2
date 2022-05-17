@@ -1,7 +1,5 @@
 
-local _basePath = (...):gsub("File$", "")
-local Property = require(_basePath .. "Property")
-
+local Property = require(GetRequireFolder(...) .. "Property")
 local File = Property:extend()
 
 File.widgetName = "file"

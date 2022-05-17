@@ -1,7 +1,5 @@
 
-local _basePath = (...):gsub("Bool$", "")
-local Property = require(_basePath .. "Property")
-
+local Property = require(GetRequireFolder(...) .. "Property")
 local Bool = Property:extend()
 
 Bool.name = "bool"

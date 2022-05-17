@@ -1,7 +1,5 @@
 
-local _basePath = (...):gsub("Vec2$", "")
-local Property = require(_basePath .. "Property")
-
+local Property = require(GetRequireFolder(...) .. "Property")
 local Vec2 = Property:extend()
 
 Vec2.widgetName = "vec2"

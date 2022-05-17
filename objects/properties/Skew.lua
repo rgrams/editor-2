@@ -1,7 +1,5 @@
 
-local _basePath = (...):gsub("Skew$", "")
-local Vec2 = require(_basePath .. "Vec2")
-
+local Vec2 = require(GetRequireFolder(...) .. "Vec2")
 local Skew = Vec2:extend()
 
 Skew.name = "skew"

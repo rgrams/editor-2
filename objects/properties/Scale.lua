@@ -1,7 +1,5 @@
 
-local _basePath = (...):gsub("Scale$", "")
-local Vec2 = require(_basePath .. "Vec2")
-
+local Vec2 = require(GetRequireFolder(...) .. "Vec2")
 local Scale = Vec2:extend()
 
 Scale.name = "scale"
