@@ -137,25 +137,8 @@ function EditorObject.touchesPoint(self, wx, wy)
 	end
 end
 
-function EditorObject.draw(self)
-	love.graphics.setBlendMode("alpha")
-	local lineWidth = 1
-	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2
-
-	if self.isHovered then
-		love.graphics.setColor(1, 1, 1, 0.03)
-		love.graphics.rectangle("fill", -hw, -hh, hw*2, hh*2)
-	end
-
-	love.graphics.setColor(config.xAxisColor)
-	love.graphics.line(0, 0, hw, 0)
-	love.graphics.setColor(config.yAxisColor)
-	love.graphics.line(0, 0, 0, -hh)
-	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
-	love.graphics.rectangle("line", -hw, -hh, hw*2, hh*2)
-	love.graphics.circle("line", 0, 0, 0.5, 4)
-
-	local children = self.children
+function EditorObject.drawParentChildLines(self, children)
+	children = children or self.children
 	if children then
 		for i=1,children.maxn or #children do
 			local child = children[i]
@@ -174,6 +157,27 @@ function EditorObject.draw(self)
 			end
 		end
 	end
+end
+
+function EditorObject.draw(self)
+	love.graphics.setBlendMode("alpha")
+	local lineWidth = 1
+	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2
+
+	if self.isHovered then
+		love.graphics.setColor(1, 1, 1, 0.03)
+		love.graphics.rectangle("fill", -hw, -hh, hw*2, hh*2)
+	end
+
+	love.graphics.setColor(config.xAxisColor)
+	love.graphics.line(0, 0, hw, 0)
+	love.graphics.setColor(config.yAxisColor)
+	love.graphics.line(0, 0, 0, -hh)
+	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
+	love.graphics.rectangle("line", -hw, -hh, hw*2, hh*2)
+	love.graphics.circle("line", 0, 0, 0.5, 4)
+
+	self:drawParentChildLines()
 end
 
 function EditorObject.updateAABB(self)
