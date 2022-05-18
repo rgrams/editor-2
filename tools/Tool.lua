@@ -109,9 +109,9 @@ local function getDragStartOffsets(inWorldSpace)
 		local obj = enclosure[1]
 		local x, y
 		if inWorldSpace then
-			x, y = obj._to_world.x, obj._to_world.y
+			x, y = obj:getWorldPos()
 		else
-			x, y = obj.pos.x, obj.pos.y
+			x, y = obj:getLocalPos()
 		end
 		dragStartOffsets[i] = {
 			enclosure = enclosure,
@@ -130,7 +130,7 @@ local function getDragArgList(startOffsets, dx, dy, inWorldSpace, rx, ry)
 		local _y = data.startY + dy
 		if inWorldSpace then
 			local obj = data.enclosure[1]
-			_x, _y = obj.parent:toLocal(_x, _y)
+			_x, _y = obj:toLocalPos(_x, _y)
 		end
 		if shouldRound then
 			_x, _y = math.round(_x, rx), math.round(_y, ry)

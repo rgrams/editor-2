@@ -13,11 +13,15 @@ EditorGuiNode.hitHeight = 100
 _G.objClassList:add(EditorGuiNode, EditorGuiNode.displayName)
 
 local Vec2 = require "objects.properties.Vec2"
+local Float = require "objects.properties.Property"
 local Cardinal = require "objects.properties.Enum_CardinalDir"
 local ResizeMode = require "objects.properties.Enum_GuiResizeMode"
 
 EditorGuiNode.isBuiltinProperty = {
+	pos = true,
+	angle = true,
 	size = true,
+	skew = true,
 	pivot = true,
 	anchor = true,
 	modeX = true,
@@ -41,7 +45,10 @@ function EditorGuiNode.init(self)
 end
 
 function EditorGuiNode.initProperties(self)
+	self:addProperty(Vec2, "pos")
+	self:addProperty(Float, "angle")
 	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight })
+	self:addProperty(Vec2, "skew")
 	self:addProperty(Cardinal, "pivot")
 	self:addProperty(Cardinal, "anchor")
 	self:addProperty(ResizeMode, "modeX")
@@ -55,13 +62,30 @@ function EditorGuiNode.allocate(self, ...)
 	self:updateAABB()
 end
 
+function EditorGuiNode.toLocalPos(self, wx, wy)
+	local lx, ly = self.parent:toLocal(wx, wy)
+	lx, ly = lx - self.anchorPosX, ly - self.anchorPosY
+	local pivotX, pivotY = self.w * self.px/2, self.h * self.py/2
+	lx, ly = lx + pivotX, ly + pivotY
+	return lx, ly
+end
+
 function EditorGuiNode.setProperty(self, name, value)
 	local property = self:getPropertyObj(name)
 	if property then
 		property:setValue(value)
-		if name == "size" then
+		if name == "pos" then
+			self:setPos(value.x, value.y, true)
+			self:updateAABB()
+		elseif name == "angle" then
+			self:setAngle(math.rad(value))
+			self:updateAABB()
+		elseif name == "size" then
 			self:size(value.x, value.y, true)
 			self.hitWidth, self.hitHeight = self.w, self.h
+			self:updateAABB()
+		elseif name == "skew" then
+			self:setSkew(value.x, value.y)
 			self:updateAABB()
 		elseif name == "pivot" then
 			self:pivot(value) -- Cardinal

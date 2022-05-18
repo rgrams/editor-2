@@ -119,6 +119,18 @@ function EditorObject.getModifiedProperties(self)
 	return properties
 end
 
+function EditorObject.getLocalPos(self)
+	return self.pos.x, self.pos.y
+end
+
+function EditorObject.getWorldPos(self)
+	return self._to_world.x, self._to_world.y
+end
+
+function EditorObject.toLocalPos(self, wx, wy)
+	return self.parent:toLocal(wx, wy)
+end
+
 function EditorObject.setPosition(self, x, y)
 	if x then  self.pos.x = x  end
 	if y then  self.pos.y = y  end
