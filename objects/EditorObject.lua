@@ -22,7 +22,6 @@ EditorObject.isBuiltinProperty = {
 
 function EditorObject.set(self)
 	EditorObject.super.set(self)
-	self.enclosure = { self } -- TODO: Placeholder. Should be in `addObject` command.
 	self.isSelected = false
 	self.isHovered = false
 	self.AABB = {}
