@@ -146,7 +146,9 @@ function EditorObject.touchesPoint(self, wx, wy)
 	local lx, ly = self:toLocal(wx, wy)
 	local hw, hh = self.hitWidth/2, self.hitHeight/2
 	if lx >= -hw and lx <= hw and ly >= -hh and ly <= hh then
-		return vec2.len2(lx, ly)
+		-- Funky calculation so smaller objects are more "sensitive" for when obj positions are identical.
+		local sx, sy = self.sx, self.sy
+		return vec2.len2(lx*hw*sx*sx, ly*hh*sy*sy)
 	end
 end
 
