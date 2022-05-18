@@ -27,6 +27,10 @@ function EditorObject.set(self)
 	self.AABB = {}
 	self.properties = {}
 	self.propertyMap = {}
+	self:initProperties()
+end
+
+function EditorObject.initProperties(self)
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
 	self:addProperty(Vec2, "scale", { x = 1, y = 1 })

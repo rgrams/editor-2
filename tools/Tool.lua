@@ -5,6 +5,7 @@ Tool.className = "Tool"
 local config = require "config"
 local scenes = require "scenes"
 local EditorObject = require "objects.EditorObject"
+local Vec2Property = require "objects.properties.Vec2"
 local objectFn = require "commands.functions.object-functions"
 local modkeys = require "modkeys"
 local list = require "lib.list"
@@ -286,7 +287,7 @@ function Tool.addAt(self, Class, wx, wy)
 		for i,parentEnclosure in ipairs(scene.selection) do
 			local parentObj = parentEnclosure[1]
 			local lx, ly = parentObj:toLocal(wx, wy)
-			local properties = { pos = { { x = lx, y = ly } } }
+			local properties = { pos = { { x = lx, y = ly }, Vec2Property } }
 			local args = {
 				scene, Class, {}, properties, isSelected, parentEnclosure
 			}
@@ -294,7 +295,7 @@ function Tool.addAt(self, Class, wx, wy)
 		end
 		scene.history:perform("addObjects", scene, argsList)
 	else
-		local properties = { pos = { { x = wx, y = wy } } }
+		local properties = { pos = { { x = wx, y = wy }, Vec2Property } }
 		scene.history:perform("addObject", scene, Class, {}, properties, isSelected, false)
 	end
 	updateHover(self)

@@ -17,8 +17,8 @@ EditorSprite.isBuiltinProperty = {
 	image = true,
 }
 
-function EditorSprite.set(self)
-	EditorSprite.super.set(self)
+function EditorSprite.initProperties(self)
+	EditorSprite.super.initProperties(self)
 	self:addProperty(Image, "image")
 end
 
