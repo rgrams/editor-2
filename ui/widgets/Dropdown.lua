@@ -15,6 +15,7 @@ function Dropdown.set(self, x, y, items)
 	local height = #items * (Button.height + spacing) - spacing + pad*2
 	Dropdown.super.set(self, spacing, false, -1, width, height, "NW", "NW")
 	self:pad(pad, pad)
+	self.layer = "dropdown"
 
 	-- Adjust position so the dropdown fits on screen.
 	local winW, winH = love.graphics.getDimensions()
@@ -55,6 +56,8 @@ end
 
 function Dropdown.addButtonObject(self, btnText)
 	local btn = Button(btnText)
+	btn.layer = "dropdown"
+	btn.text.layer = "dropdown text"
 	table.insert(self.children, btn)
 end
 
