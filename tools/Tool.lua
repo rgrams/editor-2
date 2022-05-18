@@ -63,17 +63,22 @@ local function stopDrag(self)
 	self.startedDragCommand = false
 end
 
-local function getObjectsInBox(parent, lt, top, w, h, hitEnclosures)
+local function AABBsOverlap(lt1, top1, rt1, bot1, lt2, top2, rt2, bot2)
+	return lt1 < rt2 and rt1 > lt2 and top1 < bot2 and bot1 > top2
+end
+
+local function getObjectsInBox(parent, lt, top, rt, bot, hitEnclosures)
 	hitEnclosures = hitEnclosures or {}
 	for i=1,parent.children.maxn do
 		local child = parent.children[i]
 		if child then
-			local cx, cy = child:toWorld(0, 0)
-			if cx >= lt and cx <= lt+w and cy >= top and cy <= top+h then
+			local AABB = child.AABB
+			local lt2, top2, rt2, bot2 = AABB.lt, AABB.top, AABB.rt, AABB.bot
+			if AABBsOverlap(lt, top, rt, bot, lt2, top2, rt2, bot2) then
 				table.insert(hitEnclosures, child.enclosure)
 			end
 			if child.children then
-				getObjectsInBox(child, lt, top, w, h, hitEnclosures)
+				getObjectsInBox(child, lt, top, rt, bot, hitEnclosures)
 			end
 		end
 	end
@@ -217,8 +222,8 @@ function Tool.drag(wgt, dx, dy, dragType)
 	elseif dragType == "box select" then
 		self.isBoxSelecting = true
 		local lt, top = math.min(x, self.dragStartX), math.min(y, self.dragStartY)
-		local w, h = math.abs(x - self.dragStartX), math.abs(y - self.dragStartY)
-		local hitEnclosures = getObjectsInBox(scene, lt, top, w, h)
+		local rt, bot = math.max(x, self.dragStartX), math.max(y, self.dragStartY)
+		local hitEnclosures = getObjectsInBox(scene, lt, top, rt, bot)
 		local mode = getBoxSelectMode(self)
 		local curSelection = self.originalSelection
 		local newSelection
