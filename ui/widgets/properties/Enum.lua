@@ -8,6 +8,7 @@ local Dropdown = require "ui.widgets.Dropdown"
 
 function Enum.set(self, name, value, PropClass)
 	Enum.super.set(self, name, value, PropClass)
+	self.PropClass = PropClass
 
 	self.button = Button(value, nil, "center")
 	table.insert(self.children, self.button)
@@ -22,6 +23,7 @@ end
 
 function Enum.setValue(self, value)
 	self.button.text.text = value
+	self.value = value
 	if not self.selection then
 		print("Error: PropertyWidget[Enum].setValue - No selection known.")
 	else
@@ -35,7 +37,8 @@ end
 function Enum.onButtonPress(self, wgt)
 	local btn = wgt.object
 	local x, y = btn:toWorld(-btn.w/2, -btn.h/2)
-	local dropdown = Dropdown(x, y, self.dropdownItems)
+	local focusedIndex = self.PropClass:getIndex(self.value)
+	local dropdown = Dropdown(x, y, self.dropdownItems, focusedIndex)
 	local guiRoot = self.tree:get("/Window")
 	self.tree:add(dropdown, guiRoot)
 end

@@ -11,7 +11,8 @@ local pad = 2
 local width = Button.width + pad*2
 
  -- item = { text=, fn=, args= }
-function Dropdown.set(self, x, y, items)
+function Dropdown.set(self, x, y, items, focusedIndex)
+	self.initFocusIndex = focusedIndex or 1
 	local height = #items * (Button.height + spacing) - spacing + pad*2
 	Dropdown.super.set(self, spacing, false, -1, width, height, "NW", "NW")
 	self:pad(pad, pad)
@@ -44,7 +45,7 @@ function Dropdown.init(self)
 		table.insert(wgtMap, { wgt })
 	end
 	self.ruu:mapNeighbors(wgtMap)
-	self.ruu:setFocus(self.children[1].widget)
+	self.ruu:setFocus(self.children[self.initFocusIndex].widget)
 
 	Dropdown.super.init(self)
 	Input.enable(self)

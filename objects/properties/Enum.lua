@@ -17,4 +17,12 @@ function Enum.isValid(self, value)
 	return isValid, value
 end
 
+function Enum.getIndex(self, value)
+	for i,v in ipairs(self.validValues) do
+		if v == value then
+			return i
+		end
+	end
+end
+
 return Enum
