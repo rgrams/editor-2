@@ -1,13 +1,15 @@
 
+-- Base class for properties and also a 'float' type property.
+
 local Class = require "philtre.modules.base-class"
 local Property = Class:extend()
 
-Property.name = "property"
-Property.className = "float" -- For add-property menu and import/export.
+Property.name = "float"
+Property.typeName = "float" -- For add-property menu and import/export.
 Property.WidgetClass = require("ui.widgets.properties.Float")
 Property.DEFAULT_VALUE = 0
 
-_G.propClassList:add(Property, Property.className)
+_G.propClassList:add(Property, Property.typeName)
 
 function Property.set(self, obj, name)
 	self.obj = obj

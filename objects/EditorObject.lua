@@ -10,16 +10,14 @@ EditorObject.hitHeight = 32
 
 _G.objClassList:add(EditorObject, EditorObject.displayName)
 
-local Position = require "objects.properties.Position"
-local Angle = require "objects.properties.Angle"
-local Scale = require "objects.properties.Scale"
-local Skew = require "objects.properties.Skew"
+local Float = require "objects.properties.Property"
+local Vec2 = require "objects.properties.Vec2"
 
 EditorObject.isBuiltinProperty = {
-	[Position.name] = true,
-	[Angle.name] = true,
-	[Scale.name] = true,
-	[Skew.name] = true,
+	pos = true,
+	angle = true,
+	scale = true,
+	skew = true,
 }
 
 function EditorObject.set(self)
@@ -30,10 +28,10 @@ function EditorObject.set(self)
 	self.AABB = {}
 	self.properties = {}
 	self.propertyMap = {}
-	self:addProperty(Position)
-	self:addProperty(Angle)
-	self:addProperty(Scale)
-	self:addProperty(Skew)
+	self:addProperty(Vec2, "pos")
+	self:addProperty(Float, "angle")
+	self:addProperty(Vec2, "scale", { x = 1, y = 1 })
+	self:addProperty(Vec2, "skew")
 end
 
 function EditorObject.init(self)
@@ -68,6 +66,15 @@ function EditorObject.setProperty(self, name, value)
 	local property = self:getPropertyObj(name)
 	if property then
 		property:setValue(value)
+		if name == "pos" then
+			self:setPosition(value.x, value.y)
+		elseif name == "angle" then
+			self:setAngle(math.rad(value))
+		elseif name == "scale" then
+			self:setScale(value.x, value.y)
+		elseif name == "skew" then
+			self:setSkew(value.x, value.y)
+		end
 		return true
 	else
 		return false
@@ -109,8 +116,9 @@ function EditorObject.getModifiedProperties(self)
 	return properties
 end
 
-function EditorObject.setPosition(self, pos)
-	self.pos = pos
+function EditorObject.setPosition(self, x, y)
+	if x then  self.pos.x = x  end
+	if y then  self.pos.y = y  end
 	self:updateAABB()
 end
 
@@ -119,13 +127,15 @@ function EditorObject.setAngle(self, angle)
 	self:updateAABB()
 end
 
-function EditorObject.setScale(self, sx, sy)
-	self.sx, self.sy = sx, sy
+function EditorObject.setScale(self, x, y)
+	if x then  self.sx = x  end
+	if y then  self.sy = y  end
 	self:updateAABB()
 end
 
-function EditorObject.setSkew(self, kx, ky)
-	self.kx, self.ky = kx, ky
+function EditorObject.setSkew(self, x, y)
+	if x then  self.kx = x  end
+	if y then  self.ky = y  end
 	self:updateAABB()
 end
 

@@ -7,11 +7,11 @@ local fileUtil = require "lib.file-util"
 local imageCache = {}
 
 Image.name = "image"
-Image.className = "image"
+Image.typeName = "image"
 Image.WidgetClass = require("ui.widgets.properties.File")
 Image.DEFAULT_VALUE = false
 
-_G.propClassList:add(Image, Image.className)
+_G.propClassList:add(Image, Image.typeName)
 
 -- NOTE: property `value` is the filepath. Store the actual image separately.
 

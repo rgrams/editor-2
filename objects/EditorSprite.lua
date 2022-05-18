@@ -7,33 +7,40 @@ EditorSprite.displayName = "Sprite"
 
 _G.objClassList:add(EditorSprite, EditorSprite.displayName)
 
-local Position = require "objects.properties.Position"
-local Angle = require "objects.properties.Angle"
-local Scale = require "objects.properties.Scale"
-local Skew = require "objects.properties.Skew"
 local Image = require "objects.properties.Image"
 
 EditorSprite.isBuiltinProperty = {
-	[Position.name] = true,
-	[Angle.name] = true,
-	[Scale.name] = true,
-	[Skew.name] = true,
-	[Image.name] = true,
+	pos = true,
+	angle = true,
+	scale = true,
+	skew = true,
+	image = true,
 }
 
 function EditorSprite.set(self)
-	Object.set(self)
-	self.enclosure = { self } -- TODO: Placeholder. Should be in `addObject` command.
-	self.isSelected = false
-	self.isHovered = false
-	self.AABB = {}
-	self.properties = {}
-	self.propertyMap = {}
-	self:addProperty(Position)
-	self:addProperty(Angle)
-	self:addProperty(Scale)
-	self:addProperty(Skew)
-	self:addProperty(Image)
+	EditorSprite.super.set(self)
+	self:addProperty(Image, "image")
+end
+
+function EditorSprite.setProperty(self, name, value)
+	local property = self:getPropertyObj(name)
+	if property then
+		property:setValue(value)
+		if name == "pos" then
+			self:setPosition(value.x, value.y)
+		elseif name == "angle" then
+			self:setAngle(math.rad(value))
+		elseif name == "scale" then
+			self:setScale(value.x, value.y)
+		elseif name == "skew" then
+			self:setSkew(value.x, value.y)
+		elseif name == "image" then
+			self:setImage(property.image)
+		end
+		return true
+	else
+		return false
+	end
 end
 
 function EditorSprite.setImage(self, image)

@@ -17,7 +17,7 @@ local function copyChildrenData(children)
 			for _,property in ipairs(child.properties) do
 				data[property.name] = {
 					value = property:getValue(),
-					type = property.className
+					type = property.typeName
 				}
 			end
 			if child.children then
