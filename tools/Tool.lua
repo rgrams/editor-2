@@ -16,9 +16,9 @@ local Handle = require "tools.ToolHandle"
 Tool.boxSelectAddKey = "shift"
 Tool.boxSelectToggleKey = "ctrl"
 Tool.boxSelectSubtractKey = "alt"
-Tool.cornerHandleSize = 8
-Tool.edgeHandleSize = 6
-Tool.pivotRadius = 4
+Tool.cornerHandleSize = 12
+Tool.edgeHandleSize = 9
+Tool.pivotRadius = 6
 Tool.rotateKey = "alt"
 Tool.snapKey = "ctrl"
 Tool.snapX = config.translateSnapIncrement
@@ -40,9 +40,11 @@ function Tool.set(self, ruu)
 	local cornerW = self.cornerHandleSize
 	local edgeW = self.edgeHandleSize
 	self.handles = {
-		nw = Handle(cornerW), ne = Handle(cornerW), se = Handle(cornerW), sw = Handle(cornerW),
-		n = Handle(edgeW), e = Handle(edgeW), s = Handle(edgeW), w = Handle(edgeW),
-		c = Handle(self.pivotRadius*2, true)
+		nw = Handle(cornerW, "nw"), ne = Handle(cornerW, "ne"),
+		se = Handle(cornerW, "se"), sw = Handle(cornerW, "sw"),
+		n = Handle(edgeW, "n"), e = Handle(edgeW, "e"),
+		s = Handle(edgeW, "s"), w = Handle(edgeW, "w"),
+		-- c = Handle(self.pivotRadius*2, "c", true)
 	}
 end
 
@@ -129,6 +131,9 @@ local function getDragPropertyList(enclosures, property, inWorldSpace, out)
 			end
 		elseif property == "angle" then
 			item.angle = obj:getProperty("angle") or 0
+		elseif property == "scale" then
+			local scale = obj:getProperty("scale") or obj:getProperty("size")
+			item.sx, item.sy = scale.x, scale.y
 		end
 
 		table.insert(out, item)
@@ -202,10 +207,11 @@ local function updateHandlePositions(self)
 	handles.s:setPos(cx, bot)
 	handles.sw:setPos(lt, bot)
 	handles.w:setPos(lt, cy)
-	handles.c:setPos(cx, cy)
+	-- handles.c:setPos(cx, cy)
 	unhoverHandles(self)
 end
 
+-- self.AABB is in world space.
 local function updateAABB(self)
 	local AABB = self.AABB
 	if scenes.active and scenes.active.selection[1] then
@@ -300,6 +306,95 @@ function Tool.drag(wgt, dx, dy, dragType)
 			self:updatePropertiesPanel()
 		end
 		updateAABB(self)
+
+	elseif dragType == "handle transform" then
+		local handle = self.hoverHandle
+		local inWorldSpace = true
+		local totalDX, totalDY = x - self.dragStartX, y - self.dragStartY
+
+		handle.x, handle.y = handle.x + dx, handle.y + dy
+
+		if not self.startedDragCommand then
+			-- Store original AABB.
+			local AABB = self.AABB
+			local lt, top, rt, bot = AABB.lt, AABB.top, AABB.rt, AABB.bot
+			local w, h = rt - lt, bot - top
+			self.originalDragAABB = { lt = lt, top = top, rt = rt, bot = bot, w = w, h = h }
+
+			-- Store original object positions & scales
+			local enclosures = getEnclosuresForDrag(scenes.active, inWorldSpace)
+			self.dragPosStartOffsets = getDragPropertyList(enclosures, "pos", inWorldSpace)
+			self.dragScaleStartOffsets = getDragPropertyList(enclosures, "scale", inWorldSpace)
+		end
+
+		-- AABB is in world space.
+		local AABB = self.originalDragAABB
+		local lt, top, rt, bot = AABB.lt, AABB.top, AABB.rt, AABB.bot
+		local w, h = rt - lt, bot - top
+
+		-- Figure out transform origin and new AABB.
+		local dir = handle.dir
+		local ox, oy
+
+		if dir.x == -1 then
+			lt = lt + totalDX
+			self.AABB.lt = lt -- Directly modify current AABB instead of re-summing it.
+			ox = rt
+		elseif dir.x == 0 then
+			ox = lt + w/2
+		elseif dir.x == 1 then
+			rt = rt + totalDX
+			self.AABB.rt = rt
+			ox = lt
+		end
+		if dir.y == -1 then
+			top = top + totalDY
+			self.AABB.top = top
+			oy = bot
+		elseif dir.y == 0 then
+			oy = top + h/2
+		elseif dir.y == 1 then
+			bot = bot + totalDY
+			self.AABB.bot = bot
+			oy = top
+		end
+
+		local newW, newH = rt - lt, bot - top
+		local sx, sy = newW / w, newH / h
+
+		local argsList = {}
+		for i,start in ipairs(self.dragPosStartOffsets) do
+			local x = ox + (start.x - ox)*sx
+			local y = oy + (start.y - oy)*sy
+			if inWorldSpace then
+				local obj = start.enclosure[1]
+				x, y = obj:toLocalPos(x, y)
+			end
+			local args = { start.enclosure, "pos", { x = x, y = y } }
+			table.insert(argsList, args)
+		end
+		for i,start in ipairs(self.dragScaleStartOffsets) do
+			local scale = { x = start.sx*sx, y = start.sy*sy }
+			local obj = start.enclosure[1]
+			local propName = obj:hasProperty("scale") and "scale" or "size"
+			local args = { start.enclosure, propName, scale }
+			table.insert(argsList, args)
+		end
+
+		if not self.startedDragCommand then
+			self.startedDragCommand = true
+			-- Perform set property command.
+			scene.history:perform("setMultiPropertiesOnMultiple", argsList)
+			self:updatePropertiesPanel()
+		else
+			-- Update set property command args.
+			-- TODO: Make sure the last command in the history is still ours.
+			objectFn.setMultiPropertiesOnMultiple(argsList)
+			scene.history:update(argsList)
+			self:updatePropertiesPanel()
+		end
+		updateHandlePositions(self)
+		self.hoverHandle.isHovered = true -- updateAABB will unhover all handles.
 	end
 end
 
@@ -339,6 +434,7 @@ local function updateHover(self, mx, my)
 		self.hoverObj.isHovered = false
 	end
 	self.hoverObj = nil
+	self.hoverHandle = nil
 	if scenes.active then
 		if not (mx and my) then
 			mx, my = love.mouse.getPosition()
@@ -350,7 +446,11 @@ local function updateHover(self, mx, my)
 		if scenes.active.selection[1] then
 			local hoverHandle = hitCheckHandles(self, mx, my, minDist)
 			unhoverHandles(self)
-			if hoverHandle then  hoverHandle.isHovered = true  end
+			if hoverHandle then
+				self.hoverObj = nil
+				hoverHandle.isHovered = true
+				self.hoverHandle = hoverHandle
+			end
 		end
 
 		if self.hoverObj then
@@ -415,6 +515,8 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 				startDrag(self, dragType)
 			end
 			updateAABB(self)
+		elseif self.hoverHandle then
+			startDrag(self, "handle transform")
 		else -- Clicked on nothing.
 			local selection = scenes.active.selection
 			if selection[1] and modkeys.getString() == "" then

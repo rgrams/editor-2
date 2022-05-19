@@ -2,9 +2,17 @@
 local Class = require "philtre.modules.base-class"
 local Handle = Class:extend()
 
-function Handle.set(self, size, isPivot)
+local CARDINALS = {
+	n = {x=0, y=-1}, ne = {x=1, y=-1}, e = {x=1, y=0}, se = {x=1, y=1},
+	s = {x=0, y=1}, sw = {x=-1, y=1}, w = {x=-1, y=0}, nw = {x=-1, y=-1},
+	c = {x=0, y=0}
+}
+
+function Handle.set(self, size, cardinalDir, isPivot)
 	self.x, self.y = 0, 0
 	self.w, self.h = size, size
+	self.cardinalDir = cardinalDir
+	self.dir = CARDINALS[cardinalDir]
 	self.isPivot = isPivot
 	self.isHovered = false
 end
