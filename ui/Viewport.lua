@@ -39,6 +39,7 @@ end
 
 function Viewport.scroll(wgt, depth, dx, dy)
 	Camera.current:zoomIn(config.zoomRate*dy, love.mouse.getPosition()) -- dy is actual, signed, mouse wheel dy.
+	wgt.object.tool:zoomUpdated()
 end
 
 function Viewport.drag(wgt, dx, dy, dragType)

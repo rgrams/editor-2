@@ -11,6 +11,7 @@ local modkeys = require "modkeys"
 local list = require "lib.list"
 local Dropdown = require "ui.widgets.Dropdown"
 local classList = _G.objClassList
+local Handle = require "tools.ToolHandle"
 
 Tool.boxSelectAddKey = "shift"
 Tool.boxSelectToggleKey = "ctrl"
@@ -34,6 +35,15 @@ function Tool.set(self, ruu)
 	self.widget.release = self.release
 	self.widget.drag = self.drag
 	self.lastAddClass = EditorObject
+	self.AABB = { lt = 0, top = 0, rt = 0, bot = 0 }
+
+	local cornerW = self.cornerHandleSize
+	local edgeW = self.edgeHandleSize
+	self.handles = {
+		nw = Handle(cornerW), ne = Handle(cornerW), se = Handle(cornerW), sw = Handle(cornerW),
+		n = Handle(edgeW), e = Handle(edgeW), s = Handle(edgeW), w = Handle(edgeW),
+		c = Handle(self.pivotRadius*2, true)
+	}
 end
 
 function Tool.init(self)
@@ -158,6 +168,54 @@ local function getRotDragArgList(startOffsets, da, roundIncr)
 	return argList
 end
 
+local function sumAABBs(enclosures)
+	local inf = math.huge
+	local lt, top, rt, bot = inf, inf, -inf, -inf
+	for i,enclosure in ipairs(enclosures) do
+		local obj = enclosure[1]
+		lt = math.min(lt, obj.AABB.lt)
+		top = math.min(top, obj.AABB.top)
+		rt = math.max(rt, obj.AABB.rt)
+		bot = math.max(bot, obj.AABB.bot)
+	end
+	return lt, top, rt, bot
+end
+
+local function unhoverHandles(self)
+	for k,handle in pairs(self.handles) do
+		handle.isHovered = false
+	end
+end
+
+local function updateHandlePositions(self)
+	local AABB = self.AABB
+	local handles = self.handles
+	-- Set to Tool-local coordinates for drawing.
+	local lt, top = self:toLocal( Camera.current:worldToScreen(AABB.lt, AABB.top) )
+	local rt, bot = self:toLocal( Camera.current:worldToScreen(AABB.rt, AABB.bot) )
+	local cx, cy = lt + (rt-lt)/2, top + (bot-top)/2
+	handles.nw:setPos(lt, top)
+	handles.n:setPos(cx, top)
+	handles.ne:setPos(rt, top)
+	handles.e:setPos(rt, cy)
+	handles.se:setPos(rt, bot)
+	handles.s:setPos(cx, bot)
+	handles.sw:setPos(lt, bot)
+	handles.w:setPos(lt, cy)
+	handles.c:setPos(cx, cy)
+	unhoverHandles(self)
+end
+
+local function updateAABB(self)
+	local AABB = self.AABB
+	if scenes.active and scenes.active.selection[1] then
+		AABB.lt, AABB.top, AABB.rt, AABB.bot = sumAABBs(scenes.active.selection)
+		updateHandlePositions(self)
+	else
+		AABB.lt, AABB.top, AABB.rt, AABB.bot = 0, 0, 0, 0
+	end
+end
+
 function Tool.drag(wgt, dx, dy, dragType)
 	local self = wgt.object
 	local scene = scenes.active
@@ -187,6 +245,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 			scene.history:update(argList)
 			self:updatePropertiesPanel()
 		end
+		updateAABB(self)
 
 	elseif dragType == "rotate selection" then
 		self.isRotateDragging = true
@@ -211,6 +270,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 			scene.history:update(argList)
 			self:updatePropertiesPanel()
 		end
+		updateAABB(self)
 
 	elseif dragType == "box select" then
 		self.isBoxSelecting = true
@@ -239,6 +299,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 			scene.history:update(scene.selection, newSelection)
 			self:updatePropertiesPanel()
 		end
+		updateAABB(self)
 	end
 end
 
@@ -259,7 +320,21 @@ local function hitCheckChildren(children, x, y, minDist, closestObj)
 	return closestObj, minDist
 end
 
+local function hitCheckHandles(self, mx, my, minDist)
+	local lx, ly = self:toLocal(mx, my)
+	local closestHandle
+	for k,handle in pairs(self.handles) do
+		local dist = handle:touchesPoint(lx, ly)
+		if dist and dist < minDist then
+			minDist = dist
+			closestHandle = handle
+		end
+	end
+	return closestHandle, minDist
+end
+
 local function updateHover(self, mx, my)
+	updateAABB(self)
 	if self.hoverObj then
 		self.hoverObj.isHovered = false
 	end
@@ -269,7 +344,15 @@ local function updateHover(self, mx, my)
 			mx, my = love.mouse.getPosition()
 		end
 		local wx, wy = Camera.current:screenToWorld(mx, my)
-		self.hoverObj = hitCheckChildren(scenes.active.children, wx, wy)
+		local hoverObj, minDist = hitCheckChildren(scenes.active.children, wx, wy)
+		self.hoverObj = hoverObj
+
+		if scenes.active.selection[1] then
+			local hoverHandle = hitCheckHandles(self, mx, my, minDist)
+			unhoverHandles(self)
+			if hoverHandle then  hoverHandle.isHovered = true  end
+		end
+
 		if self.hoverObj then
 			self.hoverObj.isHovered = true
 		end
@@ -331,6 +414,7 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 				local dragType = isRotate and "rotate selection" or "translate selection"
 				startDrag(self, dragType)
 			end
+			updateAABB(self)
 		else -- Clicked on nothing.
 			local selection = scenes.active.selection
 			if selection[1] and modkeys.getString() == "" then
@@ -339,6 +423,7 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 			end
 			startDrag(self, "box select")
 			self.originalSelection = selection:copyList() or {}
+			updateAABB(self)
 		end
 	end
 end
@@ -354,6 +439,14 @@ end
 function Tool.objectsUpdated(self)
 	if not self.isDragging then
 		updateHover(self)
+	else
+		updateAABB(self)
+	end
+end
+
+function Tool.zoomUpdated(self)
+	if not self.isDragging then
+		updateAABB(self)
 	end
 end
 
@@ -389,23 +482,6 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		local guiRoot = self.tree:get("/Window")
 		self.tree:add(dropdown, guiRoot)
 	end
-end
-
-local function addAABBs(enclosures)
-	local inf = math.huge
-	local lt, top, rt, bot = inf, inf, -inf, -inf
-	for i,enclosure in ipairs(enclosures) do
-		local obj = enclosure[1]
-		lt = math.min(lt, obj.AABB.lt)
-		top = math.min(top, obj.AABB.top)
-		rt = math.max(rt, obj.AABB.rt)
-		bot = math.max(bot, obj.AABB.bot)
-	end
-	return lt, top, rt, bot
-end
-
-local function centeredRect(mode, cx, cy, w, h)
-	love.graphics.rectangle(mode, cx-w/2, cy-w/2, w, h)
 end
 
 function Tool.draw(self)
@@ -452,35 +528,19 @@ function Tool.draw(self)
 	end
 
 	if scenes.active and scenes.active.selection[1] then
-		local lt, top, rt, bot = addAABBs(scenes.active.selection)
+		local AABB = self.AABB
+		local lt, top, rt, bot = AABB.lt, AABB.top, AABB.rt, AABB.bot
 		lt, top = self:toLocal( Camera.current:worldToScreen(lt, top) )
 		rt, bot = self:toLocal( Camera.current:worldToScreen(rt, bot) )
 
 		local w, h = rt - lt, bot - top
-		local cx, cy = lt + w/2, top + h/2
 
 		love.graphics.setColor(1, 1, 1, 0.1)
 		love.graphics.rectangle("line", lt, top, w, h)
 
-		--[[
-		local size = self.cornerHandleSize
-		centeredRect("line", lt, top, size, size)
-		centeredRect("line", rt, top, size, size)
-		centeredRect("line", rt, bot, size, size)
-		centeredRect("line", lt, bot, size, size)
-
-		size = self.edgeHandleSize
-		centeredRect("line", cx, top, size, size)
-		centeredRect("line", cx, bot, size, size)
-		centeredRect("line", rt, cy, size, size)
-		centeredRect("line", lt, cy, size, size)
-
-		local r = self.pivotRadius
-		love.graphics.circle("line", cx, cy, r, 12)
-		local r2 = r*2
-		love.graphics.line(cx - r2, cy, cx + r2, cy)
-		love.graphics.line(cx, cy - r2, cx, cy + r2)
-		--]]
+		for k,handle in pairs(self.handles) do
+			handle:draw()
+		end
 	end
 end
 

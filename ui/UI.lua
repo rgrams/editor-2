@@ -32,6 +32,7 @@ function UI.set(self)
 	}
 
 	self.propertyPanel = self.children[2]
+	self.tool = self.children[1].children[1]
 end
 
 function UI.init(self)
@@ -51,9 +52,11 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 	if action == "undo" and (change == 1 or isRepeat) then
 		scenes.active.history:undo()
 		self.propertyPanel:updateProperties(scenes.active.selection)
+		self.tool:objectsUpdated()
 	elseif action == "redo" and (change == 1 or isRepeat) then
 		scenes.active.history:redo()
 		self.propertyPanel:updateProperties(scenes.active.selection)
+		self.tool:objectsUpdated()
 	elseif action == "save" and change == 1 then
 		if scenes.active then
 			local filepath = fileDialog.save(lastSaveFolder)
