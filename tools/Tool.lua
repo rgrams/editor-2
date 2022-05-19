@@ -186,9 +186,9 @@ local function sumAABBs(enclosures)
 	return lt, top, rt, bot
 end
 
-local function unhoverHandles(self)
+local function updateHandleHover(self)
 	for k,handle in pairs(self.handles) do
-		handle.isHovered = false
+		handle.isHovered = handle == self.hoverHandle and true or false
 	end
 end
 
@@ -208,7 +208,7 @@ local function updateHandlePositions(self)
 	handles.sw:setPos(lt, bot)
 	handles.w:setPos(lt, cy)
 	-- handles.c:setPos(cx, cy)
-	unhoverHandles(self)
+	updateHandleHover(self)
 end
 
 -- self.AABB is in world space.
@@ -400,7 +400,6 @@ function Tool.drag(wgt, dx, dy, dragType)
 			self:updatePropertiesPanel()
 		end
 		updateHandlePositions(self)
-		self.hoverHandle.isHovered = true -- updateAABB will unhover all handles.
 	end
 end
 
@@ -451,12 +450,11 @@ local function updateHover(self, mx, my)
 
 		if scenes.active.selection[1] then
 			local hoverHandle = hitCheckHandles(self, mx, my, minDist)
-			unhoverHandles(self)
 			if hoverHandle then
 				self.hoverObj = nil
-				hoverHandle.isHovered = true
 				self.hoverHandle = hoverHandle
 			end
+			updateHandleHover(self)
 		end
 
 		if self.hoverObj then
@@ -555,6 +553,8 @@ end
 function Tool.zoomUpdated(self)
 	if not self.isDragging then
 		updateAABB(self)
+	else
+		updateHandlePositions(self)
 	end
 end
 
