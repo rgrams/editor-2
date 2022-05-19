@@ -4,11 +4,9 @@ return {
 	{ "button", "M:1", "click", true },
 	{ "button", "M:2", "right click", true },
 	{ "button", "M:3", "pan camera", true },
-	{ "button", "M:wheely+", "zoom camera" },
-	{ "button", "M:wheely-", "zoom camera" },
 
-	{ "button", "M:wheely+", "scroll" },
-	{ "button", "M:wheely-", "scroll" },
+	{ "button", "M:wheely+", "scroll", true },
+	{ "button", "M:wheely-", "scroll", true },
 
 	{ "button", "up", "up", true },
 	{ "button", "down", "down", true },
