@@ -95,73 +95,64 @@ local function getBoxSelectMode(self)
 	return mode
 end
 
-local function getDragStartOffsets(inWorldSpace)
-	local scene = scenes.active
-	local dragStartOffsets = {}
-	local enclosures
+local function getEnclosuresForDrag(scene, inWorldSpace)
 	if inWorldSpace then
-		enclosures = scene.selection:copyList()
+		local enclosures = scene.selection:copyList()
 		objectFn.removeDescendantsFromList(enclosures)
+		return enclosures
 	else
-		enclosures = scene.selection
+		return scene.selection
 	end
-	for i,enclosure in ipairs(enclosures) do
-		local obj = enclosure[1]
-		local x, y
-		if inWorldSpace then
-			x, y = obj:getWorldPos()
-		else
-			x, y = obj:getLocalPos()
-		end
-		dragStartOffsets[i] = {
-			enclosure = enclosure,
-			startX = x,
-			startY = y
-		}
-	end
-	return dragStartOffsets
 end
 
-local function getDragArgList(startOffsets, dx, dy, inWorldSpace, rx, ry)
+local function getDragPropertyList(enclosures, property, inWorldSpace, out)
+	out = out or {}
+	for i,enclosure in ipairs(enclosures) do
+		local item = { enclosure = enclosure }
+		local obj = enclosure[1]
+
+		if property == "pos" then
+			if inWorldSpace then
+				item.x, item.y = obj:getWorldPos()
+			else
+				item.x, item.y = obj:getLocalPos()
+			end
+		elseif property == "angle" then
+			item.angle = obj:getProperty("angle") or 0
+		end
+
+		table.insert(out, item)
+	end
+	return out
+end
+
+local function getPosDragArgList(startOffsets, dx, dy, inWorldSpace, rx, ry)
 	local argList = {}
 	local shouldRound = rx and ry
-	for i,data in ipairs(startOffsets) do
-		local _x = data.startX + dx
-		local _y = data.startY + dy
+	for i,start in ipairs(startOffsets) do
+		local x = start.x + dx
+		local y = start.y + dy
 		if inWorldSpace then
-			local obj = data.enclosure[1]
-			_x, _y = obj:toLocalPos(_x, _y)
+			local obj = start.enclosure[1]
+			x, y = obj:toLocalPos(x, y)
 		end
 		if shouldRound then
-			_x, _y = math.round(_x, rx), math.round(_y, ry)
+			x, y = math.round(x, rx), math.round(y, ry)
 		end
-		local args = { data.enclosure, "pos", { x = _x, y = _y } }
+		local args = { start.enclosure, "pos", { x = x, y = y } }
 		argList[i] = args
 	end
 	return argList
 end
 
-local function getRotDragStartOffsets()
-	local scene = scenes.active
-	local dragStartOffsets = {}
-	local enclosures = scene.selection
-	for i,enclosure in ipairs(enclosures) do
-		dragStartOffsets[i] = {
-			enclosure = enclosure,
-			startAngle = enclosure[1]:getProperty("angle") or 0
-		}
-	end
-	return dragStartOffsets
-end
-
 local function getRotDragArgList(startOffsets, da, roundIncr)
 	local argList = {}
-	for i,data in ipairs(startOffsets) do
-		local angle = data.startAngle + da
+	for i,start in ipairs(startOffsets) do
+		local angle = start.angle + da
 		if roundIncr then
 			angle = math.round(angle, roundIncr)
 		end
-		local args = { data.enclosure, "angle", angle }
+		local args = { start.enclosure, "angle", angle }
 		argList[i] = args
 	end
 	return argList
@@ -184,13 +175,14 @@ function Tool.drag(wgt, dx, dy, dragType)
 
 		if not self.startedDragCommand then
 			self.startedDragCommand = true
-			self.dragStartOffsets = getDragStartOffsets(inWorldSpace)
-			local argList = getDragArgList(self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
+			local enclosures = getEnclosuresForDrag(scenes.active, inWorldSpace)
+			self.dragStartOffsets = getDragPropertyList(enclosures, "pos", inWorldSpace)
+			local argList = getPosDragArgList(self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
 			scene.history:perform("setMultiPropertiesOnMultiple", argList)
 			self:updatePropertiesPanel()
 		else
 			-- TODO: Make sure the last command in the history is still ours.
-			local argList = getDragArgList(self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
+			local argList = getPosDragArgList(self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
 			objectFn.setMultiPropertiesOnMultiple(argList)
 			scene.history:update(argList)
 			self:updatePropertiesPanel()
@@ -207,7 +199,8 @@ function Tool.drag(wgt, dx, dy, dragType)
 
 		if not self.startedDragCommand then
 			self.startedDragCommand = true
-			self.dragStartOffsets = getRotDragStartOffsets()
+			local enclosures = getEnclosuresForDrag(scenes.active)
+			self.dragStartOffsets = getDragPropertyList(enclosures, "angle")
 			local argList = getRotDragArgList(self.dragStartOffsets, angle, roundIncr)
 			scene.history:perform("setMultiPropertiesOnMultiple", argList)
 			self:updatePropertiesPanel()
