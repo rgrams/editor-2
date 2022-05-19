@@ -9,16 +9,17 @@ local CARDINALS = {
 }
 
 function Handle.set(self, size, cardinalDir, isPivot)
-	self.x, self.y = 0, 0
 	self.w, self.h = size, size
 	self.cardinalDir = cardinalDir
 	self.dir = CARDINALS[cardinalDir]
+	self.ox, self.oy = self.dir.x/2*self.w, self.dir.y/2*self.h
+	self.x, self.y = self.ox, self.oy
 	self.isPivot = isPivot
 	self.isHovered = false
 end
 
 function Handle.setPos(self, x, y)
-	self.x, self.y = x, y
+	self.x, self.y = x + self.ox, y + self.oy
 end
 
 function Handle.touchesPoint(self, x, y)
@@ -34,7 +35,7 @@ end
 function Handle.draw(self)
 	local x, y = self.x, self.y
 
-	local alpha = self.isHovered and 0.5 or 0.1
+	local alpha = self.isHovered and 0.8 or 0.05
 	love.graphics.setColor(1, 1, 1, alpha)
 
 	if self.isPivot then
