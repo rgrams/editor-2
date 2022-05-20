@@ -101,12 +101,6 @@ function M.deleteObjects(caller, scene, enclosures)
 	return caller, scene, undoArgs
 end
 
-function M.cut(caller, scene, enclosures)
-	local _, _, undoArgs = M.deleteObjects(caller, scene, enclosures)
-	_G.scene_clipboard = undoArgs
-	return caller, scene, undoArgs
-end
-
 function M.copy(scene, enclosures)
 	local isSimulation = true
 	local clipboardData = {}

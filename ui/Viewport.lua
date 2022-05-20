@@ -65,7 +65,9 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 		if selection[1] then
 			local enclosures = selection:copyList()
 			objectFn.removeDescendantsFromList(enclosures)
-			scene.history:perform("cut", wgt.object, scene, enclosures) -- Command sets clipboard (perform doesn't return).
+			-- Don't want redo to set the clipboard, so just copy and then perform delete.
+			_G.scene_clipboard = objectFn.copy(scene, enclosures)
+			scene.history:perform("deleteObjects", wgt.object, scene, enclosures)
 			wgt.object.tool:objectsUpdated()
 			return true
 		end

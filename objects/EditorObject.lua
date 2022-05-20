@@ -105,10 +105,10 @@ function EditorObject.getModifiedProperties(self)
 		local value
 		if self.isBuiltinProperty[property.name] then
 			if not property:isAtDefault() then
-				value = property:getValue()
+				value = property:copyValue()
 			end
 		else
-			value = property:getValue()
+			value = property:copyValue()
 		end
 		if value ~= nil then
 			properties = properties or {}
