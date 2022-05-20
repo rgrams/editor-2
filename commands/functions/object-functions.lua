@@ -92,6 +92,21 @@ function M.delete(caller, scene, enclosure, isSimulation)
 	return caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children
 end
 
+function M.deleteObjects(caller, scene, enclosures)
+	local undoArgs = {}
+	for i,enclosure in ipairs(enclosures) do
+		local args = { M.delete(caller, scene, enclosure) }
+		table.insert(undoArgs, args)
+	end
+	return caller, scene, undoArgs
+end
+
+function M.cut(caller, scene, enclosures)
+	local _, _, undoArgs = M.deleteObjects(caller, scene, enclosures)
+	_G.scene_clipboard = undoArgs
+	return caller, scene, undoArgs
+end
+
 function M.copy(scene, enclosures)
 	local isSimulation = true
 	local clipboardData = {}
