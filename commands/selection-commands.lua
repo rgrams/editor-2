@@ -1,22 +1,22 @@
 
-local function add(selection, enclosure, index)
+local function add(caller, selection, enclosure, index)
 	selection:add(enclosure, index)
-	return selection, enclosure
+	return caller, selection, enclosure
 end
 
-local function remove(selection, enclosure)
+local function remove(caller, selection, enclosure)
 	local index = selection:remove(enclosure)
-	return selection, enclosure, index
+	return caller, selection, enclosure, index
 end
 
-local function clear(selection)
+local function clear(caller, selection)
 	local oldList = selection:clear()
-	return selection, oldList
+	return caller, selection, oldList
 end
 
-local function setTo(selection, newList)
+local function setTo(caller, selection, newList)
 	local oldList = selection:setTo(newList)
-	return selection, oldList
+	return caller, selection, oldList
 end
 
 return {

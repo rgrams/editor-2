@@ -45,7 +45,8 @@ function Vec2.onConfirm(self, wgt, axis)
 		local x, y
 		if axis == "x" then  x = value
 		else  y = value  end
-		scene.history:perform(cmd, enclosures, self.propertyName, { x = x, y = y })
+		local caller = self.tree:get("/Window/UI/PropertyPanel")
+		scene.history:perform(cmd, caller, enclosures, self.propertyName, { x = x, y = y })
 	end
 end
 

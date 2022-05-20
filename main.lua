@@ -121,7 +121,7 @@ function love.filedropped(file)
 					image = { filepath },
 					pos = { { x = x, y = y } }
 				}
-				scene.history:perform("addObject", scene, Class, {}, properties)
+				scene.history:perform("addObject", false, scene, Class, {}, properties)
 				_G.shouldRedraw = true
 				return
 			end

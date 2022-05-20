@@ -25,7 +25,8 @@ function Float.onConfirm(self, wgt)
 		local scene = self.selection.scene
 		local cmd = "setSamePropertyOnMultiple"
 		local enclosures = self.selection:copyList()
-		scene.history:perform(cmd, enclosures, self.propertyName, value)
+		local caller = self.tree:get("/Window/UI/PropertyPanel")
+		scene.history:perform(cmd, caller, enclosures, self.propertyName, value)
 	end
 end
 

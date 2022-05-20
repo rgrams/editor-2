@@ -47,7 +47,7 @@ function M.export(scene, filepath, options)
 	file:close()
 end
 
-local function makeAddObjArgs(scene, obj, parentEnclosure)
+local function makeAddObjArgs(caller, scene, obj, parentEnclosure)
 	local Class = classList:get(obj.class)
 	local enclosure = {}
 	local properties = {}
@@ -63,10 +63,10 @@ local function makeAddObjArgs(scene, obj, parentEnclosure)
 	if obj.children then
 		children = {}
 		for i,child in ipairs(obj.children) do
-			table.insert(children, makeAddObjArgs(scene, child, enclosure))
+			table.insert(children, makeAddObjArgs(caller, scene, child, enclosure))
 		end
 	end
-	return { scene, Class, enclosure, properties, isSelected, parentEnclosure, children }
+	return { caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children }
 end
 
 function M.import(scene, filepath, options)
@@ -94,6 +94,7 @@ function M.import(scene, filepath, options)
 	end
 
 	local argsList = {}
+	local caller = false
 
 	-- Just need to add the objects at the base level, any children will be added along with.
 	for i,obj in ipairs(data) do
@@ -101,15 +102,15 @@ function M.import(scene, filepath, options)
 			print("   Error parsing objects: No object class property found.")
 			return
 		end
-		table.insert(argsList, makeAddObjArgs(scene, obj, false))
+		table.insert(argsList, makeAddObjArgs(caller, scene, obj, false))
 	end
 
 	local existingEnclosures = {}
 	for i,child in ipairs(scene.children) do
 		table.insert(existingEnclosures, child.enclosure)
 	end
-	scene.history:perform("deleteObjects", scene, existingEnclosures)
-	scene.history:perform("addObjects", scene, argsList)
+	scene.history:perform("deleteObjects", caller, scene, existingEnclosures)
+	scene.history:perform("addObjects", caller, scene, argsList)
 end
 
 return M

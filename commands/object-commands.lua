@@ -1,19 +1,19 @@
 
 local Obj = require "commands.functions.object-functions"
 
-local function deleteObjects(scene, enclosures)
+local function deleteObjects(caller, scene, enclosures)
 	local undoArgs = {}
 	for i,enclosure in ipairs(enclosures) do
-		local args = { Obj.delete(scene, enclosure) }
+		local args = { Obj.delete(caller, scene, enclosure) }
 		table.insert(undoArgs, args)
 	end
-	return scene, undoArgs
+	return caller, scene, undoArgs
 end
 
-local function cut(scene, enclosures)
-	local _, undoArgs = deleteObjects(scene, enclosures)
+local function cut(caller, scene, enclosures)
+	local _, _, undoArgs = deleteObjects(caller, scene, enclosures)
 	_G.scene_clipboard = undoArgs
-	return scene, undoArgs
+	return caller, scene, undoArgs
 end
 
 return {

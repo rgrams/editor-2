@@ -39,7 +39,7 @@ function PropertyPanel.addProperty(self, propType, propName)
 	local selection = scenes.active.selection
 	local enclosures = selection:copyList()
 	local Class = propClass:get(propType)
-	scenes.active.history:perform("addSamePropertyToMultiple", enclosures, Class, propName)
+	scenes.active.history:perform("addSamePropertyToMultiple", self, enclosures, Class, propName)
 	self:updateProperties(selection)
 end
 
