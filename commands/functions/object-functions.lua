@@ -114,7 +114,7 @@ end
 function M.addToMultiple(caller, scene, parentEnclosures, Class, properties, isSelected, children)
 	local newEnclosures = {}
 	for i,parentEnclosure in ipairs(parentEnclosures) do
-		local _, enc = M.add(caller, scene, Class, {}, properties, isSelected, parentEnclosure, children)
+		local _, scn, enc = M.add(caller, scene, Class, {}, properties, isSelected, parentEnclosure, children)
 		table.insert(newEnclosures, enc)
 	end
 	return caller, scene, newEnclosures
@@ -123,8 +123,8 @@ end
 function M.addObjects(caller, scene, argsList)
 	local enclosures = {}
 	for i,args in ipairs(argsList) do
-		local _,enclosure = M.add(unpack(args))
-		table.insert(enclosures, enclosure)
+		local _, scn, enc = M.add(unpack(args))
+		table.insert(enclosures, enc)
 	end
 	return caller, scene, enclosures
 end
@@ -155,15 +155,15 @@ end
 function M.paste(caller, scene, parentEnclosures, copiedArgsList)
 	local newEnclosures
 	if not parentEnclosures then -- Add to scene root.
-		local _, newEnc = M.addObjects(caller, scene, copiedArgsList)
-		newEnclosures = newEnc
+		local _, scn, newEncs = M.addObjects(caller, scene, copiedArgsList)
+		newEnclosures = newEncs
 	else
 		newEnclosures = {}
 		for i,parentEnclosure in ipairs(parentEnclosures) do
 			local argsList = i == 1 and copiedArgsList or M.copyPasteDataFor(caller, scene, parentEnclosure, copiedArgsList)
 			M.copyPasteDataFor(caller, scene, parentEnclosure, argsList)
-			local _, newEnc = M.addObjects(caller, scene, argsList)
-			for _,enclosure in ipairs(newEnc) do
+			local _, scn, newEncs = M.addObjects(caller, scene, argsList)
+			for _,enclosure in ipairs(newEncs) do
 				table.insert(newEnclosures, enclosure)
 			end
 		end
