@@ -50,13 +50,25 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 	if r then  return r  end
 
 	if action == "undo" and (change == 1 or isRepeat) then
-		scenes.active.history:undo()
-		self.propertyPanel:updateProperties(scenes.active.selection)
-		self.tool:objectsUpdated()
+		local past = scenes.active.history.past
+		local cmd = past[#past] -- { name, doArgs, undoArgs }
+		if cmd then
+			local undoArgs = cmd[3]
+			undoArgs[1] = self -- Set caller to ourself.
+			scenes.active.history:undo()
+			self.propertyPanel:updateProperties(scenes.active.selection)
+			self.tool:objectsUpdated()
+		end
 	elseif action == "redo" and (change == 1 or isRepeat) then
-		scenes.active.history:redo()
-		self.propertyPanel:updateProperties(scenes.active.selection)
-		self.tool:objectsUpdated()
+		local future = scenes.active.history.future
+		local cmd = future[#future]
+		if cmd then
+			local redoArgs = cmd[2]
+			redoArgs[1] = self -- Set caller to ourself.
+			scenes.active.history:redo()
+			self.propertyPanel:updateProperties(scenes.active.selection)
+			self.tool:objectsUpdated()
+		end
 	elseif action == "save" and change == 1 then
 		if scenes.active then
 			local filepath = fileDialog.save(lastSaveFolder)

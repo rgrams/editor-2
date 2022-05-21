@@ -7,6 +7,8 @@ local scenes = require "scenes"
 local EditorObject = require "objects.EditorObject"
 local Vec2Property = require "objects.properties.Vec2"
 local objectFn = require "commands.functions.object-functions"
+local objectCmd = require "commands.object-commands"
+local selectCmd = require "commands.selection-commands"
 local modkeys = require "modkeys"
 local list = require "lib.list"
 local Dropdown = require "ui.widgets.Dropdown"
@@ -247,7 +249,8 @@ function Tool.drag(wgt, dx, dy, dragType)
 		else
 			-- TODO: Make sure the last command in the history is still ours.
 			local argList = getPosDragArgList(self, self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
-			objectFn.setMultiPropertiesOnMultiple(self, argList)
+			local doCmd = objectCmd.setMultiPropertiesOnMultiple[1]
+			doCmd(self, argList)
 			scene.history:update(self, argList)
 			self:updatePropertiesPanel()
 		end
@@ -272,7 +275,8 @@ function Tool.drag(wgt, dx, dy, dragType)
 		else
 			-- TODO: Make sure the last command in the history is still ours.
 			local argList = getRotDragArgList(self, self.dragStartOffsets, angle, roundIncr)
-			objectFn.setMultiPropertiesOnMultiple(self, argList)
+			local doCmd = objectCmd.setMultiPropertiesOnMultiple[1]
+			doCmd(self, argList)
 			scene.history:update(self, argList)
 			self:updatePropertiesPanel()
 		end
@@ -301,7 +305,8 @@ function Tool.drag(wgt, dx, dy, dragType)
 			scene.history:perform("setSelection", self, scene.selection, newSelection)
 			self:updatePropertiesPanel()
 		else
-			scene.selection:setTo(newSelection)
+			local doCmd = selectCmd.setSelection[1]
+			doCmd(self, scene.selection, newSelection)
 			scene.history:update(self, scene.selection, newSelection)
 			self:updatePropertiesPanel()
 		end
@@ -395,7 +400,8 @@ function Tool.drag(wgt, dx, dy, dragType)
 		else
 			-- Update set property command args.
 			-- TODO: Make sure the last command in the history is still ours.
-			objectFn.setMultiPropertiesOnMultiple(self, argsList)
+			local doCmd = objectCmd.setMultiPropertiesOnMultiple[1]
+			doCmd(self, argsList)
 			scene.history:update(self, argsList)
 			self:updatePropertiesPanel()
 		end

@@ -20,9 +20,12 @@ function M.add(caller, scene, Class, enclosure, properties, isSelected, parentEn
 
 	scene:add(object, parentEnclosure and parentEnclosure[1])
 
+	local oneWasSelected = isSelected
+
 	if children then
 		for i,childData in ipairs(children) do
-			M.add(unpack(childData))
+			local _, scn, enc, wasSelected = M.add(unpack(childData))
+			oneWasSelected = oneWasSelected or wasSelected
 		end
 	end
 
@@ -30,7 +33,7 @@ function M.add(caller, scene, Class, enclosure, properties, isSelected, parentEn
 		scene.selection:add(enclosure)
 	end
 
-	return caller, scene, enclosure
+	return caller, scene, enclosure, oneWasSelected
 end
 
 local function deleteChildren(caller, scene, children, isSimulation)
@@ -39,15 +42,18 @@ local function deleteChildren(caller, scene, children, isSimulation)
 	local childCount = children.maxn or #children
 	if childCount == 0 then  return false  end
 
+	local oneWasSelected = false
+
 	local undoArgs = {}
 	for i=1,childCount do
 		local object = children[i]
 		if object then
-			local args = { M.delete(caller, scene, object.enclosure, isSimulation) }
+			local args = { M.delete(caller, scene, object.enclosure, false, isSimulation) }
+			oneWasSelected = oneWasSelected or args[9]
 			table.insert(undoArgs, args)
 		end
 	end
-	return undoArgs
+	return undoArgs, oneWasSelected
 end
 
 local function dictContainsAncestor(dict, obj)
@@ -73,11 +79,12 @@ function M.removeDescendantsFromList(enclosures)
 	end
 end
 
-function M.delete(caller, scene, enclosure, isSimulation)
+function M.delete(caller, scene, enclosure, _oneWasSelected, isSimulation)
 	local object = enclosure[1]
 	local Class = getmetatable(object)
 	local properties = object:getModifiedProperties() or false
 	local isSelected = object.isSelected
+	local oneWasSelected = isSelected
 	if isSelected and not isSimulation then
 		scene.selection:remove(enclosure)
 	end
@@ -85,27 +92,30 @@ function M.delete(caller, scene, enclosure, isSimulation)
 		print("obj.delete - object has no parent", object)
 	end
 	local parentEnclosure = object.parent.enclosure or false
-	local children = deleteChildren(caller, scene, object.children, isSimulation)
+	local children, childWasSelected = deleteChildren(caller, scene, object.children, isSimulation)
+	oneWasSelected = oneWasSelected or childWasSelected
 	if not isSimulation then
 		object.tree:remove(object)
 	end
-	return caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children
+	return caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children, oneWasSelected
 end
 
 function M.deleteObjects(caller, scene, enclosures)
 	local undoArgs = {}
+	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
 		local args = { M.delete(caller, scene, enclosure) }
 		table.insert(undoArgs, args)
+		oneWasSelected = oneWasSelected or args[9]
 	end
-	return caller, scene, undoArgs
+	return caller, scene, undoArgs, oneWasSelected
 end
 
 function M.copy(scene, enclosures)
 	local isSimulation = true
 	local clipboardData = {}
 	for i,enclosure in ipairs(enclosures) do
-		local args = { M.delete(false, scene, enclosure, isSimulation) }
+		local args = { M.delete(false, scene, enclosure, false, isSimulation) }
 		table.insert(clipboardData, args)
 	end
 	return clipboardData
@@ -113,20 +123,24 @@ end
 
 function M.addToMultiple(caller, scene, parentEnclosures, Class, properties, isSelected, children)
 	local newEnclosures = {}
+	local oneWasSelected = isSelected
 	for i,parentEnclosure in ipairs(parentEnclosures) do
-		local _, scn, enc = M.add(caller, scene, Class, {}, properties, isSelected, parentEnclosure, children)
+		local _, scn, enc, wasSelected = M.add(caller, scene, Class, {}, properties, isSelected, parentEnclosure, children)
+		oneWasSelected = oneWasSelected or wasSelected
 		table.insert(newEnclosures, enc)
 	end
-	return caller, scene, newEnclosures
+	return caller, scene, newEnclosures, oneWasSelected
 end
 
 function M.addObjects(caller, scene, argsList)
 	local enclosures = {}
+	local oneWasSelected = false
 	for i,args in ipairs(argsList) do
-		local _, scn, enc = M.add(unpack(args))
+		local _, scn, enc, wasSelected = M.add(unpack(args))
+		oneWasSelected = oneWasSelected or wasSelected
 		table.insert(enclosures, enc)
 	end
-	return caller, scene, enclosures
+	return caller, scene, enclosures, oneWasSelected
 end
 
 -- Copy to new tables and insert new enclosures and new scene-tree.
@@ -154,21 +168,24 @@ end
 -- WARNING: Clipboard argsList needs to be copied before it gets put into the history.
 function M.paste(caller, scene, parentEnclosures, copiedArgsList)
 	local newEnclosures
+	local oneWasSelected = false
 	if not parentEnclosures then -- Add to scene root.
-		local _, scn, newEncs = M.addObjects(caller, scene, copiedArgsList)
+		local _, scn, newEncs, wasSelected = M.addObjects(caller, scene, copiedArgsList)
+		oneWasSelected = oneWasSelected or wasSelected
 		newEnclosures = newEncs
 	else
 		newEnclosures = {}
 		for i,parentEnclosure in ipairs(parentEnclosures) do
 			local argsList = i == 1 and copiedArgsList or M.copyPasteDataFor(caller, scene, parentEnclosure, copiedArgsList)
 			M.copyPasteDataFor(caller, scene, parentEnclosure, argsList)
-			local _, scn, newEncs = M.addObjects(caller, scene, argsList)
+			local _, scn, newEncs, wasSelected = M.addObjects(caller, scene, argsList)
+			oneWasSelected = oneWasSelected or wasSelected
 			for _,enclosure in ipairs(newEncs) do
 				table.insert(newEnclosures, enclosure)
 			end
 		end
 	end
-	return caller, scene, newEnclosures
+	return caller, scene, newEnclosures, oneWasSelected
 end
 
 function M.setProperty(caller, enclosure, name, value)
@@ -179,49 +196,55 @@ function M.setProperty(caller, enclosure, name, value)
 		oldValue = property:copyValue()
 		object:setProperty(name, value)
 	end
-	return caller, enclosure, name, oldValue
+	return caller, enclosure, name, oldValue, object.isSelected
 end
 
 function M.setSamePropertyOnMultiple(caller, enclosures, name, value)
 	local undoArgList = {}
+	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
 		local undoArgs = { M.setProperty(caller, enclosure, name, value) }
+		oneWasSelected = oneWasSelected or undoArgs[5]
 		table.insert(undoArgList, undoArgs)
 	end
-	return caller, undoArgList
+	return caller, undoArgList, oneWasSelected
 end
 
 function M.setMultiPropertiesOnMultiple(caller, argList)
 	local undoArgList = {}
+	local oneWasSelected = false
 	for i,args in ipairs(argList) do
 		local undoArgs = { M.setProperty(unpack(args)) }
+		oneWasSelected = oneWasSelected or undoArgs[5]
 		table.insert(undoArgList, undoArgs)
 	end
-	return caller, undoArgList
+	return caller, undoArgList, oneWasSelected
 end
 
 function M.offsetVec2PropertyOnMultiple(caller, enclosures, name, dx, dy)
 	dx, dy = dx or 0, dy or 0
 	local undoArgList = {}
+	local oneWasSelected = false
 	for _,enclosure in ipairs(enclosures) do
 		local object = enclosure[1]
 		local oldValue = object:getProperty(name)
 		local newValue = { x = oldValue.x + dx, y = oldValue.y + dy }
 		object:setProperty(name, newValue)
 		local undoArgs = { caller, enclosure, name, oldValue }
+		oneWasSelected = oneWasSelected or object.isSelected
 		table.insert(undoArgList, undoArgs)
 	end
-	return caller, undoArgList
+	return caller, undoArgList, oneWasSelected
 end
 
 function M.addProperty(caller, enclosure, Class, name, value)
 	assert(name, "object-functions.addProperty - `name` can not be nil.")
 	local obj = enclosure[1]
-	if not Class or obj:getPropertyObj(name) then
-		return caller, enclosure, name
+	if not Class or obj:getPropertyObj(name) then -- If adding `nil` property or object already has the property.
+		return caller, enclosure, name, false
 	end
-	name = enclosure[1]:addProperty(Class, name, value) -- `name` can be nil and the class default is used.
-	return caller, enclosure, name
+	name = obj:addProperty(Class, name, value) -- `name` can be nil and the class default is used.
+	return caller, enclosure, name, obj.isSelected
 end
 
 function M.removeProperty(caller, enclosure, name)
@@ -233,43 +256,51 @@ function M.removeProperty(caller, enclosure, name)
 	local value = property:getValue()
 	local Class = getmetatable(property)
 	obj:removeProperty(name)
-	return caller, enclosure, Class, name, value
+	return caller, enclosure, Class, name, value, obj.isSelected
 end
 
 function M.addSamePropertyToMultiple(caller, enclosures, Class, name, value)
 	local undoArgList = {}
+	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
 		local undoArgs = { M.addProperty(caller, enclosure, Class, name, value) }
+		oneWasSelected = oneWasSelected or undoArgs[4]
 		undoArgList[i] = undoArgs
 	end
-	return caller, undoArgList
+	return caller, undoArgList, oneWasSelected
 end
 
 function M.addPropertyToMultiple(caller, argList)
 	local undoArgList = {}
+	local oneWasSelected = false
 	for i,args in ipairs(argList) do
 		local undoArgs = { M.addProperty(unpack(args)) }
+		oneWasSelected = oneWasSelected or undoArgs[4]
 		undoArgList[i] = undoArgs
 	end
-	return caller, undoArgList
+	return caller, undoArgList, oneWasSelected
 end
 
 function M.removeSamePropertyFromMultiple(caller, enclosures, name)
 	local undoArgList = {}
+	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
 		local undoArgs = { M.removeProperty(caller, enclosure, name) }
+		oneWasSelected = oneWasSelected or undoArgs[6]
 		undoArgList[i] = undoArgs
 	end
-	return caller, undoArgList
+	return caller, undoArgList, oneWasSelected
 end
 
 function M.removePropertyFromMultiple(caller, argList)
 	local undoArgList = {}
+	local oneWasSelected = false
 	for i,args in ipairs(argList) do
 		local undoArgs = { M.removeProperty(unpack(args)) }
+		oneWasSelected = oneWasSelected or undoArgs[6]
 		undoArgList[i] = undoArgs
 	end
-	return caller, undoArgList
+	return caller, undoArgList, oneWasSelected
 end
 
 return M
