@@ -42,7 +42,6 @@ function BaseClass.ruuInput(wgt, depth, action, value, change)
 			local enclosures = self.selection:copyList()
 			local propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
 			scene.history:perform(cmd, propertyPanel, enclosures, self.propertyName)
-			propertyPanel:updateProperties(self.selection)
 		end
 	end
 end

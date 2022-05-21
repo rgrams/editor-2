@@ -4,6 +4,7 @@ Tool.className = "Tool"
 
 local config = require "config"
 local scenes = require "scenes"
+local signals = require "signals"
 local EditorObject = require "objects.EditorObject"
 local Vec2Property = require "objects.properties.Vec2"
 local objectFn = require "commands.functions.object-functions"
@@ -39,6 +40,13 @@ function Tool.set(self, ruu)
 	self.lastAddClass = EditorObject
 	self.AABB = { lt = 0, top = 0, rt = 0, bot = 0 }
 
+	signals.subscribe(self, self.onObjectsChanged,
+		"objects added",
+		"objects deleted",
+		"selected objects modified",
+		"selection changed"
+	)
+
 	local cornerW = self.cornerHandleSize
 	local edgeW = self.edgeHandleSize
 	self.handles = {
@@ -53,11 +61,6 @@ end
 function Tool.init(self)
 	Tool.super.init(self)
 	self.propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
-end
-
-function Tool.updatePropertiesPanel(self)
-	local enclosures = scenes.active.selection
-	self.propertyPanel:updateProperties(enclosures)
 end
 
 local function startDrag(self, dragType)
@@ -245,14 +248,12 @@ function Tool.drag(wgt, dx, dy, dragType)
 			self.dragStartOffsets = getDragPropertyList(enclosures, "pos", inWorldSpace)
 			local argList = getPosDragArgList(self, self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
 			scene.history:perform("setMultiPropertiesOnMultiple", self, argList)
-			self:updatePropertiesPanel()
 		else
 			-- TODO: Make sure the last command in the history is still ours.
 			local argList = getPosDragArgList(self, self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
 			local doCmd = objectCmd.setMultiPropertiesOnMultiple[1]
 			doCmd(self, argList)
 			scene.history:update(self, argList)
-			self:updatePropertiesPanel()
 		end
 		updateAABB(self)
 
@@ -271,14 +272,12 @@ function Tool.drag(wgt, dx, dy, dragType)
 			self.dragStartOffsets = getDragPropertyList(enclosures, "angle")
 			local argList = getRotDragArgList(self, self.dragStartOffsets, angle, roundIncr)
 			scene.history:perform("setMultiPropertiesOnMultiple", self, argList)
-			self:updatePropertiesPanel()
 		else
 			-- TODO: Make sure the last command in the history is still ours.
 			local argList = getRotDragArgList(self, self.dragStartOffsets, angle, roundIncr)
 			local doCmd = objectCmd.setMultiPropertiesOnMultiple[1]
 			doCmd(self, argList)
 			scene.history:update(self, argList)
-			self:updatePropertiesPanel()
 		end
 		updateAABB(self)
 
@@ -303,12 +302,10 @@ function Tool.drag(wgt, dx, dy, dragType)
 		if not self.startedDragCommand then
 			self.startedDragCommand = true
 			scene.history:perform("setSelection", self, scene.selection, newSelection)
-			self:updatePropertiesPanel()
 		else
 			local doCmd = selectCmd.setSelection[1]
 			doCmd(self, scene.selection, newSelection)
 			scene.history:update(self, scene.selection, newSelection)
-			self:updatePropertiesPanel()
 		end
 		updateAABB(self)
 
@@ -396,14 +393,12 @@ function Tool.drag(wgt, dx, dy, dragType)
 			self.startedDragCommand = true
 			-- Perform set property command.
 			scene.history:perform("setMultiPropertiesOnMultiple", self, argsList)
-			self:updatePropertiesPanel()
 		else
 			-- Update set property command args.
 			-- TODO: Make sure the last command in the history is still ours.
 			local doCmd = objectCmd.setMultiPropertiesOnMultiple[1]
 			doCmd(self, argsList)
 			scene.history:update(self, argsList)
-			self:updatePropertiesPanel()
 		end
 		updateHandlePositions(self)
 	end
@@ -510,14 +505,11 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 			if not isSelected then
 				if shouldToggle then
 					history:perform("addToSelection", self, selection, self.hoverObj.enclosure)
-					self:updatePropertiesPanel()
 				else
 					history:perform("setSelection", self, selection, { self.hoverObj.enclosure })
-					self:updatePropertiesPanel()
 				end
 			elseif isSelected and shouldToggle then
 				history:perform("removeFromSelection", self, selection, self.hoverObj.enclosure)
-				self:updatePropertiesPanel()
 			end
 			if self.hoverObj.isSelected then
 				local isRotate = modkeys.isPressed(self.rotateKey)
@@ -531,7 +523,6 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 			local selection = scenes.active.selection
 			if selection[1] and modkeys.getString() == "" then
 				scenes.active.history:perform("clearSelection", self, selection)
-				self:updatePropertiesPanel()
 			end
 			startDrag(self, "box select")
 			self.originalSelection = selection:copyList() or {}
@@ -548,7 +539,8 @@ function Tool.release(wgt, depth, dontFire, mx, my, isKeyboard)
 	end
 end
 
-function Tool.objectsUpdated(self)
+function Tool.onObjectsChanged(self, sender, signal)
+	if sender == self then  return  end
 	if not self.isDragging then
 		updateHover(self)
 	else
@@ -577,7 +569,6 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 				local enclosures = scene.selection:copyList()
 				objectFn.removeDescendantsFromList(enclosures)
 				scene.history:perform("deleteObjects", self, scene, enclosures)
-				self:updatePropertiesPanel()
 				updateHover(self)
 			end
 		end

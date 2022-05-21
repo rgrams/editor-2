@@ -68,7 +68,6 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 			-- Don't want redo to set the clipboard, so just copy and then perform delete.
 			_G.scene_clipboard = objectFn.copy(scene, enclosures)
 			scene.history:perform("deleteObjects", wgt.object, scene, enclosures)
-			wgt.object.tool:objectsUpdated()
 			return true
 		end
 	elseif action == "copy" and change == 1 and scenes.active then
@@ -89,7 +88,6 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 			local argsList = objectFn.copyPasteDataFor(wgt.object, scene, firstParent, _G.scene_clipboard)
 			-- Do NOT want to put the mutable clipboard table into the command history.
 			scene.history:perform("paste", wgt.object, scene, parentEnclosures, argsList)
-			wgt.object.tool:objectsUpdated()
 			return true
 		end
 	end

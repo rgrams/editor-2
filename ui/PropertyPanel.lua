@@ -3,6 +3,7 @@ local PropertyPanel = gui.Column:extend()
 PropertyPanel.className = "PropertyPanel"
 
 local scenes = require "scenes"
+local signals = require "signals"
 local AddPropertyDialog = require "ui.AddPropertyDialog"
 
 local headerFont = { "assets/font/OpenSans-Semibold.ttf", 17 }
@@ -21,6 +22,9 @@ function PropertyPanel.set(self, ruu)
 	self.widget = self.ruu:Panel(self)
 	self.widget.ruuInput = self.ruuInput
 	self.wgtMap = {}
+
+	local signalFn = self.onSelectedObjectsModified
+	signals.subscribe(self, signalFn, "selection changed", "selected objects modified")
 end
 
 function PropertyPanel.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
@@ -40,7 +44,7 @@ function PropertyPanel.addProperty(self, propType, propName)
 	local enclosures = selection:copyList()
 	local Class = propClass:get(propType)
 	scenes.active.history:perform("addSamePropertyToMultiple", self, enclosures, Class, propName)
-	self:updateProperties(selection)
+	self:updateProperties(selection) -- We'll ignore the signal from ourself, so manually update.
 end
 
 local function addPropertyWidget(self, selection, PropClass, name, value)
@@ -53,6 +57,12 @@ end
 local function removePropertyWidget(self, object)
 	object:destroyRuu(self.wgtMap)
 	self.tree:remove(object)
+end
+
+function PropertyPanel.onSelectedObjectsModified(self, sender)
+	if sender ~= self then
+		self:updateProperties(scenes.active.selection)
+	end
 end
 
 function PropertyPanel.updateProperties(self, selection)

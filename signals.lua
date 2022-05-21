@@ -9,7 +9,7 @@ function M.send(signal, sender)
 		return
 	end
 	for i,sub in ipairs(list) do
-		sub.fn(sub.obj, signal, sender)
+		sub.fn(sub.obj, sender, signal)
 	end
 end
 

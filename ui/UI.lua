@@ -56,8 +56,6 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 			local undoArgs = cmd[3]
 			undoArgs[1] = self -- Set caller to ourself.
 			scenes.active.history:undo()
-			self.propertyPanel:updateProperties(scenes.active.selection)
-			self.tool:objectsUpdated()
 		end
 	elseif action == "redo" and (change == 1 or isRepeat) then
 		local future = scenes.active.history.future
@@ -66,8 +64,6 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 			local redoArgs = cmd[2]
 			redoArgs[1] = self -- Set caller to ourself.
 			scenes.active.history:redo()
-			self.propertyPanel:updateProperties(scenes.active.selection)
-			self.tool:objectsUpdated()
 		end
 	elseif action == "save" and change == 1 then
 		if scenes.active then
