@@ -65,6 +65,7 @@ end
 
 local function startDrag(self, dragType)
 	self.isDragging = true
+	self.lastDragType = dragType
 	self.ruu:startDrag(self.widget, dragType)
 
 	local wmx, wmy = Camera.current:screenToWorld(self.ruu.mx, self.ruu.my)
@@ -587,6 +588,10 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		local dropdown = Dropdown(mx, my, items)
 		local guiRoot = self.tree:get("/Window")
 		self.tree:add(dropdown, guiRoot)
+	elseif action == "snap" then
+		if wgt.object.isDragging and (change == 1 or change == -1) then
+			wgt:drag(0, 0, wgt.object.lastDragType)
+		end
 	end
 end
 
