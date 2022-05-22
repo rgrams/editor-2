@@ -336,33 +336,34 @@ function Tool.drag(wgt, dx, dy, dragType)
 
 		-- Figure out transform origin and new AABB.
 		local isSnapped = modkeys.isPressed(self.snapKey)
+		local snapIncr = isSnapped and config.translateSnapIncrement or config.roundAllPropsTo
 
 		local dir = handle.dir
 		local ox, oy
 
 		if dir.x == -1 then
 			lt = lt + totalDX
-			if isSnapped then  lt = math.round(lt, config.translateSnapIncrement)  end
+			lt = math.round(lt, snapIncr)
 			self.AABB.lt = lt -- Directly modify current AABB instead of re-summing it.
 			ox = rt
 		elseif dir.x == 0 then
 			ox = lt + w/2
 		elseif dir.x == 1 then
 			rt = rt + totalDX
-			if isSnapped then  rt = math.round(rt, config.translateSnapIncrement)  end
+			rt = math.round(rt, snapIncr)
 			self.AABB.rt = rt
 			ox = lt
 		end
 		if dir.y == -1 then
 			top = top + totalDY
-			if isSnapped then  top = math.round(top, config.translateSnapIncrement)  end
+			top = math.round(top, snapIncr)
 			self.AABB.top = top
 			oy = bot
 		elseif dir.y == 0 then
 			oy = top + h/2
 		elseif dir.y == 1 then
 			bot = bot + totalDY
-			if isSnapped then  bot = math.round(bot, config.translateSnapIncrement)  end
+			bot = math.round(bot, snapIncr)
 			self.AABB.bot = bot
 			oy = top
 		end
