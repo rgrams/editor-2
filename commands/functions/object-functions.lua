@@ -154,7 +154,7 @@ function M.copyPasteDataFor(caller, scene, parentEnclosure, childArgList)
 		newArgs[3] = args[3]         -- [3] Class
 		newArgs[4] = newEnclosure    -- [4] enclosure
 		newArgs[5] = args[5]         -- [5] properties
-		newArgs[6] = args[6]         -- [6] isSelected
+		newArgs[6] = false           -- [6] isSelected
 		newArgs[7] = parentEnclosure -- [7] parentEnclosure
 		local children = args[8]
 		if children then
