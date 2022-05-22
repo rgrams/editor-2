@@ -23,6 +23,7 @@ function PropertyPanel.set(self, ruu)
 	self.widget.ruuInput = self.ruuInput
 	self.wgtMap = {}
 
+	self.lastProps = {}
 	self.wgtForProp = {}
 
 	local signalFn = self.onSelectedObjectsModified
@@ -112,9 +113,16 @@ function PropertyPanel.updateProperties(self, selection)
 		classForName[name] = Class
 	end
 
+	for i,prop in ipairs(self.lastProps) do
+		if not votesForName[prop.name] or classForName[prop.name] ~= prop.Class then
+			removePropertyWidget(self, prop.name, prop.Class)
+		end
+	end
+
 	-- Loop through all other objects to check which properties are shared.
 	for objI=2,#selection do
-		local obj = selection[objI][1]
+		local enclosure = selection[objI]
+		local obj = enclosure[1]
 		-- Loop once and "vote" for properties that this object has.
 		for i,property in ipairs(obj.properties) do
 			local name = property.name
@@ -140,7 +148,9 @@ function PropertyPanel.updateProperties(self, selection)
 		end
 	end
 
+	self:allocateChildren()
 	self.ruu:mapNextPrev(self.wgtMap)
+	self.lastProps = commonProperties
 end
 
 local maxLineWidth = 1

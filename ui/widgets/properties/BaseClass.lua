@@ -41,8 +41,7 @@ function BaseClass.ruuInput(wgt, depth, action, value, change)
 			local scene = self.selection.scene
 			local cmd = "removeSamePropertyFromMultiple"
 			local enclosures = self.selection:copyList()
-			local propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
-			scene.history:perform(cmd, propertyPanel, enclosures, self.propertyName)
+			scene.history:perform(cmd, self, enclosures, self.propertyName)
 		end
 	end
 end
