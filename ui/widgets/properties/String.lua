@@ -13,6 +13,10 @@ function String.set(self, name, value, PropClass)
 	table.insert(self.children, self.field)
 end
 
+function String.updateValue(self, value)
+	self.wgt:setText(value)
+end
+
 function String.onConfirm(self, wgt)
 	if wgt.text == wgt.oldText then
 		return

@@ -23,6 +23,8 @@ function PropertyPanel.set(self, ruu)
 	self.widget.ruuInput = self.ruuInput
 	self.wgtMap = {}
 
+	self.wgtForProp = {}
+
 	local signalFn = self.onSelectedObjectsModified
 	signals.subscribe(self, signalFn, "selection changed", "selected objects modified")
 end
@@ -47,16 +49,39 @@ function PropertyPanel.addProperty(self, propType, propName)
 	self:updateProperties(selection) -- We'll ignore the signal from ourself, so manually update.
 end
 
-local function addPropertyWidget(self, selection, PropClass, name, value)
-	local object = PropClass.WidgetClass(name, value, PropClass)
+local function addPropertyWidget(self, selection, name, Class, value)
+	local object = Class.WidgetClass(name, value, Class)
+	self.wgtForProp[name] = object
 	self.tree:add(object, self)
 	object:setSelection(selection)
 	object:initRuu(self.ruu, self.wgtMap)
 end
 
-local function removePropertyWidget(self, object)
+local function destroyPropertyWidget(self, object)
+	self.wgtForProp[object.propertyName] = nil
 	object:destroyRuu(self.wgtMap)
 	self.tree:remove(object)
+end
+
+local function getPropertyWidget(self, name, Class)
+	local object = self.wgtForProp[name]
+	if object and object.propertyClass == Class then
+		return object
+	end
+end
+
+local function removePropertyWidget(self, name, Class)
+	local object = getPropertyWidget(self, name, Class)
+	if object then  destroyPropertyWidget(self, object)  end
+end
+
+local function clearPropertyWidgets(self)
+	for i=self.children.maxn,2,-1 do
+		local child = self.children[i]
+		if child then
+			destroyPropertyWidget(self, child)
+		end
+	end
 end
 
 function PropertyPanel.onSelectedObjectsModified(self, sender)
@@ -66,24 +91,16 @@ function PropertyPanel.onSelectedObjectsModified(self, sender)
 end
 
 function PropertyPanel.updateProperties(self, selection)
-	for i=self.children.maxn,2,-1 do
-		local child = self.children[i]
-		if child then
-			removePropertyWidget(self, child)
-		end
-	end
-
 	if not selection or not selection[1] then
+		clearPropertyWidgets(self)
 		return
 	end
 
 	-- Get list of properties that all objects have in common.
 	-- Need properties and value.
-	local commonProperties = {
-		votes = {}, -- Lookup table by name.
-		classes = {}
-		-- { Class = , value = value }
-	}
+	local votesForName = {} -- Lookup table by name.
+	local classForName = {} -- Lookup table by name.
+	local commonProperties = {} -- [1] = { Class= , name= , value= }, [2]...
 
 	-- Copy property list from the first object.
 	local firstObj = selection[1][1]
@@ -91,8 +108,8 @@ function PropertyPanel.updateProperties(self, selection)
 		local Class, name = getmetatable(property), property.name
 		local value = property:getValue()
 		table.insert(commonProperties, { Class = Class, name = name, value = value })
-		commonProperties.votes[name] = 1
-		commonProperties.classes[name] = Class
+		votesForName[name] = 1
+		classForName[name] = Class
 	end
 
 	-- Loop through all other objects to check which properties are shared.
@@ -101,25 +118,28 @@ function PropertyPanel.updateProperties(self, selection)
 		-- Loop once and "vote" for properties that this object has.
 		for i,property in ipairs(obj.properties) do
 			local name = property.name
-			local votes = commonProperties.votes[name]
-			if votes and commonProperties.classes[name] == getmetatable(property) then
-				commonProperties.votes[name] = votes + 1
+			local votes = votesForName[name]
+			if votes and classForName[name] == getmetatable(property) then
+				votesForName[name] = votes + 1
 			end
 		end
 	end
 
 	-- If not all objects "voted" for a property, remove it from the list.
 	local requiredVotes = #selection
-	for i=#commonProperties,1,-1 do
-		local name = commonProperties[i].name
-		if commonProperties.votes[name] < requiredVotes then
-			table.remove(commonProperties, i)
+	for i,propData in ipairs(commonProperties) do
+		if votesForName[propData.name] < requiredVotes then
+			removePropertyWidget(self, propData.name, propData.Class)
+		else
+			local object = getPropertyWidget(self, propData.name, propData.Class)
+			if not object then
+				addPropertyWidget(self, selection, propData.name, propData.Class, propData.value)
+			else
+				object:updateValue(propData.value)
+			end
 		end
 	end
 
-	for i,propData in ipairs(commonProperties) do
-		addPropertyWidget(self, selection, propData.Class, propData.name, propData.value)
-	end
 	self.ruu:mapNextPrev(self.wgtMap)
 end
 

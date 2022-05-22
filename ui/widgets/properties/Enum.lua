@@ -21,6 +21,11 @@ function Enum.set(self, name, value, PropClass)
 	end
 end
 
+function Enum.updateValue(self, value)
+	self.button.text.text = value
+	self.value = value
+end
+
 function Enum.setValue(self, value)
 	self.button.text.text = value
 	self.value = value

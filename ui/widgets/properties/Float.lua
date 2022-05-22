@@ -11,6 +11,10 @@ function Float.set(self, name, value, PropClass)
 	table.insert(self.children, self.field)
 end
 
+function Float.updateValue(self, value)
+	self.wgt:setText(value)
+end
+
 function Float.onConfirm(self, wgt)
 	if wgt.text == wgt.oldText then
 		return

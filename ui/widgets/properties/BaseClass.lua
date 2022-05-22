@@ -12,6 +12,7 @@ function BaseClass.set(self, name, value, PropClass)
 	self:mode("fill", "none")
 	self.layer = "gui"
 	self.propertyName = name
+	self.propertyClass = PropClass
 
 	self.label = gui.Text(name, self.font, self.labelWidth or self.width, "W", "W", "left")
 	self.label:setPos(2)
@@ -43,25 +44,6 @@ function BaseClass.ruuInput(wgt, depth, action, value, change)
 			local propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
 			scene.history:perform(cmd, propertyPanel, enclosures, self.propertyName)
 		end
-	end
-end
-
-function BaseClass.onConfirm(self, wgt)
-	if wgt.text == wgt.oldText then
-		return
-	end
-	local value = tonumber(wgt.text)
-	if not value then
-		return true -- Reject input.
-	end
-	if not self.selection then
-		print("Error: PropertyWidget[BaseClass].onConfirm - No selection known.")
-	else
-		local scene = self.selection.scene
-		local cmd = "setSamePropertyOnMultiple"
-		local enclosures = self.selection:copyList()
-		local propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
-		scene.history:perform(cmd, propertyPanel, enclosures, self.propertyName, value)
 	end
 end
 

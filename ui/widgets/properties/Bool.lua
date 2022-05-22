@@ -13,6 +13,10 @@ function Bool.set(self, name, value, PropClass)
 	table.insert(self.children, self.checkbox)
 end
 
+function Bool.updateValue(self, value)
+	self.wgt:setChecked(value)
+end
+
 function Bool.onToggle(self, wgt)
 	local value = wgt.isChecked
 	if not self.selection then

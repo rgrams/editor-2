@@ -31,6 +31,11 @@ function Vec2.set(self, name, value, PropClass)
 	self.fieldY = self.children[5]
 end
 
+function Vec2.updateValue(self, value)
+	self.widgetX:setText(value.x)
+	self.widgetY:setText(value.y)
+end
+
 function Vec2.onConfirm(self, wgt, axis)
 	local value = tonumber(wgt.text)
 	if not value then

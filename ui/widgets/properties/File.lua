@@ -24,6 +24,10 @@ function File.set(self, name, value, PropClass)
 	table.insert(self.children, self.button)
 end
 
+function File.updateValue(self, value)
+	self.fieldWgt:setText(value)
+end
+
 function File.onConfirm(self, wgt)
 	if wgt.text == wgt.oldText then
 		return
