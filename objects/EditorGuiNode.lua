@@ -65,6 +65,7 @@ end
 function EditorGuiNode.toLocalPos(self, wx, wy)
 	local lx, ly = self.parent:toLocal(wx, wy)
 	lx, ly = lx - self.anchorPosX, ly - self.anchorPosY
+	lx, ly = lx - self._givenRect.x, ly - self._givenRect.y
 	local pivotX, pivotY = self.w * self.px/2, self.h * self.py/2
 	lx, ly = lx + pivotX, ly + pivotY
 	return lx, ly
