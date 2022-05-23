@@ -50,7 +50,7 @@ function EditorObject.addProperty(self, Class, name, value)
 	end
 	self.propertyMap[name] = property
 	table.insert(self.properties, property)
-	return name
+	return name, property.value
 end
 
 function EditorObject.removeProperty(self, name)

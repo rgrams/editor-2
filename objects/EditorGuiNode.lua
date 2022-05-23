@@ -12,6 +12,7 @@ EditorGuiNode.hitHeight = 100
 
 _G.objClassList:add(EditorGuiNode, EditorGuiNode.displayName)
 
+local Bool = require "objects.properties.Bool"
 local Vec2 = require "objects.properties.Vec2"
 local Float = require "objects.properties.Property"
 local Cardinal = require "objects.properties.Enum_CardinalDir"
@@ -105,11 +106,29 @@ function EditorGuiNode.setProperty(self, name, value)
 		elseif name == "pad" then
 			self:pad(value.x, value.y)
 			self:updateAABB()
+		elseif name == "isGreedy" and property:is(Bool) then
+			self.isGreedy = value
 		end
 		return true
 	else
 		return false
 	end
+end
+
+function EditorGuiNode.addProperty(self, Class, name, value)
+	name, value = EditorObject.addProperty(self, Class, name, value)
+	if name == "isGreedy" and Class == "Bool" then
+		self.isGreedy = value
+	end
+	return name, value
+end
+
+function EditorGuiNode.removeProperty(self, name)
+	local wasRemoved = EditorObject.removeProperty(self, name)
+	if name == "isGreedy" then
+		self.isGreedy = nil
+	end
+	return wasRemoved
 end
 
 return EditorGuiNode
