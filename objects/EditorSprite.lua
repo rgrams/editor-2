@@ -8,6 +8,7 @@ EditorSprite.displayName = "Sprite"
 _G.objClassList:add(EditorSprite, EditorSprite.displayName)
 
 local Image = require "objects.properties.Image"
+local Color = require "objects.properties.Color"
 
 EditorSprite.isBuiltinProperty = {
 	pos = true,
@@ -15,11 +16,18 @@ EditorSprite.isBuiltinProperty = {
 	scale = true,
 	skew = true,
 	image = true,
+	color = true,
 }
+
+function EditorSprite.set(self)
+	EditorSprite.super.set(self)
+	self.color = { 1, 1, 1, 1 }
+end
 
 function EditorSprite.initProperties(self)
 	EditorSprite.super.initProperties(self)
 	self:addProperty(Image, "image")
+	self:addProperty(Color, "color")
 end
 
 function EditorSprite.setProperty(self, name, value)
@@ -36,6 +44,8 @@ function EditorSprite.setProperty(self, name, value)
 			self:setSkew(value.x, value.y)
 		elseif name == "image" then
 			self:setImage(property.image)
+		elseif name == "color" then
+			self.color = property:getValue()
 		end
 		return true
 	else
@@ -58,11 +68,13 @@ end
 
 function EditorSprite.draw(self)
 	if self.image then
-		love.graphics.setColor(1, 1, 1)
+		love.graphics.setColor(self.color)
 		love.graphics.draw(self.image, self.ox, self.oy)
 	else
-		love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
-		love.graphics.circle("line", 0, 0, self.hitWidth/4, 8)
+		love.graphics.setColor(self.color)
+		local r = self.hitWidth*0.35
+		love.graphics.line(-r, -r, r, r)
+		love.graphics.line(r, -r, -r, r)
 	end
 	EditorSprite.super.draw(self)
 end
