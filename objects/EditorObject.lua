@@ -172,7 +172,8 @@ function EditorObject.drawParentChildLines(self, children)
 			if child then
 				love.graphics.setColor(config.parentLineColor)
 				local frac = config.parentLineLenFrac
-				local x, y = child.pos.x*frac, child.pos.y*frac
+				local x, y = self:toLocal(child._to_world.x, child._to_world.y)
+				x, y = x * frac, y * frac
 				love.graphics.line(0, 0, x, y)
 				local vx, vy = vec2.normalize(x, y)
 				local arrowLen = config.parentLineArrowLength
