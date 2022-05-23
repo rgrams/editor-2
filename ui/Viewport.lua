@@ -7,6 +7,7 @@ local scenes = require "scenes"
 local BackgroundGrid = require "ui.BackgroundGrid"
 local Tool = require "tools.Tool"
 local objectFn = require "commands.functions.object-functions"
+local InputField = require "ui.widgets.InputField"
 
 local maxLineWidth = 1
 
@@ -20,9 +21,27 @@ function Viewport.set(self, ruu)
 	self.widget.ruuInput = Viewport.ruuInput
 	self.widget.drag = Viewport.drag
 	self.children = {
-		Tool(ruu)
+		Tool(ruu),
 	}
 	self.tool = self.children[1]
+
+	local snapIncr = config.translateSnapIncrement
+
+	local snapLabel = gui.Text("snap to:", { "assets/font/OpenSans-Semibold.ttf", 12 }, 50, "NW", "NW")
+	snapLabel:setPos(3, 6)
+	snapLabel.color[4] = 0.5
+	table.insert(self.children, snapLabel)
+	local snapField = InputField(snapIncr, 40)
+	table.insert(self.children, snapField)
+	snapField:anchor("NW"):pivot("NW"):setPos(53, 3)
+	local snapWgt = self.ruu:InputField(snapField, self.snapIncrementSet, snapIncr)
+	snapWgt:args(self, snapWgt)
+end
+
+function Viewport.snapIncrementSet(self, wgt)
+	local value = tonumber(wgt.text)
+	if not value then  return true  end
+	config.translateSnapIncrement = value
 end
 
 function Viewport.init(self)

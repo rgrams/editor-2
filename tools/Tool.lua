@@ -24,8 +24,6 @@ Tool.edgeHandleSize = 9
 Tool.pivotRadius = 6
 Tool.rotateKey = "alt"
 Tool.snapKey = "ctrl"
-Tool.snapX = config.translateSnapIncrement
-Tool.snapY = config.translateSnapIncrement
 Tool.dragInWorldSpace = true
 
 function Tool.set(self, ruu)
@@ -238,10 +236,11 @@ function Tool.drag(wgt, dx, dy, dragType)
 	if dragType == "translate selection" then
 		local totalDX, totalDY = x - self.dragStartX, y - self.dragStartY
 		local inWorldSpace = self.dragInWorldSpace
-		local roundX, roundY = config.roundAllPropsTo, config.roundAllPropsTo
+		local snapIncr = config.roundAllPropsTo
 		if modkeys.isPressed(self.snapKey) then
-			roundX, roundY = self.snapX, self.snapY
+			snapIncr = config.translateSnapIncrement
 		end
+		local roundX, roundY = snapIncr, snapIncr
 
 		if not self.startedDragCommand then
 			self.startedDragCommand = true
