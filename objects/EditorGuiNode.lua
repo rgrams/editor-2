@@ -6,7 +6,7 @@ EditorGuiNode:implements(EditorObject, "skip")
 
 EditorGuiNode.className = "EditorGuiNode"
 
-EditorGuiNode.displayName = "GUINode"
+EditorGuiNode.displayName = "GUI Node"
 EditorGuiNode.hitWidth = 100
 EditorGuiNode.hitHeight = 100
 
