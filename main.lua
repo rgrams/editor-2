@@ -4,6 +4,7 @@ io.stdout:setvbuf("no")
 require "run"
 require "philtre.init"
 require "philtre.lib.math-patch"
+require "lib.new-custom"
 require "lib.GetRequireFolder" -- Global function.
 _G.gui = require "philtre.objects.gui.all"
 _G.vec2 = require "philtre.lib.vec2xy"

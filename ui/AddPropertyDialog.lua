@@ -58,6 +58,7 @@ function AddPropDialog.set(self, callback, callbackArgs)
 		{ text = "color", fn = self.setType, args = {self, "color" } },
 		{ text = "string", fn = self.setType, args = {self, "string" } },
 		{ text = "file", fn = self.setType, args = {self, "file" } },
+		{ text = "font", fn = self.setType, args = {self, "font" } },
 	}
 end
 

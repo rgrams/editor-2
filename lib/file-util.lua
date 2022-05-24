@@ -10,6 +10,34 @@ function M.splitFilepath(path)
 	end
 end
 
+function M.loadFontFromAbsolutePath(path, size)
+	local file, error = io.open(path, "rb")
+	if error then
+		print(error)
+		return
+	end
+	local _, filename, ext = M.splitFilepath(path)
+	ext = ext or ".ttf"
+	filename = (filename ~= "" and filename or "new") .. ext
+	local fileData, error = love.filesystem.newFileData(file:read("*a"), filename)
+	file:close()
+	if not error then
+		local isSuccess, result = pcall(love.font.newTrueTypeRasterizer, fileData, size)
+		if not isSuccess then
+			print("Error generating rasterizer from file:\n   "..result)
+		else
+			local isSuccess, result = pcall(love.graphics.newFont, result, size)
+			if not isSuccess then
+				print("Error loading font from rasterizer:\n   "..result)
+			else
+				return result
+			end
+		end
+	else
+		print("Error reading file:\n   "..error)
+	end
+end
+
 function M.loadImageFromAbsolutePath(path)
 	local file, error = io.open(path, "rb")
 	if error then
