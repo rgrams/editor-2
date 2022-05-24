@@ -104,7 +104,13 @@ function EditorGuiText.setProperty(self, name, value)
 			self:setAngle(math.rad(value))
 			self:updateAABB()
 		elseif name == "size" then
-			self:size(value.x, value.y, true)
+			local w, h = value.x, value.y
+
+			-- Tell our children that we've always been this size.
+			if w then  self._contentRect.designW = w - self.padX*2  end
+			if h then  self._contentRect.designH = h - self.padY*2  end
+
+			self:size(w, h, true)
 			self.hitWidth, self.hitHeight = self.w, self.h
 			self:updateAABB()
 		elseif name == "skew" then
