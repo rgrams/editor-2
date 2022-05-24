@@ -591,6 +591,21 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		if wgt.object.isDragging and (change == 1 or change == -1) then
 			wgt:drag(0, 0, wgt.object.lastDragType)
 		end
+	elseif action == "zero position" and change == 1 then
+		local self, scene = wgt.object, scenes.active
+		if scene.selection[1] then
+			local enclosures = scene.selection:copyList()
+			local pos = { x = 0, y = 0 }
+			scene.history:perform("setSamePropertyOnMultiple", self, enclosures, "pos", pos)
+			updateHover(self)
+		end
+	elseif action == "zero rotation" and change == 1 then
+		local self, scene = wgt.object, scenes.active
+		if scene.selection[1] then
+			local enclosures = scene.selection:copyList()
+			scene.history:perform("setSamePropertyOnMultiple", self, enclosures, "angle", 0)
+			updateHover(self)
+		end
 	end
 end
 

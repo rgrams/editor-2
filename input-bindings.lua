@@ -40,4 +40,6 @@ return {
 	{ "button", "ctrl s", "save" },
 	{ "button", "ctrl o", "open" },
 	{ "button", "ctrl shift a", "add property" },
+	{ "button", "0", "zero position" },
+	{ "button", "shift 0", "zero rotation" },
 }
