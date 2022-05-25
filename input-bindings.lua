@@ -4,6 +4,7 @@ return {
 	{ "button", "M:1", "click", true },
 	{ "button", "M:2", "right click", true },
 	{ "button", "M:3", "pan camera", true },
+	{ "button", "space", "pan camera", true },
 
 	{ "button", "M:wheely+", "scroll", true },
 	{ "button", "M:wheely-", "scroll", true },
