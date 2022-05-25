@@ -115,6 +115,7 @@ function EditorGuiNode.setProperty(self, name, value)
 		elseif name == "isGreedy" and property:is(Bool) then
 			self.isGreedy = value
 		end
+		self:wasModified()
 		return true
 	else
 		return false
@@ -125,6 +126,7 @@ function EditorGuiNode.addProperty(self, Class, name, value)
 	name, value = EditorObject.addProperty(self, Class, name, value)
 	if name == "isGreedy" and Class == "Bool" then
 		self.isGreedy = value
+		self:wasModified()
 	end
 	return name, value
 end
@@ -133,6 +135,7 @@ function EditorGuiNode.removeProperty(self, name)
 	local wasRemoved = EditorObject.removeProperty(self, name)
 	if name == "isGreedy" then
 		self.isGreedy = nil
+		self:wasModified()
 	end
 	return wasRemoved
 end

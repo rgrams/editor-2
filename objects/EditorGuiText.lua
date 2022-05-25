@@ -150,6 +150,7 @@ function EditorGuiText.setProperty(self, name, value)
 		elseif name == "color" then
 			self.color = property:getValue()
 		end
+		self:wasModified()
 		return true
 	else
 		return false

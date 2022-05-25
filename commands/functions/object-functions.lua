@@ -95,7 +95,9 @@ function M.delete(caller, scene, enclosure, _oneWasSelected, isSimulation)
 	local children, childWasSelected = deleteChildren(caller, scene, object.children, isSimulation)
 	oneWasSelected = oneWasSelected or childWasSelected
 	if not isSimulation then
+		local parent = object.parent
 		object.tree:remove(object)
+		object:call("wasRemoved", parent)
 	end
 	return caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children, oneWasSelected
 end

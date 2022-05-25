@@ -51,6 +51,10 @@ function EditorGuiColumn.allocateChild(self, child, forceUpdate)
 	gui.Column.allocateChild(self, child, forceUpdate)
 end
 
+function EditorGuiColumn.childrenModified(self)
+	self:allocateChildren()
+end
+
 function EditorGuiColumn.setProperty(self, name, value)
 	local property = self:getPropertyObj(name)
 	if property then
@@ -103,6 +107,7 @@ function EditorGuiColumn.setProperty(self, name, value)
 		elseif name == "isGreedy" and property:is(Bool) then
 			self.isGreedy = value
 		end
+		self:wasModified()
 		return true
 	else
 		return false

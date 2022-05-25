@@ -41,6 +41,11 @@ function EditorObject.init(self)
 	self:updateAABB()
 end
 
+-- Called from object-functions after fully removed from the tree (no longer in parent's child list).
+function EditorObject.wasRemoved(self, fromParent)
+	self:wasModified(fromParent)
+end
+
 function EditorObject.addProperty(self, Class, name, value)
 	assert(Class, "EditorObject.addProperty - No class given for property: '"..tostring(name).."', value: '"..tostring(value).."'.")
 	local property = Class(self, name)
@@ -50,6 +55,7 @@ function EditorObject.addProperty(self, Class, name, value)
 	end
 	self.propertyMap[name] = property
 	table.insert(self.properties, property)
+	self:wasModified()
 	return name, property.value
 end
 
@@ -59,9 +65,17 @@ function EditorObject.removeProperty(self, name)
 		for i,property in ipairs(self.properties) do
 			if property.name == name then
 				table.remove(self.properties, i)
+				self:wasModified()
 				return true
 			end
 		end
+	end
+end
+
+function EditorObject.wasModified(self, parent)
+	parent = parent or self.parent
+	if parent and parent.childrenModified then
+		parent:childrenModified()
 	end
 end
 
@@ -78,6 +92,7 @@ function EditorObject.setProperty(self, name, value)
 		elseif name == "skew" then
 			self:setSkew(value.x, value.y)
 		end
+		self:wasModified()
 		return true
 	else
 		return false
