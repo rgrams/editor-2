@@ -16,9 +16,9 @@ local Dropdown = require "ui.widgets.Dropdown"
 local classList = _G.objClassList
 local Handle = require "tools.ToolHandle"
 
-Tool.boxSelectAddKey = "shift"
-Tool.boxSelectToggleKey = "ctrl"
-Tool.boxSelectSubtractKey = "alt"
+Tool.boxSelectAddChord = "shift "
+Tool.boxSelectToggleChord = "ctrl "
+Tool.boxSelectSubtractChord = "alt "
 Tool.cornerHandleSize = 12
 Tool.edgeHandleSize = 9
 Tool.pivotRadius = 6
@@ -104,9 +104,9 @@ end
 local function getBoxSelectMode(self)
 	local curModChord = modkeys.getString()
 	local mode = "set"
-	if     curModChord == self.boxSelectAddKey .. " "      then  mode = "add"
-	elseif curModChord == self.boxSelectToggleKey .. " "   then  mode = "toggle"
-	elseif curModChord == self.boxSelectSubtractKey .. " " then  mode = "subtract"
+	if     curModChord == self.boxSelectAddChord      then  mode = "add"
+	elseif curModChord == self.boxSelectToggleChord   then  mode = "toggle"
+	elseif curModChord == self.boxSelectSubtractChord then  mode = "subtract"
 	end
 	return mode
 end
@@ -493,7 +493,12 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 	if scenes.active and not isKeyboard then
 		local self = wgt.object
 
-		if Input.isPressed("add modifier") then
+		if scenes.active.selection[1] and Input.isPressed("force drag modifier") then
+			local isRotate = modkeys.isPressed(self.rotateKey)
+			local dragType = isRotate and "rotate selection" or "translate selection"
+			startDrag(self, dragType)
+
+		elseif Input.isPressed("add modifier") then
 			local wx, wy = Camera.current:screenToWorld(mx, my)
 			wgt.object:addAt(self.lastAddClass, wx, wy)
 
@@ -518,8 +523,10 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 				startDrag(self, dragType)
 			end
 			updateAABB(self)
+
 		elseif self.hoverHandle then
 			startDrag(self, "handle transform")
+
 		else -- Clicked on nothing.
 			local selection = scenes.active.selection
 			if selection[1] and modkeys.getString() == "" then
