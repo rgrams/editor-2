@@ -179,26 +179,39 @@ function EditorObject.touchesPoint(self, wx, wy)
 	end
 end
 
+local tempTransform = love.math.newTransform()
+
 function EditorObject.drawParentChildLines(self, children)
 	children = children or self.children
 	if children then
+		-- Reset our world transform, back to just camera transform.
+		love.graphics.pop()
+
+		local arrowLen = config.parentLineArrowLength
+		local arrowAngle = config.parentLineArrowAngle
+		local px, py = self._to_world.x, self._to_world.y
+
 		for i=1,children.maxn or #children do
 			local child = children[i]
 			if child then
 				love.graphics.setColor(config.parentLineColor)
 				local frac = config.parentLineLenFrac
-				local x, y = self:toLocal(child._to_world.x, child._to_world.y)
-				x, y = x * frac, y * frac
-				love.graphics.line(0, 0, x, y)
-				local vx, vy = vec2.normalize(x, y)
-				local arrowLen = config.parentLineArrowLength
-				local arrowAngle = config.parentLineArrowAngle
+				local chx, chy = child._to_world.x, child._to_world.y
+				local dx, dy = (chx - px)*frac, (chy - py)*frac
+				chx, chy = px + dx, py + dy
+				love.graphics.line(px, py, chx, chy)
+				local vx, vy = vec2.normalize(dx, dy)
 				vx, vy = -vx*arrowLen, -vy*arrowLen
 				local x2, y2 = vec2.rotate(vx, vy, arrowAngle)
 				local x3, y3 = vec2.rotate(vx, vy, -arrowAngle)
-				love.graphics.line(x2+x, y2+y, x, y, x3+x, y3+y)
+				love.graphics.line(x2+chx, y2+chy, chx, chy, x3+chx, y3+chy)
 			end
 		end
+
+		-- Re-apply our world transform.
+		local t = matrix.toTransform(self._to_world, tempTransform)
+		love.graphics.push()
+		love.graphics.applyTransform(t)
 	end
 end
 
