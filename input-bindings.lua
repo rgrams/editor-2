@@ -42,4 +42,6 @@ return {
 	{ "button", "ctrl shift a", "add property" },
 	{ "button", "0", "zero position" },
 	{ "button", "shift 0", "zero rotation" },
+	{ "button", "kp0", "zero position" },
+	{ "button", "shift kp0", "zero rotation" },
 }
