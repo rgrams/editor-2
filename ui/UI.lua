@@ -5,6 +5,7 @@ UI.className = "UI"
 local Ruu = require "ui.ruu.ruu"
 local Viewport = require "ui.Viewport"
 local PropertyPanel = require "ui.PropertyPanel"
+local ResizeHandle = require "ui.widgets.ResizeHandle"
 local scenes = require "scenes"
 local fileDialog = require "lib.native-file-dialog.dialog"
 local fileUtil = require "lib.file-util"
@@ -28,10 +29,13 @@ function UI.set(self)
 
 	self.children = {
 		Viewport(self.ruu),
+		ResizeHandle("/Window/UI/PropertyPanel"),
 		PropertyPanel(self.ruu)
 	}
 
-	self.propertyPanel = self.children[2]
+	self.children[2]:initRuu(self.ruu)
+
+	self.propertyPanel = self.children[3]
 	self.tool = self.children[1].children[1]
 end
 
