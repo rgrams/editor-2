@@ -124,7 +124,7 @@ end
 
 function EditorGuiNode.addProperty(self, Class, name, value)
 	name, value = EditorObject.addProperty(self, Class, name, value)
-	if name == "isGreedy" and Class == "Bool" then
+	if name == "isGreedy" and Class == Bool then
 		self.isGreedy = value
 		self:wasModified()
 	end
