@@ -31,6 +31,7 @@ return {
 	{ "button", "lctrl", "snap", true },
 	{ "button", "rctrl", "snap", true },
 
+	{ "button", "ctrl a", "select all" },
 	{ "button", "a", "add modifier" },
 	{ "button", "shift a", "add" },
 	{ "button", "ctrl z", "undo" },

@@ -11,6 +11,14 @@ local cursorW = 2
 local selectionColor = { 0.16, 0.44, 0.78, 1 }
 local cursorColor = { 1, 1, 1, 1 }
 
+-- Modify Ruu InputField widget class directly to add select-all to all fields.
+local RuuInputField = require "ui.ruu.widgets.InputField"
+function RuuInputField.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
+	if action == "select all" and change == 1 then
+		wgt:selectAll()
+	end
+end
+
 local function selectionDraw(self)
 	love.graphics.setColor(self.color)
 	love.graphics.rectangle("fill", -self.w/2, -self.h/2, self.w, self.h)
