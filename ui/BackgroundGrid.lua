@@ -36,7 +36,7 @@ end
 function BackgroundGrid.draw(self)
 	local vp = Camera.current.vp
 	local w_lt, w_top = Camera.current:screenToWorld(vp.x, vp.y)
-	local w_rt, w_bot = Camera.current:screenToWorld(vp.w, vp.h)
+	local w_rt, w_bot = Camera.current:screenToWorld(vp.x + vp.w, vp.y + vp.h)
 	local w_w, w_h = w_rt - w_lt, w_bot - w_top
 
 	local snapIncr = config.translateSnapIncrement

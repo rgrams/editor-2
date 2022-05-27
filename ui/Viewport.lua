@@ -46,7 +46,8 @@ end
 
 function Viewport.init(self)
 	Viewport.super.init(self)
-	self.tree:add(BackgroundGrid(self))
+	-- Add Background Grid to scene-tree root so our Node transform doesn't make things difficult.
+	self.tree:add( BackgroundGrid(self) )
 	self.ruu:setFocus(self.children[1].widget)
 end
 
