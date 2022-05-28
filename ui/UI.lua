@@ -120,6 +120,14 @@ function UI.saveScene(self, scene, filepath)
 end
 
 function UI.openScene(self, filepath)
+	-- If scene is already open, just switch to it.
+	for i,scene in ipairs(scenes) do
+		if scene.filepath == filepath then
+			scenes.setActive(scene)
+			return
+		end
+	end
+
 	local _, filename = fileUtil.splitFilepath(filepath)
 	local importer = require "io.defaultLuaImportExport"
 	local scene = scenes.create(filename, filepath)

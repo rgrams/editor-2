@@ -63,6 +63,7 @@ function M.setActive(scene)
 	M.active = scene
 	love.window.setTitle("Editor - " .. scene.name)
 	signals.send("active scene changed")
+	_G.shouldRedraw = true
 end
 
 return M
