@@ -18,7 +18,7 @@ _G.objClassList = IndexedList()
 _G.propClassList = IndexedList()
 
 local scenes = require "scenes"
-local scene
+local editorTree
 local window
 
 local screenRect = gui.Rect(0, 0, love.graphics.getDimensions())
@@ -59,36 +59,35 @@ function love.load()
 	-- Load editor object classes.
 	requireModulesInFolder("objects/")
 
-	scene = SceneTree(layers, defaultLayer)
+	editorTree = SceneTree(layers, defaultLayer)
 
-	scene:add(mod(Camera(0, 0, 0, {800,600}, "expand view"), {name="MyCamera"}))
-	window = scene:add( require("ui.Window")() )
+	editorTree:add( Camera(0, 0, 0, {800,600}, "expand view") )
+	window = editorTree:add( require("ui.Window")() )
 
 	-- Add default editing scene.
-	local sceneLayers = { "default" }
-	local sceneDefaultLayer = "default"
-	local commands = require("commands.all")
-	scenes.add( scenes.create(sceneLayers, sceneDefaultLayer, commands) )
+	scenes.add( scenes.create() )
 end
 
 function love.update(dt)
 	if scenes.active then  scenes.active:update(dt)  end
-	scene:update(dt)
+	editorTree:update(dt)
 end
 
 function love.draw()
-	scene:updateTransforms()
-	if scenes.active then  scenes.active:updateTransforms()  end
+	local activeScene = scenes.active
+
+	editorTree:updateTransforms()
+	if activeScene then  activeScene:updateTransforms()  end
 	Camera.current:applyTransform()
-	if scenes.active then  scenes.active:draw()  end
-	scene:draw("world")
+	if activeScene then  activeScene:draw()  end
+	editorTree:draw("world")
 	Camera.current:resetTransform()
-	scene:draw("gui")
+	editorTree:draw("gui")
 
 	if guiDebugDrawEnabled then
 		window:callRecursive("debugDraw", "guiDebug")
-		scene:draw("guiDebug")
-		scene.draw_order:clear("guiDebug")
+		editorTree:draw("guiDebug")
+		editorTree.draw_order:clear("guiDebug")
 	end
 end
 
