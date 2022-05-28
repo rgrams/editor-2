@@ -30,9 +30,8 @@ function M.add(scene, isNotActive)
 end
 
 function M.remove(scene)
-	for i=1,#M,-1 do
-		local scn = M[i]
-		if scn == scene then
+	for i=1,#M do
+		if M[i] == scene then
 			table.remove(M, i)
 			signals.send("scene removed")
 			-- If this scene was the active one, activate another scene.

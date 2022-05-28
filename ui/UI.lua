@@ -82,6 +82,8 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 			local prevIndex = ((index - 1 - 1) % #scenes) + 1
 			scenes.setActive(scenes[prevIndex])
 		end
+	elseif action == "close tab" and (change == 1) then
+		scenes.remove(scenes.active)
 	elseif action == "save" and change == 1 then
 		if scenes.active then
 			local filepath = scenes.active.filepath

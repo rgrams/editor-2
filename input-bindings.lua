@@ -50,4 +50,5 @@ return {
 	{ "button", ";", "force drag modifier", true },
 	{ "button", "ctrl tab", "next tab" },
 	{ "button", "ctrl shift tab", "prev tab" },
+	{ "button", "ctrl w", "close tab" },
 }
