@@ -41,6 +41,7 @@ function M.export(scene, filepath, options)
 
 	options = options or {}
 	local data = copyChildrenData(scene.children, options)
+	data.isSceneFile = true
 	local str = "return " .. objToStr(data) .. "\n"
 	file:write(str)
 
@@ -75,7 +76,7 @@ function M.import(scene, filepath, options)
 	print("   "..filepath)
 	local file, errMsg = io.open(filepath, "r")
 	if not file then
-		print("error", errMsg)
+		print("Error opening file", errMsg)
 		return
 	end
 
@@ -84,16 +85,22 @@ function M.import(scene, filepath, options)
 
 	local isSuccess, result = pcall(loadstring, str)
 	if not isSuccess then
-		print(result)
+		print("Error loading contents of file as lua code", result)
 		return
 	end
+
 	local isSuccess, data = pcall(result)
 	if not isSuccess then
 		print("Error executing loaded lua code: "..tostring(data))
 		return
 	end
 
-	local argsList = {}
+	-- if not data.isSceneFile then
+		-- print("Lua module is not flagged as a scene file.")
+		-- return
+	-- end
+
+	local addArgsList = {}
 	local caller = false
 
 	-- Just need to add the objects at the base level, any children will be added along with.
@@ -102,15 +109,10 @@ function M.import(scene, filepath, options)
 			print("   Error parsing objects: No object class property found.")
 			return
 		end
-		table.insert(argsList, makeAddObjArgs(caller, scene, obj, false))
+		table.insert(addArgsList, makeAddObjArgs(caller, scene, obj, false))
 	end
 
-	local existingEnclosures = {}
-	for i,child in ipairs(scene.children) do
-		table.insert(existingEnclosures, child.enclosure)
-	end
-	scene.history:perform("deleteObjects", caller, scene, existingEnclosures)
-	scene.history:perform("addObjects", caller, scene, argsList)
+	return addArgsList
 end
 
 return M

@@ -47,4 +47,6 @@ return {
 	{ "button", "kp0", "zero position" },
 	{ "button", "shift kp0", "zero rotation" },
 	{ "button", ";", "force drag modifier", true },
+	{ "button", "ctrl tab", "next tab" },
+	{ "button", "ctrl shift tab", "prev tab" },
 }

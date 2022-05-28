@@ -51,6 +51,14 @@ function M.remove(scene)
 	end
 end
 
+function M.getIndex(scene)
+	for i=1,#M do
+		if M[i] == scene then
+			return i
+		end
+	end
+end
+
 function M.setActive(scene)
 	M.active = scene
 	love.window.setTitle("Editor - " .. scene.name)

@@ -9,6 +9,7 @@ local ResizeHandle = require "ui.widgets.ResizeHandle"
 local scenes = require "scenes"
 local fileDialog = require "lib.native-file-dialog.dialog"
 local fileUtil = require "lib.file-util"
+local objectFn = require "commands.functions.object-functions"
 
 local lastOpenFolder
 local lastSaveFolder
@@ -69,6 +70,18 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 			redoArgs[1] = self -- Set caller to ourself.
 			scenes.active.history:redo()
 		end
+	elseif action == "next tab" and (change == 1 or isRepeat) then
+		if #scenes > 1 then
+			local index = scenes.getIndex(scenes.active)
+			local nextIndex = ((index - 1 + 1) % #scenes) + 1
+			scenes.setActive(scenes[nextIndex])
+		end
+	elseif action == "prev tab" and (change == 1 or isRepeat) then
+		if #scenes > 1 then
+			local index = scenes.getIndex(scenes.active)
+			local prevIndex = ((index - 1 - 1) % #scenes) + 1
+			scenes.setActive(scenes[prevIndex])
+		end
 	elseif action == "save" and change == 1 then
 		if scenes.active then
 			local filepath = fileDialog.save(lastSaveFolder)
@@ -80,9 +93,23 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 	elseif action == "open" and change == 1 then
 		local filepath = fileDialog.open(lastOpenFolder)
 		if not filepath then  return  end
-		lastOpenFolder = fileUtil.splitFilepath(filepath)
-		local importer = require "io.defaultLuaImportExport"
-		importer.import(scenes.active, filepath)
+
+		local folder = fileUtil.splitFilepath(filepath)
+		lastOpenFolder = folder
+
+		self:openScene(filepath)
+	end
+end
+
+function UI.openScene(self, filepath)
+	local _, filename = fileUtil.splitFilepath(filepath)
+	local importer = require "io.defaultLuaImportExport"
+	local scene = scenes.create(filename, filepath)
+	local addArgsList = importer.import(scene, filepath)
+	if addArgsList then
+		objectFn.addObjects(self, scene, addArgsList)
+		scenes.add(scene)
+		_G.shouldRedraw = true
 	end
 end
 

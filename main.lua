@@ -126,8 +126,7 @@ function love.filedropped(file)
 				return
 			end
 		end
-		local importer = require "io.defaultLuaImportExport"
-		importer.import(scene, filepath)
-		_G.shouldRedraw = true
 	end
+	local ui = editorTree:get("/Window/UI")
+	ui:openScene(file:getFilename())
 end
