@@ -84,11 +84,18 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 		end
 	elseif action == "save" and change == 1 then
 		if scenes.active then
+			local filepath = scenes.active.filepath
+			if not filepath then  filepath = fileDialog.save(lastSaveFolder)  end
+			if not filepath then  return  end
+			lastSaveFolder = fileUtil.splitFilepath(filepath)
+			self:saveScene(scenes.active, filepath)
+		end
+	elseif action == "save as" and change == 1 then
+		if scenes.active then
 			local filepath = fileDialog.save(lastSaveFolder)
 			if not filepath then  return  end
 			lastSaveFolder = fileUtil.splitFilepath(filepath)
-			local exporter = require "io.defaultLuaImportExport"
-			exporter.export(scenes.active, filepath)
+			self:saveScene(scenes.active, filepath)
 		end
 	elseif action == "open" and change == 1 then
 		local filepath = fileDialog.open(lastOpenFolder)
@@ -99,6 +106,17 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 
 		self:openScene(filepath)
 	end
+end
+
+function UI.saveScene(self, scene, filepath)
+	scene.filepath = filepath
+	local _, filename = fileUtil.splitFilepath(filepath)
+	scene.name = filename
+	if scenes.active == scene then
+		love.window.setTitle("Editor - " .. scene.name)
+	end
+	local exporter = require "io.defaultLuaImportExport"
+	exporter.export(scene, filepath)
 end
 
 function UI.openScene(self, filepath)

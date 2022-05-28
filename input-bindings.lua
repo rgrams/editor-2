@@ -40,6 +40,7 @@ return {
 	{ "button", "ctrl c", "copy" },
 	{ "button", "ctrl v", "paste" },
 	{ "button", "ctrl s", "save" },
+	{ "button", "ctrl shift s", "save as" },
 	{ "button", "ctrl o", "open" },
 	{ "button", "ctrl shift a", "add property" },
 	{ "button", "0", "zero position" },
