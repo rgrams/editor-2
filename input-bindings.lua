@@ -51,4 +51,5 @@ return {
 	{ "button", "ctrl tab", "next tab" },
 	{ "button", "ctrl shift tab", "prev tab" },
 	{ "button", "ctrl w", "close tab" },
+	{ "button", "ctrl n", "new scene" },
 }

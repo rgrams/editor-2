@@ -84,6 +84,18 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 		end
 	elseif action == "close tab" and (change == 1) then
 		scenes.remove(scenes.active)
+	elseif action == "new scene" and (change == 1) then
+		local name = "Untitled"
+		local suffixIndex = 0
+		local existingSceneName = {}
+		for i,scene in ipairs(scenes) do
+			existingSceneName[scene.name] = true
+		end
+		while existingSceneName[name] do
+			suffixIndex = suffixIndex + 1
+			name = "Untitled-" .. suffixIndex
+		end
+		scenes.add( scenes.create(name) )
 	elseif action == "save" and change == 1 then
 		if scenes.active then
 			local filepath = scenes.active.filepath
