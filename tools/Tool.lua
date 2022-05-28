@@ -42,7 +42,8 @@ function Tool.set(self, ruu)
 		"objects added",
 		"objects deleted",
 		"selected objects modified",
-		"selection changed"
+		"selection changed",
+		"active scene changed"
 	)
 
 	local cornerW = self.cornerHandleSize

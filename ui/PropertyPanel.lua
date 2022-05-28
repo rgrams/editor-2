@@ -28,6 +28,7 @@ function PropertyPanel.set(self, ruu)
 
 	local signalFn = self.onSelectedObjectsModified
 	signals.subscribe(self, signalFn, "selection changed", "selected objects modified")
+	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
 end
 
 function PropertyPanel.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
@@ -83,6 +84,10 @@ local function clearPropertyWidgets(self)
 			destroyPropertyWidget(self, child)
 		end
 	end
+end
+
+function PropertyPanel.onActiveSceneChanged(self, sender)
+	self:updateProperties(scenes.active.selection)
 end
 
 function PropertyPanel.onSelectedObjectsModified(self, sender)
