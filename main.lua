@@ -50,6 +50,8 @@ function love.load()
 	Input.bind( require("input-bindings") )
 	love.keyboard.setKeyRepeat(true)
 
+	love.graphics.setLineStyle("rough")
+
 	local config = require "config"
 	love.graphics.setBackgroundColor(config.viewportBackgroundColor)
 
