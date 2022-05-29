@@ -1,7 +1,7 @@
 
 local ResizeHandle = gui.Node:extend()
 
-local theme = require "ui.widgets.themes.resize-handle"
+local Theme = require "ui.widgets.themes.ResizeHandleTheme"
 
 ResizeHandle.width = 6
 
@@ -12,7 +12,7 @@ function ResizeHandle.set(self, target, dir, isYAxis, width)
 	self.dir = dir or -1
 	self.isXAxis = not isYAxis
 	self.layer = "gui"
-	self.color = theme.normalColor
+	self.color = Theme.normalColor
 end
 
 function ResizeHandle.init(self)
@@ -25,7 +25,7 @@ end
 
 function ResizeHandle.initRuu(self, ruu)
 	self.ruu = ruu
-	self.widget = ruu:Panel(self, theme)
+	self.widget = ruu:Panel(self, Theme)
 	self.widget.press = self.press
 	self.widget.release = self.release
 	self.widget.drag = self.drag
@@ -62,28 +62,9 @@ function ResizeHandle.drag(wgt, dx, dy, dragType)
 end
 
 function ResizeHandle.draw(self)
-	love.graphics.setColor(self.color)
-	local w, h = self.w, self.h
-	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
-
-	-- Draw handle lines.
-	love.graphics.setColor(0, 0, 0, 1)
-	local padX = 2
-	local left, right = -w/2 + padX, w/2 - padX
-	local lineCt = 4
-	local lineWidth = 1
-	local spacing = 3 + lineWidth
-	for i=0,lineCt-1 do
-		local topY = -(lineCt - 1)/2 * spacing
-		local y = topY + i*spacing
-		love.graphics.line(left, y, right, y)
-	end
-
-	if self.widget and self.widget.isFocused then
-		local lineWidth = 1
-		love.graphics.setColor(1, 1, 1, 0.2)
-		w, h = self.w - lineWidth, self.h - lineWidth
-		love.graphics.rectangle("line", -w/2, -h/2, w, h)
+	local widget = self.widget
+	if widget then
+		widget.wgtTheme.draw(widget, self)
 	end
 end
 

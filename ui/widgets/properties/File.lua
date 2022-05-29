@@ -6,7 +6,7 @@ File.className = "File"
 local InputField = require "ui.widgets.InputField"
 local Button = require "ui.widgets.Button"
 local fileDialog = require "lib.native-file-dialog.dialog"
-local fileFieldTheme = require "ui.widgets.themes.filepath-inputField"
+local FilepathFieldTheme = require "ui.widgets.themes.FilepathFieldTheme"
 local fileUtil = require "lib.file-util"
 
 local lastOpenFolder
@@ -56,7 +56,7 @@ end
 function File.initRuu(self, ruu, navList)
 	File.super.initRuu(self, ruu, navList)
 
-	self.fieldWgt = self.ruu:InputField(self.field, self.onConfirm, self.value, fileFieldTheme)
+	self.fieldWgt = self.ruu:InputField(self.field, self.onConfirm, self.value, FilepathFieldTheme)
 	self.fieldWgt:args(self, self.fieldWgt)
 	self.fieldWgt.alignRightOnUnfocus = true
 	self:addWidget(self.fieldWgt)

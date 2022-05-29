@@ -6,7 +6,7 @@ Font.className = "Font"
 local InputField = require "ui.widgets.InputField"
 local Button = require "ui.widgets.Button"
 local fileDialog = require "lib.native-file-dialog.dialog"
-local fileFieldTheme = require "ui.widgets.themes.filepath-inputField"
+local FilepathFieldTheme = require "ui.widgets.themes.FilepathFieldTheme"
 local fileUtil = require "lib.file-util"
 
 local lastOpenFolder
@@ -73,7 +73,7 @@ function Font.initRuu(self, ruu, navList)
 	self.sizeWgt:args(self, self.sizeWgt, "size")
 	self:addWidget(self.sizeWgt)
 
-	self.pathWgt = self.ruu:InputField(self.pathField, self.onConfirm, self.value[1], fileFieldTheme)
+	self.pathWgt = self.ruu:InputField(self.pathField, self.onConfirm, self.value[1], FilepathFieldTheme)
 	self.pathWgt:args(self, self.pathWgt, "path")
 	self.pathWgt.alignRightOnUnfocus = true
 	self:addWidget(self.pathWgt)

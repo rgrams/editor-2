@@ -4,7 +4,7 @@ Dropdown.className = "Dropdown"
 
 local Ruu = require "ui.ruu.ruu"
 local Button = require "ui.widgets.Button"
-local menuBtnTheme = require "ui.widgets.themes.menu-button"
+local MenuButtonTheme = require "ui.widgets.themes.MenuButtonTheme"
 
 local spacing = 1
 local pad = 2
@@ -39,7 +39,7 @@ function Dropdown.init(self)
 	-- Initialize Ruu stuff.
 	local wgtMap = {}
 	for i,btn in ipairs(self.children) do
-		local wgt = self.ruu:Button(btn, self.confirm, menuBtnTheme)
+		local wgt = self.ruu:Button(btn, self.confirm, MenuButtonTheme)
 		btn.widget = wgt
 		wgt:args(self, btn, wgt, self.items[i])
 		table.insert(wgtMap, { wgt })

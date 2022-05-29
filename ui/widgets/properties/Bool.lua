@@ -4,7 +4,7 @@ local Bool = BaseClass:extend()
 Bool.className = "Bool"
 
 local Checkbox = require "ui.widgets.Checkbox"
-local checkboxTheme = require "ui.widgets.themes.checkbox"
+local CheckboxTheme = require "ui.widgets.themes.CheckboxTheme"
 
 function Bool.set(self, name, value, PropClass)
 	Bool.super.set(self, name, value, PropClass)
@@ -32,7 +32,7 @@ end
 
 function Bool.initRuu(self, ruu, navList)
 	Bool.super.initRuu(self, ruu, navList)
-	self.wgt = self.ruu:ToggleButton(self.checkbox, self.onToggle, self.value, checkboxTheme)
+	self.wgt = self.ruu:ToggleButton(self.checkbox, self.onToggle, self.value, CheckboxTheme)
 	self.wgt:args(self, self.wgt)
 	self:addWidget(self.wgt)
 end

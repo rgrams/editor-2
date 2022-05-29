@@ -58,7 +58,8 @@ function InputField.draw(self)
 	love.graphics.rectangle("fill", -self.w/2, -self.h/2, self.w, self.h)
 
 	if self.widget and self.widget.isFocused then
-		local w, h = self.w+4, self.h+4
+		love.graphics.setColor(1, 1, 1)
+		local w, h = self.w+1, self.h+1
 		love.graphics.rectangle("line", -w/2, -h/2, w, h)
 	end
 end
