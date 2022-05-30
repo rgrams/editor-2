@@ -10,6 +10,7 @@ local signals = require "signals"
 local layers = { "default" }
 local defaultLayer = "default"
 local commands = require("commands.all")
+local SENDER = nil
 
 function M.create(name, filepath)
 	local scene = SceneTree(layers, defaultLayer)
@@ -23,7 +24,7 @@ end
 
 function M.add(scene, isNotActive)
 	table.insert(M, scene)
-	signals.send("scene added")
+	signals.send("scene added", SENDER, scene)
 	if not isNotActive then
 		M.setActive(scene)
 	end
@@ -33,7 +34,7 @@ function M.remove(scene)
 	for i=1,#M do
 		if M[i] == scene then
 			table.remove(M, i)
-			signals.send("scene removed")
+			signals.send("scene removed", SENDER, scene)
 			-- If this scene was the active one, activate another scene.
 			if M.active == scene then
 				if M[i-1] then
@@ -61,7 +62,7 @@ end
 function M.setActive(scene)
 	M.active = scene
 	love.window.setTitle("Editor - " .. scene.name)
-	signals.send("active scene changed")
+	signals.send("active scene changed", SENDER, scene)
 	_G.shouldRedraw = true
 end
 

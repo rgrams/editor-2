@@ -3,13 +3,13 @@ local M = {}
 
 local subscribers = {}
 
-function M.send(signal, sender)
+function M.send(signal, sender, ...)
 	local list = subscribers[signal]
 	if not list then
 		return
 	end
 	for i,sub in ipairs(list) do
-		sub.fn(sub.obj, sender, signal)
+		sub.fn(sub.obj, sender, signal, ...)
 	end
 end
 
