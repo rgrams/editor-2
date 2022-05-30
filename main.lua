@@ -25,7 +25,7 @@ local screenRect = gui.Rect(0, 0, love.graphics.getDimensions())
 
 local layers = {
 	world = { "default", "background" },
-	gui = { "dropdown text", "dropdown", "gui text", "gui" },
+	gui = { "dropdown text", "dropdown", "gui text", "gui", "viewport" },
 	guiDebug = { "guiDebug" },
 }
 local defaultLayer = "default"

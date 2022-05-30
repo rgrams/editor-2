@@ -28,7 +28,7 @@ Tool.dragInWorldSpace = true
 
 function Tool.set(self, ruu)
 	Tool.super.set(self, 1, 1, "C", "C", "fill")
-	self.layer = "gui"
+	self.layer = "viewport"
 	self.ruu = ruu
 	self.widget = ruu:Panel(self)
 	self.widget.ruuInput = self.ruuInput

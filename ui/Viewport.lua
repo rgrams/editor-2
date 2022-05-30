@@ -14,7 +14,7 @@ local maxLineWidth = 1
 function Viewport.set(self, ruu)
 	Viewport.super.set(self, 50, 600, "C", "C", "fill")
 	self.isGreedy = true
-	self.layer = "gui"
+	self.layer = "viewport"
 	self.ruu = ruu
 	self.widget = ruu:Panel(self)
 	self.widget.scroll = Viewport.scroll
@@ -115,13 +115,9 @@ end
 
 function Viewport.draw(self)
 	if self.widget.isFocused then
-		local depth = self.panelIndex or 0
-		local lineWidth = maxLineWidth / (depth + 1)
-		love.graphics.setLineWidth(lineWidth)
 		love.graphics.setColor(1, 1, 1, 0.5)
-
-		local w, h = self.w - lineWidth, self.h - lineWidth
-		love.graphics.rectangle("line", -w/2, -h/2, w, h)
+		local w, h = self.w, self.h
+		love.graphics.rectangle("line", -w/2+1, -h/2+1, w-1, h-1)
 
 		love.graphics.setLineWidth(1)
 	end

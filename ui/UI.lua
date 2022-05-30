@@ -23,7 +23,7 @@ function UI.set(self)
 	self.layer = "gui"
 
 	self.ruu = Ruu()
-	self.ruu:registerLayers({"gui"})
+	self.ruu:registerLayers({"gui", "viewport"})
 
 	self.widget = self.ruu:Panel(self)
 	self.widget.ruuInput = self.ruuInput
