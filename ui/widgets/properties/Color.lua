@@ -4,6 +4,7 @@ local Color = BaseClass:extend()
 Color.className = "Color"
 
 local InputField = require "ui.widgets.InputField"
+local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 
 local sublabelFont = { "assets/font/OpenSans-Regular.ttf", 12 }
 local fieldWidth = 32
@@ -69,10 +70,10 @@ end
 function Color.initRuu(self, ruu, navList)
 	Color.super.initRuu(self, ruu, navList)
 
-	self.widgetR = self.ruu:InputField(self.fieldR, self.onConfirm, self.r)
-	self.widgetG = self.ruu:InputField(self.fieldG, self.onConfirm, self.g)
-	self.widgetB = self.ruu:InputField(self.fieldB, self.onConfirm, self.b)
-	self.widgetA = self.ruu:InputField(self.fieldA, self.onConfirm, self.a)
+	self.widgetR = self.ruu:InputField(self.fieldR, self.onConfirm, self.r, InputFieldTheme)
+	self.widgetG = self.ruu:InputField(self.fieldG, self.onConfirm, self.g, InputFieldTheme)
+	self.widgetB = self.ruu:InputField(self.fieldB, self.onConfirm, self.b, InputFieldTheme)
+	self.widgetA = self.ruu:InputField(self.fieldA, self.onConfirm, self.a, InputFieldTheme)
 	self.widgetR:args(self, self.widgetR, 1)
 	self.widgetG:args(self, self.widgetG, 2)
 	self.widgetB:args(self, self.widgetB, 3)

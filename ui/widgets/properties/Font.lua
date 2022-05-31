@@ -6,6 +6,7 @@ Font.className = "Font"
 local InputField = require "ui.widgets.InputField"
 local Button = require "ui.widgets.Button"
 local fileDialog = require "lib.native-file-dialog.dialog"
+local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 local FilepathFieldTheme = require "ui.widgets.themes.FilepathFieldTheme"
 local fileUtil = require "lib.file-util"
 
@@ -69,7 +70,7 @@ end
 function Font.initRuu(self, ruu, navList)
 	Font.super.initRuu(self, ruu, navList)
 
-	self.sizeWgt = self.ruu:InputField(self.sizeField, self.onConfirm, self.value[2])
+	self.sizeWgt = self.ruu:InputField(self.sizeField, self.onConfirm, self.value[2], InputFieldTheme)
 	self.sizeWgt:args(self, self.sizeWgt, "size")
 	self:addWidget(self.sizeWgt)
 

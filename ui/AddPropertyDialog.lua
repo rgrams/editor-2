@@ -5,6 +5,8 @@ local Ruu = require "ui.ruu.ruu"
 local Button = require "ui.widgets.Button"
 local InputField = require "ui.widgets.InputField"
 local Dropdown = require "ui.widgets.Dropdown"
+local PanelTheme = require "ui.widgets.themes.PanelTheme"
+local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 
 local headerFont = { "assets/font/OpenSans-Semibold.ttf", 17 }
 local spacing = 2
@@ -38,9 +40,9 @@ function AddPropDialog.set(self, callback, callbackArgs)
 	self.layer = "gui"
 	self.ruu = Ruu()
 	self.ruu:registerLayers({"gui"})
-	self.widget = self.ruu:Panel(self)
+	self.widget = self.ruu:Panel(self, PanelTheme)
 
-	local inputWgt = self.ruu:InputField(self.inputFld, self.inputConfirmed, "propertyName")
+	local inputWgt = self.ruu:InputField(self.inputFld, self.inputConfirmed, "propertyName", InputFieldTheme)
 	inputWgt:args(self, inputWgt)
 	local typeWgt = self.ruu:Button(self.typeBtn, self.typeBtnPressed)
 	typeWgt:args(self, typeWgt)
@@ -125,21 +127,9 @@ function AddPropDialog.OKBtnPressed(self)
 end
 
 function AddPropDialog.draw(self)
-	love.graphics.setColor(0.2, 0.2, 0.2, 1)
-	local w, h = self.w, self.h
-	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
-
-	if self.widget.isFocused then
-		local depth = self.panelIndex or 0
-		local maxLineWidth = 1
-		local lineWidth = maxLineWidth / (depth + 1)
-		love.graphics.setLineWidth(lineWidth)
-		love.graphics.setColor(1, 1, 1, 0.5)
-
-		local w, h = self.w - lineWidth, self.h - lineWidth
-		love.graphics.rectangle("line", -w/2, -h/2, w, h)
-
-		love.graphics.setLineWidth(1)
+	local widget = self.widget
+	if widget then
+		widget.wgtTheme.draw(widget, self)
 	end
 end
 

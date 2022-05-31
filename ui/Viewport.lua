@@ -8,6 +8,7 @@ local BackgroundGrid = require "ui.BackgroundGrid"
 local Tool = require "tools.Tool"
 local objectFn = require "commands.functions.object-functions"
 local InputField = require "ui.widgets.InputField"
+local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 
 local maxLineWidth = 1
 
@@ -34,7 +35,7 @@ function Viewport.set(self, ruu)
 	local snapField = InputField(snapIncr, 40)
 	table.insert(self.children, snapField)
 	snapField:anchor("NW"):pivot("NW"):setPos(53, 3)
-	local snapWgt = self.ruu:InputField(snapField, self.snapIncrementSet, snapIncr)
+	local snapWgt = self.ruu:InputField(snapField, self.snapIncrementSet, snapIncr, InputFieldTheme)
 	snapWgt:args(self, snapWgt)
 end
 

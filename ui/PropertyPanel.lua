@@ -4,6 +4,7 @@ PropertyPanel.className = "PropertyPanel"
 
 local scenes = require "scenes"
 local signals = require "signals"
+local PanelTheme = require "ui.widgets.themes.PanelTheme"
 local AddPropertyDialog = require "ui.AddPropertyDialog"
 
 local headerFont = { "assets/font/OpenSans-Semibold.ttf", 17 }
@@ -19,7 +20,7 @@ function PropertyPanel.set(self, ruu)
 	}
 	self.layer = "gui"
 	self.ruu = ruu
-	self.widget = self.ruu:Panel(self)
+	self.widget = self.ruu:Panel(self, PanelTheme)
 	self.widget.ruuInput = self.ruuInput
 	self.wgtMap = {}
 
@@ -158,23 +159,10 @@ function PropertyPanel.updateProperties(self, selection)
 	self.lastProps = commonProperties
 end
 
-local maxLineWidth = 1
-
 function PropertyPanel.draw(self)
-	love.graphics.setColor(0.2, 0.2, 0.2, 1)
-	local w, h = self.w, self.h
-	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
-
-	if self.widget.isFocused then
-		local depth = self.panelIndex or 0
-		local lineWidth = maxLineWidth / (depth + 1)
-		love.graphics.setLineWidth(lineWidth)
-		love.graphics.setColor(1, 1, 1, 0.5)
-
-		local w, h = self.w - lineWidth, self.h - lineWidth
-		love.graphics.rectangle("line", -w/2, -h/2, w, h)
-
-		love.graphics.setLineWidth(1)
+	local widget = self.widget
+	if widget then
+		widget.wgtTheme.draw(widget, self)
 	end
 end
 

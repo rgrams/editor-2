@@ -5,6 +5,7 @@ TabBar.className = "TabBar"
 local scenes = require "scenes"
 local signals = require "signals"
 local Tab = require "ui.widgets.Tab"
+local PanelTheme = require "ui.widgets.themes.PanelTheme"
 local TabTheme = require "ui.widgets.themes.TabTheme"
 local TabCloseButtonTheme = require "ui.widgets.themes.TabCloseButtonTheme"
 
@@ -17,7 +18,7 @@ function TabBar.set(self, ruu)
 	self:mode("fill", "none")
 	self.layer = "gui"
 	self.ruu = ruu
-	self.widget = ruu:Panel(self)
+	self.widget = ruu:Panel(self, PanelTheme)
 	self.tabWidgets = {}
 	signals.subscribe(self, self.onSceneAdded, "scene added")
 	signals.subscribe(self, self.onSceneRemoved, "scene removed")
@@ -89,15 +90,9 @@ function TabBar.tabCloseBtnPressed(self, wgt)
 end
 
 function TabBar.draw(self)
-	love.graphics.setColor(0.2, 0.2, 0.2, 1)
-	local w, h = self.w, self.h
-	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
-
-	if self.widget.isFocused then
-		love.graphics.setColor(1, 1, 1, 0.5)
-		local lineWidth = 1
-		w, h = w - lineWidth, h - lineWidth
-		love.graphics.rectangle("line", -w/2, -h/2, w, h)
+	local widget = self.widget
+	if widget then
+		widget.wgtTheme.draw(widget, self)
 	end
 end
 

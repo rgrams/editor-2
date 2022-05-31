@@ -54,13 +54,9 @@ function InputField.set(self, text, width)
 end
 
 function InputField.draw(self)
-	love.graphics.setColor(self.color)
-	love.graphics.rectangle("fill", -self.w/2, -self.h/2, self.w, self.h)
-
-	if self.widget and self.widget.isFocused then
-		love.graphics.setColor(1, 1, 1)
-		local w, h = self.w+1, self.h+1
-		love.graphics.rectangle("line", -w/2, -h/2, w, h)
+	local widget = self.widget
+	if widget then
+		widget.wgtTheme.draw(widget, self)
 	end
 end
 

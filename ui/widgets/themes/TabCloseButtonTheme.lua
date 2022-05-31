@@ -2,13 +2,18 @@
 local TabTheme = require(GetRequireFolder(...) .. "TabTheme")
 local TabCloseButtonTheme = TabTheme:extend()
 
+-- TabCloseButtonTheme.normalCheckVal = 0.47 -- Same as Tab.
+TabCloseButtonTheme.hoverCheckVal = 0.59
+-- TabCloseButtonTheme.normalUncheckVal = 0.32 -- Same as Tab.
+TabCloseButtonTheme.hoverUncheckVal = 0.45
+
+TabCloseButtonTheme.textCheckNormalVal = 0.75
+TabCloseButtonTheme.textUncheckNormalVal = 0.5
+
 function TabCloseButtonTheme.init(self, themeData)
 	self.object = themeData
 	self.object.text:setPos(0, -2)
-
-	local Theme = self.wgtTheme
-	local val = Theme.normalUncheckVal
-	TabCloseButtonTheme.setValue(self.object.color, val)
+	self.wgtTheme.updateColors(self)
 end
 
 function TabCloseButtonTheme.draw(self, obj)
@@ -23,23 +28,7 @@ function TabCloseButtonTheme.draw(self, obj)
 end
 
 function TabCloseButtonTheme.release(self, dontFire, mx, my, isKeyboard)
-	local Theme = self.wgtTheme
-	Theme.update(self)
-end
-
-function TabCloseButtonTheme.update(self)
-	local Theme = self.wgtTheme
-	local val
-	if self.isPressed then
-		val = Theme.pressValue
-	else
-		if self.isHovered then
-			val = self.isChecked and Theme.hoverCheckVal or Theme.hoverUncheckVal
-		else
-			val = self.isChecked and Theme.normalCheckVal or Theme.normalUncheckVal
-		end
-	end
-	TabCloseButtonTheme.setValue(self.object.color, val)
+	self.wgtTheme.updateColors(self)
 end
 
 return TabCloseButtonTheme

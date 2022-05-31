@@ -1,8 +1,8 @@
 
 -- Just aligns text to right end when not in focus.
 
-local DefaultInputFieldTheme = require("ui.ruu.defaultTheme").InputField
-local FilepathFieldTheme = DefaultInputFieldTheme:extend()
+local InputFieldTheme = require(GetRequireFolder(...) .. "InputFieldTheme")
+local FilepathFieldTheme = InputFieldTheme:extend()
 
 -- Called from widget whenever text is changed.
 function FilepathFieldTheme.updateText(self)
