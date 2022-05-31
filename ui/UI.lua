@@ -3,6 +3,7 @@ local UI = gui.Row:extend()
 UI.className = "UI"
 
 local Ruu = require "ui.ruu.ruu"
+local TabBar = require "ui.TabBar"
 local Viewport = require "ui.Viewport"
 local PropertyPanel = require "ui.PropertyPanel"
 local ResizeHandle = require "ui.widgets.ResizeHandle"
@@ -28,8 +29,16 @@ function UI.set(self)
 	self.widget = self.ruu:Panel(self)
 	self.widget.ruuInput = self.ruuInput
 
-	self.children = {
+	local vpCol = gui.Column(0, false, -1, 100, 100, "C", "C", "fill")
+	vpCol.name = "VPColumn"
+	vpCol.isGreedy = true
+	vpCol.children = {
+		TabBar(self.ruu),
 		Viewport(self.ruu),
+	}
+
+	self.children = {
+		vpCol,
 		ResizeHandle("/Window/UI/PropertyPanel"),
 		PropertyPanel(self.ruu)
 	}

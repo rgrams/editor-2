@@ -12,7 +12,7 @@ local InputField = require "ui.widgets.InputField"
 local maxLineWidth = 1
 
 function Viewport.set(self, ruu)
-	Viewport.super.set(self, 50, 600, "C", "C", "fill")
+	Viewport.super.set(self, 50, 50, "C", "C", "fill")
 	self.isGreedy = true
 	self.layer = "viewport"
 	self.ruu = ruu
