@@ -21,10 +21,10 @@ Ruu.isHoverAction["right click"] = true
 function UI.set(self)
 	local w, h = love.graphics.getDimensions()
 	UI.super.set(self, 0, false, -1, w, h, "C", "C", "fill")
-	self.layer = "gui"
+	self.layer = "viewport"
 
 	self.ruu = Ruu()
-	self.ruu:registerLayers({"gui", "viewport"})
+	self.ruu:registerLayers({"viewport", "gui"}) -- Bottom to top.
 
 	self.widget = self.ruu:Panel(self)
 	self.widget.ruuInput = self.ruuInput
