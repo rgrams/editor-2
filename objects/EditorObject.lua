@@ -217,6 +217,7 @@ end
 
 function EditorObject.draw(self)
 	love.graphics.setBlendMode("alpha")
+	love.graphics.setLineStyle("smooth")
 	local lineWidth = 1
 	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2
 
@@ -234,6 +235,8 @@ function EditorObject.draw(self)
 	love.graphics.circle("line", 0, 0, 0.5, 4)
 
 	self:drawParentChildLines()
+
+	love.graphics.setLineStyle("rough")
 end
 
 function EditorObject.updateAABB(self)
