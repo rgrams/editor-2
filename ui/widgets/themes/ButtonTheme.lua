@@ -19,21 +19,27 @@ function ButtonTheme.init(self, themeData)
 	ButtonTheme.super.init(self, themeData)
 	local val = self.wgtTheme.normalValue
 	ButtonTheme.setValue(self.object.color, val)
-	ButtonTheme.setValue(self.object.text.color, self.wgtTheme.textNormalValue)
+	if self.object.text then
+		ButtonTheme.setValue(self.object.text.color, self.wgtTheme.textNormalValue)
+	end
 end
 
 function ButtonTheme.hover(self)
 	local val = self.wgtTheme.hoverValue
 	ButtonTheme.setValue(self.object.color, val)
-	local textVal = self.wgtTheme.textHoverValue
-	ButtonTheme.setValue(self.object.text.color, textVal)
+	if self.object.text then
+		local textVal = self.wgtTheme.textHoverValue
+		ButtonTheme.setValue(self.object.text.color, textVal)
+	end
 end
 
 function ButtonTheme.unhover(self)
 	local val = self.wgtTheme.normalValue
 	ButtonTheme.setValue(self.object.color, val)
-	local textVal = self.wgtTheme.textNormalValue
-	ButtonTheme.setValue(self.object.text.color, textVal)
+	if self.object.text then
+		local textVal = self.wgtTheme.textNormalValue
+		ButtonTheme.setValue(self.object.text.color, textVal)
+	end
 end
 
 function ButtonTheme.press(self, mx, my, isKeyboard)
@@ -45,8 +51,10 @@ function ButtonTheme.release(self, dontFire, mx, my, isKeyboard)
 	local Theme = self.wgtTheme
 	local val = self.isHovered and Theme.hoverValue or Theme.normalValue
 	ButtonTheme.setValue(self.object.color, val)
-	local textVal = self.isHovered and Theme.textHoverValue or Theme.textNormalValue
-	ButtonTheme.setValue(self.object.text.color, textVal)
+	if self.object.text then
+		local textVal = self.isHovered and Theme.textHoverValue or Theme.textNormalValue
+		ButtonTheme.setValue(self.object.text.color, textVal)
+	end
 end
 
 function ButtonTheme.draw(self, obj)
