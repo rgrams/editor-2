@@ -9,7 +9,7 @@ local imageCache = {}
 Image.name = "image"
 Image.typeName = "image"
 Image.WidgetClass = require("ui.widgets.properties.File")
-Image.DEFAULT_VALUE = false
+Image.DEFAULT_VALUE = ""
 
 _G.propClassList:add(Image, Image.typeName)
 
