@@ -134,14 +134,17 @@ local function getDragPropertyList(enclosures, property, inWorldSpace, out)
 			else
 				item.x, item.y = obj:getLocalPos()
 			end
+			table.insert(out, item)
 		elseif property == "angle" then
 			item.angle = obj:getProperty("angle") or 0
+			table.insert(out, item)
 		elseif property == "scale" then
 			local scale = obj:getProperty("scale") or obj:getProperty("size")
-			item.sx, item.sy = scale.x, scale.y
+			if scale then
+				item.sx, item.sy = scale.x, scale.y
+				table.insert(out, item)
+			end
 		end
-
-		table.insert(out, item)
 	end
 	return out
 end
