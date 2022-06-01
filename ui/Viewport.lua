@@ -4,13 +4,12 @@ Viewport.className = "Viewport"
 
 local config = require "config"
 local scenes = require "scenes"
+local signals = require "signals"
 local BackgroundGrid = require "ui.BackgroundGrid"
 local Tool = require "tools.Tool"
 local objectFn = require "commands.functions.object-functions"
 local InputField = require "ui.widgets.InputField"
 local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
-
-local maxLineWidth = 1
 
 function Viewport.set(self, ruu)
 	Viewport.super.set(self, 50, 50, "C", "C", "fill")
@@ -25,6 +24,8 @@ function Viewport.set(self, ruu)
 		Tool(ruu),
 	}
 	self.tool = self.children[1]
+
+	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
 
 	local snapIncr = config.translateSnapIncrement
 
@@ -58,8 +59,17 @@ function Viewport.allocate(self, ...)
 	Camera.current:setViewport(left, top, self.w, self.h)
 end
 
+function Viewport.onActiveSceneChanged(self, sender, signal, scene)
+	Camera.current.zoom = scene.camZoom
+	local pos = Camera.current.pos
+	pos.x, pos.y = scene.camX, scene.camY
+end
+
 function Viewport.scroll(wgt, depth, dx, dy)
 	Camera.current:zoomIn(config.zoomRate*dy, love.mouse.getPosition()) -- dy is actual, signed, mouse wheel dy.
+	if scenes.active then
+		scenes.active.camZoom = Camera.current.zoom
+	end
 	wgt.object.tool:zoomUpdated()
 end
 
@@ -68,6 +78,9 @@ function Viewport.drag(wgt, dx, dy, dragType)
 		local wdx, wdy = Camera.current:screenToWorld(dx, dy, true)
 		local pos = Camera.current.pos
 		pos.x, pos.y = pos.x - wdx, pos.y - wdy
+		if scenes.active then
+			scenes.active.camX, scenes.active.camY = pos.x, pos.y
+		end
 	end
 end
 

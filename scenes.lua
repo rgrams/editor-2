@@ -18,6 +18,7 @@ function M.create(name, filepath)
 	scene.filepath = filepath
 	scene.name = name or "Untitled"
 	scene.properties = {}
+	scene.camX, scene.camY, scene.camZoom = 0, 0, 1
 	return scene
 end
 
