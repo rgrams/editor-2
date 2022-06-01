@@ -72,72 +72,60 @@ function EditorGuiNode.toLocalPos(self, wx, wy)
 	return lx, ly
 end
 
-function EditorGuiNode.setProperty(self, name, value)
-	local property = self:getPropertyObj(name)
-	if property then
-		property:setValue(value)
-		if name == "pos" then
-			self:setPos(value.x, value.y, true)
-			self:updateAABB()
-		elseif name == "angle" then
-			self:setAngle(math.rad(value))
-			self:updateAABB()
-		elseif name == "size" then
-			local w, h = value.x, value.y
+function EditorGuiNode.propertyWasSet(self, name, value, property)
+	if name == "pos" then
+		self:setPos(value.x, value.y, true)
+		self:updateAABB()
+	elseif name == "angle" then
+		self:setAngle(math.rad(value))
+		self:updateAABB()
+	elseif name == "size" then
+		local w, h = value.x, value.y
 
-			-- Tell our children that we've always been this size.
-			if w then  self._contentRect.designW = w - self.padX*2  end
-			if h then  self._contentRect.designH = h - self.padY*2  end
+		-- Tell our children that we've always been this size.
+		if w then  self._contentRect.designW = w - self.padX*2  end
+		if h then  self._contentRect.designH = h - self.padY*2  end
 
-			self:size(w, h, true)
-			self.hitWidth, self.hitHeight = self.w, self.h
-			self:updateAABB()
-		elseif name == "skew" then
-			self:setSkew(value.x, value.y)
-			self:updateAABB()
-		elseif name == "pivot" then
-			self:pivot(value) -- Cardinal
-			self:updateAABB()
-		elseif name == "anchor" then
-			self:anchor(value) -- Cardinal
-			self:updateAABB()
-		elseif name == "modeX" then
-			self:mode(value, nil)
-			self.hitWidth, self.hitHeight = self.w, self.h
-			self:updateAABB()
-		elseif name == "modeY" then
-			self:mode(nil, value)
-			self.hitWidth, self.hitHeight = self.w, self.h
-			self:updateAABB()
-		elseif name == "pad" then
-			self:pad(value.x, value.y)
-			self:updateAABB()
-		elseif name == "isGreedy" and property:is(Bool) then
-			self.isGreedy = value
-		end
-		self:wasModified()
-		return true
-	else
-		return false
+		self:size(w, h, true)
+		self.hitWidth, self.hitHeight = self.w, self.h
+		self:updateAABB()
+	elseif name == "skew" then
+		self:setSkew(value.x, value.y)
+		self:updateAABB()
+	elseif name == "pivot" then
+		self:pivot(value) -- Cardinal
+		self:updateAABB()
+	elseif name == "anchor" then
+		self:anchor(value) -- Cardinal
+		self:updateAABB()
+	elseif name == "modeX" then
+		self:mode(value, nil)
+		self.hitWidth, self.hitHeight = self.w, self.h
+		self:updateAABB()
+	elseif name == "modeY" then
+		self:mode(nil, value)
+		self.hitWidth, self.hitHeight = self.w, self.h
+		self:updateAABB()
+	elseif name == "pad" then
+		self:pad(value.x, value.y)
+		self:updateAABB()
+	elseif name == "isGreedy" and property:is(Bool) then
+		self.isGreedy = value
 	end
 end
 
-function EditorGuiNode.addProperty(self, Class, name, value)
-	name, value = EditorObject.addProperty(self, Class, name, value)
+function EditorGuiNode.propertyWasAdded(self, name, value, property, Class)
 	if name == "isGreedy" and Class == Bool then
 		self.isGreedy = value
 		self:wasModified()
 	end
-	return name, value
 end
 
-function EditorGuiNode.removeProperty(self, name)
-	local wasRemoved = EditorObject.removeProperty(self, name)
+function EditorGuiNode.propertyWasRemoved(self, name, property)
 	if name == "isGreedy" then
 		self.isGreedy = nil
 		self:wasModified()
 	end
-	return wasRemoved
 end
 
 return EditorGuiNode

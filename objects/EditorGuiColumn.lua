@@ -55,62 +55,17 @@ function EditorGuiColumn.childrenModified(self)
 	self:allocateChildren()
 end
 
-function EditorGuiColumn.setProperty(self, name, value)
-	local property = self:getPropertyObj(name)
-	if property then
-		property:setValue(value)
-		if name == "spacing" then
-			self.spacing = value
-			self:allocateChildren()
-		elseif name == "homogeneous" then
-			self.homogeneous = value
-			self:allocateChildren()
-		elseif name == "dir" then
-			self.dir = value
-			self:allocateChildren()
-		elseif name == "pos" then
-			self:setPos(value.x, value.y, true)
-			self:updateAABB()
-		elseif name == "angle" then
-			self:setAngle(math.rad(value))
-			self:updateAABB()
-		elseif name == "size" then
-			local w, h = value.x, value.y
-
-			-- Tell our children that we've always been this size.
-			if w then  self._contentRect.designW = w - self.padX*2  end
-			if h then  self._contentRect.designH = h - self.padY*2  end
-
-			self:size(w, h, true)
-			self.hitWidth, self.hitHeight = self.w, self.h
-			self:updateAABB()
-		elseif name == "skew" then
-			self:setSkew(value.x, value.y)
-			self:updateAABB()
-		elseif name == "pivot" then
-			self:pivot(value) -- Cardinal
-			self:updateAABB()
-		elseif name == "anchor" then
-			self:anchor(value) -- Cardinal
-			self:updateAABB()
-		elseif name == "modeX" then
-			self:mode(value, nil)
-			self.hitWidth, self.hitHeight = self.w, self.h
-			self:updateAABB()
-		elseif name == "modeY" then
-			self:mode(nil, value)
-			self.hitWidth, self.hitHeight = self.w, self.h
-			self:updateAABB()
-		elseif name == "pad" then
-			self:pad(value.x, value.y)
-			self:updateAABB()
-		elseif name == "isGreedy" and property:is(Bool) then
-			self.isGreedy = value
-		end
-		self:wasModified()
-		return true
-	else
-		return false
+function EditorGuiColumn.propertyWasSet(self, name, value, property)
+	EditorGuiColumn.super.propertyWasSet(self, name, value, property)
+	if name == "spacing" then
+		self.spacing = value
+		self:allocateChildren()
+	elseif name == "homogeneous" then
+		self.homogeneous = value
+		self:allocateChildren()
+	elseif name == "dir" then
+		self.dir = value
+		self:allocateChildren()
 	end
 end
 

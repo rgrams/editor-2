@@ -55,6 +55,7 @@ function EditorObject.addProperty(self, Class, name, value)
 	end
 	self.propertyMap[name] = property
 	table.insert(self.properties, property)
+	self:call("propertyWasAdded", name, value, property, Class)
 	self:wasModified()
 	return name, property.value
 end
@@ -65,6 +66,7 @@ function EditorObject.removeProperty(self, name)
 		for i,property in ipairs(self.properties) do
 			if property.name == name then
 				table.remove(self.properties, i)
+				self:call("propertyWasRemoved", name, property)
 				self:wasModified()
 				return true
 			end
@@ -83,19 +85,23 @@ function EditorObject.setProperty(self, name, value)
 	local property = self:getPropertyObj(name)
 	if property then
 		property:setValue(value)
-		if name == "pos" then
-			self:setPosition(value.x, value.y)
-		elseif name == "angle" then
-			self:setAngle(math.rad(value))
-		elseif name == "scale" then
-			self:setScale(value.x, value.y)
-		elseif name == "skew" then
-			self:setSkew(value.x, value.y)
-		end
+		self:call("propertyWasSet", name, value, property)
 		self:wasModified()
 		return true
 	else
 		return false
+	end
+end
+
+function EditorObject.propertyWasSet(self, name, value, property)
+	if name == "pos" then
+		self:setPosition(value.x, value.y)
+	elseif name == "angle" then
+		self:setAngle(math.rad(value))
+	elseif name == "scale" then
+		self:setScale(value.x, value.y)
+	elseif name == "skew" then
+		self:setSkew(value.x, value.y)
 	end
 end
 

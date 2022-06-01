@@ -64,7 +64,7 @@ function EditorGuiText.updateScale(self, alloc)
 	local isDirty = EditorGuiText.super.updateScale(self, alloc)
 	if isDirty then
 		-- TODO: Load new font like Font property does, with new.custom, etc.
-		-- NOTE: Shouldn't be used currently since there's no way to set the allocation scale.
+		-- NOTE: Won't be used currently since there's no way to set the allocation scale.
 		-- local size = self.fontSize * self._givenRect.scale
 		-- if self.fontFilename then
 			-- self.font = new.font(self.fontFilename, size)
@@ -93,67 +93,22 @@ function EditorGuiText.draw(self)
 	end
 end
 
-function EditorGuiText.setProperty(self, name, value)
-	local property = self:getPropertyObj(name)
-	if property then
-		property:setValue(value)
-		if name == "pos" then
-			self:setPos(value.x, value.y, true)
-			self:updateAABB()
-		elseif name == "angle" then
-			self:setAngle(math.rad(value))
-			self:updateAABB()
-		elseif name == "size" then
-			local w, h = value.x, value.y
-
-			-- Tell our children that we've always been this size.
-			if w then  self._contentRect.designW = w - self.padX*2  end
-			if h then  self._contentRect.designH = h - self.padY*2  end
-
-			self:size(w, h, true)
-			self.hitWidth, self.hitHeight = self.w, self.h
-			self:updateAABB()
-		elseif name == "skew" then
-			self:setSkew(value.x, value.y)
-			self:updateAABB()
-		elseif name == "pivot" then
-			self:pivot(value) -- Cardinal
-			self:updateAABB()
-		elseif name == "anchor" then
-			self:anchor(value) -- Cardinal
-			self:updateAABB()
-		elseif name == "modeX" then
-			self:mode(value, nil)
-			self.hitWidth, self.hitHeight = self.w, self.h
-			self:updateAABB()
-		elseif name == "modeY" then
-			self:mode(nil, value)
-			self.hitWidth, self.hitHeight = self.w, self.h
-			self:updateAABB()
-		elseif name == "pad" then
-			self:pad(value.x, value.y)
-			self:updateAABB()
-		elseif name == "text" then
-			self.text = value
-			if self.parent then  self:allocate()  end
-		elseif name == "font" then
-			value = property:getValue()
-			self.font = property.font
-			self.fontFilename, self.fontSize = value[1], value[2]
-			if self.parent then  self:allocate()  end
-		elseif name == "align" then
-			self:align(value)
-		elseif name == "isWrapping" then
-			self:wrap(value)
-		elseif name == "isGreedy" and property:is(Bool) then
-			self.isGreedy = value
-		elseif name == "color" then
-			self.color = property:getValue()
-		end
-		self:wasModified()
-		return true
-	else
-		return false
+function EditorGuiText.propertyWasSet(self, name, value, property)
+	EditorGuiText.super.propertyWasSet(self, name, value, property)
+	if name == "text" then
+		self.text = value
+		if self.parent then  self:allocate()  end
+	elseif name == "font" then
+		value = property:getValue()
+		self.font = property.font
+		self.fontFilename, self.fontSize = value[1], value[2]
+		if self.parent then  self:allocate()  end
+	elseif name == "align" then
+		self:align(value)
+	elseif name == "isWrapping" then
+		self:wrap(value)
+	elseif name == "color" then
+		self.color = property:getValue()
 	end
 end
 

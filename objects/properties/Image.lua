@@ -37,9 +37,6 @@ end
 function Image._setValidValue(self, filepath, image)
 	self.value = filepath
 	self.image = image
-	if self.obj.setImage then
-		self.obj:setImage(image)
-	end
 end
 
 function Image.isAtDefault(self)

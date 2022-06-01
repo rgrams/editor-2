@@ -30,27 +30,12 @@ function EditorSprite.initProperties(self)
 	self:addProperty(Color, "color")
 end
 
-function EditorSprite.setProperty(self, name, value)
-	local property = self:getPropertyObj(name)
-	if property then
-		property:setValue(value)
-		if name == "pos" then
-			self:setPosition(value.x, value.y)
-		elseif name == "angle" then
-			self:setAngle(math.rad(value))
-		elseif name == "scale" then
-			self:setScale(value.x, value.y)
-		elseif name == "skew" then
-			self:setSkew(value.x, value.y)
-		elseif name == "image" then
-			self:setImage(property.image)
-		elseif name == "color" then
-			self.color = property:getValue()
-		end
-		self:wasModified()
-		return true
-	else
-		return false
+function EditorSprite.propertyWasSet(self, name, value, property)
+	EditorSprite.super.propertyWasSet(self, name, value, property)
+	if name == "image" then
+		self:setImage(property.image)
+	elseif name == "color" then
+		self.color = property:getValue()
 	end
 end
 
