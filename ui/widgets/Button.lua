@@ -3,7 +3,7 @@ local Button = gui.Node:extend()
 Button.className = "Button"
 
 Button.font = { "assets/font/OpenSans-Semibold.ttf", 15 }
-Button.width = 96
+Button.width = 100
 Button.height = 24
 
 function Button.set(self, text, width, textAlign)
