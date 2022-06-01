@@ -38,6 +38,8 @@ function Script.setValue(self, filepath)
 end
 
 function Script._setValidValue(self, filepath, script)
+	self.oldPath = self.value
+	self.oldScript = self.script -- So objects can remove it when changed.
 	self.value = filepath
 	self.script = script
 end

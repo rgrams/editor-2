@@ -12,6 +12,7 @@ _G.objClassList:add(EditorObject, EditorObject.displayName)
 
 local Float = require "objects.properties.Property"
 local Vec2 = require "objects.properties.Vec2"
+local Script = require "objects.properties.Script"
 
 EditorObject.isBuiltinProperty = {
 	pos = true,
@@ -102,6 +103,44 @@ function EditorObject.propertyWasSet(self, name, value, property)
 		self:setScale(value.x, value.y)
 	elseif name == "skew" then
 		self:setSkew(value.x, value.y)
+	elseif getmetatable(property) == Script then
+		if property.oldScript then
+			self:removeScript(name, property.oldPath, property.oldScript)
+		end
+		self:addScript(name, value, property.script)
+	end
+end
+
+function EditorObject.addScript(self, name, filepath, script)
+	if not script then  return  end
+	self.scripts = self.scripts or {}
+	table.insert(self.scripts, script)
+	self:call("editor_script_added", name, filepath, script)
+end
+
+function EditorObject.removeScript(self, name, filepath, script)
+	if not script then  return  end
+	self:call("editor_script_removed", name, filepath, script)
+	local scripts = self.scripts
+	if scripts then
+		for i=#scripts,1,-1 do
+			if scripts[i] == script then
+				table.remove(scripts, i)
+				break
+			end
+		end
+	end
+end
+
+function EditorObject.propertyWasAdded(self, name, value, property, Class)
+	if Class == Script then
+		self:addScript(name, value, property.script)
+	end
+end
+
+function EditorObject.propertyWasRemoved(self, name, property)
+	if getmetatable(property) == Script then
+		self:removeScript(name, property.value, property.script)
 	end
 end
 

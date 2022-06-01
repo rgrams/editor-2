@@ -14,6 +14,7 @@ _G.objClassList:add(EditorGuiNode, EditorGuiNode.displayName)
 
 local Bool = require "objects.properties.Bool"
 local Vec2 = require "objects.properties.Vec2"
+local Script = require "objects.properties.Script"
 local Float = require "objects.properties.Property"
 local Cardinal = require "objects.properties.Enum_CardinalDir"
 local ResizeMode = require "objects.properties.Enum_GuiResizeMode"
@@ -111,10 +112,16 @@ function EditorGuiNode.propertyWasSet(self, name, value, property)
 		self:updateAABB()
 	elseif name == "isGreedy" and property:is(Bool) then
 		self.isGreedy = value
+	elseif getmetatable(property) == Script then
+		if property.oldScript then
+			self:removeScript(name, property.oldPath, property.oldScript)
+		end
+		self:addScript(name, value, property.script)
 	end
 end
 
 function EditorGuiNode.propertyWasAdded(self, name, value, property, Class)
+	EditorObject.propertyWasAdded(self, name, value, property, Class)
 	if name == "isGreedy" and Class == Bool then
 		self.isGreedy = value
 		self:wasModified()
@@ -122,6 +129,7 @@ function EditorGuiNode.propertyWasAdded(self, name, value, property, Class)
 end
 
 function EditorGuiNode.propertyWasRemoved(self, name, property)
+	EditorObject.propertyWasRemoved(self, name, property)
 	if name == "isGreedy" then
 		self.isGreedy = nil
 		self:wasModified()
