@@ -10,6 +10,15 @@ function M.splitFilepath(path)
 	end
 end
 
+function M.loadScriptFromAbsolutePath(path)
+	local isSuccess, result = pcall(dofile, path)
+	if isSuccess then
+		return result
+	else
+		print(result)
+	end
+end
+
 function M.loadFontFromAbsolutePath(path, size)
 	local file, error = io.open(path, "rb")
 	if error then
