@@ -73,6 +73,10 @@ function EditorGuiNode.toLocalPos(self, wx, wy)
 	return lx, ly
 end
 
+function EditorGuiNode.getSizePropertyObj(self)
+	return self:getPropertyObj("size")
+end
+
 function EditorGuiNode.propertyWasSet(self, name, value, property)
 	if name == "pos" then
 		self:setPos(value.x, value.y, true)

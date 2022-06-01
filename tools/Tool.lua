@@ -139,9 +139,14 @@ local function getDragPropertyList(enclosures, property, inWorldSpace, out)
 			item.angle = obj:getProperty("angle") or 0
 			table.insert(out, item)
 		elseif property == "scale" then
-			local scale = obj:getProperty("scale") or obj:getProperty("size")
-			if scale then
-				item.sx, item.sy = scale.x, scale.y
+			local sizeProp = obj:getSizePropertyObj()
+			if sizeProp then
+				local size = sizeProp:getValue()
+				if sizeProp.typeName == "vec2" then
+					item.sx, item.sy = size.x, size.y
+				elseif sizeProp.typeName == "float" then
+					item.s = size
+				end
 				table.insert(out, item)
 			end
 		end
@@ -387,10 +392,16 @@ function Tool.drag(wgt, dx, dy, dragType)
 			table.insert(argsList, args)
 		end
 		for i,start in ipairs(self.dragScaleStartOffsets) do
-			local scale = { x = start.sx*sx, y = start.sy*sy }
 			local obj = start.enclosure[1]
-			local propName = obj:hasProperty("scale") and "scale" or "size"
-			local args = { self, start.enclosure, propName, scale }
+			local sizeProp = obj:getSizePropertyObj()
+			local value
+			if sizeProp.typeName == "vec2" then
+				value = { x = start.sx*sx, y = start.sy*sy }
+			elseif sizeProp.typeName == "float" then
+				value = start.s * math.min(sx, sy)
+			end
+			local propName = sizeProp.name
+			local args = { self, start.enclosure, propName, value }
 			table.insert(argsList, args)
 		end
 
