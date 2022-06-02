@@ -14,6 +14,7 @@ ButtonTheme.textHoverValue = 1.0
 ButtonTheme.bevelLighten = 0.15
 ButtonTheme.bevelHoverLighten = 0.25
 ButtonTheme.bevelDarken = 0.15
+ButtonTheme.bevelDepth = 2
 
 function ButtonTheme.init(self, themeData)
 	ButtonTheme.super.init(self, themeData)
@@ -66,11 +67,12 @@ function ButtonTheme.draw(self, obj)
 	local Theme = self.wgtTheme
 	local v1 = val + (self.isHovered and Theme.bevelHoverLighten or Theme.bevelLighten)
 	local v2 = val - Theme.bevelDarken
+	local depth = Theme.bevelDepth
 	if self.isPressed then  v1, v2 = v2, v1  end
 	love.graphics.setColor(v1, v1, v1, alpha)
-	love.graphics.rectangle("fill", -w/2, -h/2, w, 2)
+	love.graphics.rectangle("fill", -w/2, -h/2, w, depth)
 	love.graphics.setColor(v2, v2, v2, alpha)
-	love.graphics.rectangle("fill", -w/2, h/2 - 2, w, 2)
+	love.graphics.rectangle("fill", -w/2, h/2 - depth, w, depth)
 
 	if self.isFocused then
 		love.graphics.setColor(1, 1, 1, 1)

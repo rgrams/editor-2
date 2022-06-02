@@ -18,6 +18,7 @@ TabTheme.textUncheckHoverVal = 0.85
 TabTheme.bevelLighten = 0.15
 TabTheme.bevelHoverLighten = 0.25
 TabTheme.bevelDarken = 0.15
+TabTheme.bevelDepth = 2
 
 local ButtonTheme = require(GetRequireFolder(...) .. "ButtonTheme")
 TabTheme.draw = ButtonTheme.draw
