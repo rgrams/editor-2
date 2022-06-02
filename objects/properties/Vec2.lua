@@ -2,6 +2,8 @@
 local Property = require(GetRequireFolder(...) .. "Property")
 local Vec2 = Property:extend()
 
+local config = require "config"
+
 Vec2.name = "vec2"
 Vec2.typeName = "vec2"
 Vec2.WidgetClass = require("ui.widgets.properties.Vec2")
@@ -27,6 +29,9 @@ function Vec2.isValid(self, value)
 	if not (x or y) then
 		return false, nil, nil, "Property.setValue: Invalid vec2: '("..tostring(x)..", "..tostring(y)..")'. At least 'x' or 'y' must be a number."
 	end
+	local incr = config.roundAllPropsTo
+	if x then  x = math.round(x, incr)  end
+	if y then  y = math.round(y, incr)  end
 	return true, x or self.value.x, y or self.value.y
 end
 

@@ -2,6 +2,8 @@
 local Vec2 = require(GetRequireFolder(...) .. "Vec2")
 local Color = Vec2:extend()
 
+local config = require "config"
+
 Color.name = "color"
 Color.typeName = "color"
 Color.WidgetClass = require("ui.widgets.properties.Color")
@@ -20,6 +22,11 @@ function Color.isValid(self, value)
 		return false, nil, nil, nil, nil, "Property.setValue: Invalid color parameter, must have at least one r, g, b, or a key with a number value."
 	end
 	local cur = self.value
+	local incr = config.roundAllPropsTo
+	if r then  r = math.round(r, incr)  end
+	if g then  g = math.round(g, incr)  end
+	if b then  b = math.round(b, incr)  end
+	if a then  a = math.round(a, incr)  end
 	r, g, b, a = r or cur[1], g or cur[2], b or cur[3], a or cur[4]
 	return true, r, g, b, a
 end

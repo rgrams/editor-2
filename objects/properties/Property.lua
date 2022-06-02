@@ -4,6 +4,8 @@
 local Class = require "philtre.modules.base-class"
 local Property = Class:extend()
 
+local config = require "config"
+
 Property.name = "float"
 Property.typeName = "float" -- For add-property menu and import/export.
 Property.WidgetClass = require("ui.widgets.properties.Float")
@@ -29,6 +31,9 @@ end
 function Property.isValid(self, value)
 	local validValue = tonumber(value)
 	local isValid = validValue
+	if isValid then
+		validValue = math.round(validValue, config.roundAllPropsTo)
+	end
 	local errMsg = not validValue and "Property.setValue: Invalid value: "..tostring(value)..". Must be a number."
 	return isValid, validValue, errMsg
 end
