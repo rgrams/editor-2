@@ -20,12 +20,14 @@ function Viewport.set(self, ruu)
 	self.widget.scroll = Viewport.scroll
 	self.widget.ruuInput = Viewport.ruuInput
 	self.widget.drag = Viewport.drag
+
+	-- Subscribe before tool so camera updates before tool AABB.
+	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
+
 	self.children = {
 		Tool(ruu),
 	}
 	self.tool = self.children[1]
-
-	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
 end
 
 function Viewport.init(self)
