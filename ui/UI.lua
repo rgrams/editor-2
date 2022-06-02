@@ -1,8 +1,9 @@
 
-local UI = gui.Row:extend()
+local UI = gui.Column:extend()
 UI.className = "UI"
 
 local Ruu = require "ui.ruu.ruu"
+local Toolbar = require "ui.Toolbar"
 local TabBar = require "ui.TabBar"
 local Viewport = require "ui.Viewport"
 local PropertyPanel = require "ui.PropertyPanel"
@@ -37,16 +38,23 @@ function UI.set(self)
 		Viewport(self.ruu),
 	}
 
-	self.children = {
+	local mainRow = gui.Row(0, false, -1, 50, 50, "C", "C", "fill")
+	mainRow.name = "MainRow"
+	mainRow.isGreedy = true
+	mainRow.children = {
 		vpCol,
-		ResizeHandle("/Window/UI/PropertyPanel"),
+		ResizeHandle("/Window/UI/MainRow/PropertyPanel"),
 		PropertyPanel(self.ruu)
 	}
 
-	self.children[2]:initRuu(self.ruu)
+	self.children = {
+		Toolbar(self.ruu),
+		mainRow,
+	}
 
-	self.propertyPanel = self.children[3]
-	self.tool = self.children[1].children[1]
+	mainRow.children[2]:initRuu(self.ruu)
+
+	self.propertyPanel = mainRow.children[3]
 end
 
 function UI.init(self)

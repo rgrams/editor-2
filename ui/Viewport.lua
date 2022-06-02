@@ -26,24 +26,6 @@ function Viewport.set(self, ruu)
 	self.tool = self.children[1]
 
 	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
-
-	local snapIncr = config.translateSnapIncrement
-
-	local snapLabel = gui.Text("snap to:", { "assets/font/OpenSans-Semibold.ttf", 12 }, 50, "NW", "NW")
-	snapLabel:setPos(3, 6)
-	snapLabel.color[4] = 0.5
-	table.insert(self.children, snapLabel)
-	local snapField = InputField(snapIncr, 40)
-	table.insert(self.children, snapField)
-	snapField:anchor("NW"):pivot("NW"):setPos(53, 3)
-	local snapWgt = self.ruu:InputField(snapField, self.snapIncrementSet, snapIncr, InputFieldTheme)
-	snapWgt:args(self, snapWgt)
-end
-
-function Viewport.snapIncrementSet(self, wgt)
-	local value = tonumber(wgt.text)
-	if not value then  return true  end
-	config.translateSnapIncrement = value
 end
 
 function Viewport.init(self)

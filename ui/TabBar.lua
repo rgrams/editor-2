@@ -11,7 +11,7 @@ local TabCloseButtonTheme = require "ui.widgets.themes.TabCloseButtonTheme"
 
 local spacing = 2
 local width = 100
-local height = 26
+local height = 24
 
 function TabBar.set(self, ruu)
 	TabBar.super.set(self, spacing, false, -1, width, height)
