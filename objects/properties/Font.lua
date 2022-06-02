@@ -7,7 +7,7 @@ local fileUtil = require "lib.file-util"
 Font.name = "font"
 Font.typeName = "font"
 Font.WidgetClass = require("ui.widgets.properties.Font")
-Font.DEFAULT_VALUE = { "", 12 }
+Font.defaultValue = { "", 12 }
 
 _G.propClassList:add(Font, Font.typeName)
 
@@ -44,7 +44,7 @@ function Font.copyValue(self)
 end
 
 function Font.isAtDefault(self)
-	local cur, def = self.value, self.DEFAULT_VALUE
+	local cur, def = self.value, self.defaultValue
 	return cur[1] ~= def[1] or cur[2] ~= def[2]
 end
 

@@ -34,7 +34,7 @@ end
 function EditorObject.initProperties(self)
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
-	self:addProperty(Vec2, "scale", { x = 1, y = 1 })
+	self:addProperty(Vec2, "scale", { x = 1, y = 1 }, true)
 	self:addProperty(Vec2, "skew")
 end
 
@@ -47,12 +47,15 @@ function EditorObject.wasRemoved(self, fromParent)
 	self:wasModified(fromParent)
 end
 
-function EditorObject.addProperty(self, Class, name, value)
+function EditorObject.addProperty(self, Class, name, value, isDefault)
 	assert(Class, "EditorObject.addProperty - No class given for property: '"..tostring(name).."', value: '"..tostring(value).."'.")
 	local property = Class(self, name)
 	name = property.name
 	if value ~= nil then
 		property:setValue(value)
+		if isDefault then
+			property.defaultValue = value
+		end
 	end
 	self.propertyMap[name] = property
 	table.insert(self.properties, property)

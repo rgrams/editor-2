@@ -48,7 +48,7 @@ end
 function EditorGuiText.initProperties(self)
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
-	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight })
+	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true)
 	self:addProperty(Vec2, "skew")
 	self:addProperty(Cardinal, "pivot")
 	self:addProperty(Cardinal, "anchor")

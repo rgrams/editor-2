@@ -5,12 +5,12 @@ local Color = Vec2:extend()
 Color.name = "color"
 Color.typeName = "color"
 Color.WidgetClass = require("ui.widgets.properties.Color")
-Color.DEFAULT_VALUE = { 1, 1, 1, 1 }
+Color.defaultValue = { 1, 1, 1, 1 }
 
 _G.propClassList:add(Color, Color.typeName)
 
 function Color.isAtDefault(self)
-	local cur, def = self.value, self.DEFAULT_VALUE
+	local cur, def = self.value, self.defaultValue
 	return cur[1] == def[1] and cur[2] == def[2] and cur[3] == def[3] and cur[4] == def[4]
 end
 

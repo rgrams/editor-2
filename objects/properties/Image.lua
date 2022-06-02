@@ -9,7 +9,7 @@ local imageCache = {}
 Image.name = "image"
 Image.typeName = "image"
 Image.WidgetClass = require("ui.widgets.properties.File")
-Image.DEFAULT_VALUE = ""
+Image.defaultValue = ""
 
 _G.propClassList:add(Image, Image.typeName)
 
@@ -41,7 +41,7 @@ end
 
 function Image.isAtDefault(self)
 	local curVal = self:getValue()
-	return curVal and curVal ~= self.DEFAULT_VALUE -- `nil` and `false` considered equal
+	return curVal ~= self.defaultValue
 end
 
 return Image

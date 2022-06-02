@@ -37,8 +37,8 @@ end
 function EditorGuiColumn.initProperties(self)
 	EditorGuiColumn.super.initProperties(self)
 	self:addProperty(Float, "spacing")
-	self:addProperty(Bool, "homogeneous", false)
-	self:addProperty(Float, "dir", -1)
+	self:addProperty(Bool, "homogeneous", false, true)
+	self:addProperty(Float, "dir", -1, true)
 end
 
 function EditorGuiColumn.allocateChildren(self, forceUpdate)

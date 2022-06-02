@@ -5,20 +5,20 @@ local Vec2 = Property:extend()
 Vec2.name = "vec2"
 Vec2.typeName = "vec2"
 Vec2.WidgetClass = require("ui.widgets.properties.Vec2")
-Vec2.DEFAULT_VALUE = { x = 0, y = 0 }
+Vec2.defaultValue = { x = 0, y = 0 }
 
 _G.propClassList:add(Vec2, Vec2.typeName)
 
 function Vec2.getDefaultValue(self)
 	local value = {}
-	for k,v in pairs(self.DEFAULT_VALUE) do
+	for k,v in pairs(self.defaultValue) do
 		value[k] = v
 	end
 	return value
 end
 
 function Vec2.isAtDefault(self)
-	return self.value.x == self.DEFAULT_VALUE.x and self.value.y == self.DEFAULT_VALUE.y
+	return self.value.x == self.defaultValue.x and self.value.y == self.defaultValue.y
 end
 
 function Vec2.isValid(self, value)
@@ -49,7 +49,7 @@ end
 local _printStr = "(Prop[%s]: '%s', (%.3f, %.3f))"
 
 function Vec2.__tostring(self)
-	local value = self.value or self.DEFAULT_VALUE -- So we can print the Class which has no `value`.
+	local value = self.value or self.defaultValue -- So we can print the Class which has no `value`.
 	return _printStr:format(self.type, self.name, value.x, value.y)
 end
 

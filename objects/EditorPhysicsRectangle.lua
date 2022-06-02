@@ -31,10 +31,10 @@ end
 function EditorPhysicsRectangle.initProperties(self)
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
-	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight })
-	self:addProperty(Bool, "sensor", false)
-	self:addProperty(Float, "friction", 0.2)
-	self:addProperty(Float, "density", 1)
+	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true)
+	self:addProperty(Bool, "sensor", false, true)
+	self:addProperty(Float, "friction", 0.2, true)
+	self:addProperty(Float, "density", 1, true)
 	self:addProperty(Float, "restitution")
 end
 

@@ -5,7 +5,7 @@ local File = Property:extend()
 File.name = "file"
 File.typeName = "file"
 File.WidgetClass = require("ui.widgets.properties.File")
-File.DEFAULT_VALUE = ""
+File.defaultValue = ""
 
 _G.propClassList:add(File, File.typeName)
 

@@ -9,7 +9,7 @@ local scriptCache = {}
 Script.name = "script"
 Script.typeName = "script"
 Script.WidgetClass = require("ui.widgets.properties.File")
-Script.DEFAULT_VALUE = ""
+Script.defaultValue = ""
 
 _G.propClassList:add(Script, Script.typeName)
 
@@ -46,7 +46,7 @@ end
 
 function Script.isAtDefault(self)
 	local curVal = self:getValue()
-	return curVal ~= self.DEFAULT_VALUE
+	return curVal ~= self.defaultValue
 end
 
 return Script

@@ -5,7 +5,7 @@ local String = Property:extend()
 String.name = "string"
 String.typeName = "string"
 String.WidgetClass = require("ui.widgets.properties.String")
-String.DEFAULT_VALUE = ""
+String.defaultValue = ""
 
 _G.propClassList:add(String, String.typeName)
 

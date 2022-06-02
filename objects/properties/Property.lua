@@ -7,7 +7,7 @@ local Property = Class:extend()
 Property.name = "float"
 Property.typeName = "float" -- For add-property menu and import/export.
 Property.WidgetClass = require("ui.widgets.properties.Float")
-Property.DEFAULT_VALUE = 0
+Property.defaultValue = 0
 
 _G.propClassList:add(Property, Property.typeName)
 
@@ -18,12 +18,12 @@ function Property.set(self, obj, name)
 end
 
 function Property.getDefaultValue(self)
-	return self.DEFAULT_VALUE
+	return self.defaultValue
 end
 
 function Property.isAtDefault(self)
 	local curVal = self:getValue()
-	return curVal == self.DEFAULT_VALUE
+	return curVal == self.defaultValue
 end
 
 function Property.isValid(self, value)
@@ -54,7 +54,7 @@ Property.copyValue = Property.getValue -- These will be separate for vector/tabl
 local _printStr = "(Prop[%s]: '%s', %s)"
 
 function Property.__tostring(self)
-	local value = self.value or self.DEFAULT_VALUE -- So we can print the Class which has no `value`.
+	local value = self.value or self.defaultValue -- So we can print the Class which has no `value`.
 	return _printStr:format(self.type, self.name, tostring(value))
 end
 

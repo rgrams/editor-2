@@ -38,10 +38,10 @@ end
 function EditorCircle.initProperties(self)
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
-	self:addProperty(Float, "radius", self.radius)
-	self:addProperty(Float, "segments", self.segments)
-	self:addProperty(Float, "lineWidth", 1)
-	self:addProperty(Bool, "filled", self.isFilled)
+	self:addProperty(Float, "radius", self.radius, true)
+	self:addProperty(Float, "segments", self.segments, true)
+	self:addProperty(Float, "lineWidth", 1, true)
+	self:addProperty(Bool, "filled", self.isFilled, true)
 	self:addProperty(Color, "color")
 end
 

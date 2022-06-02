@@ -8,7 +8,7 @@ Enum.name = "enum"
 Enum.typeName = "enum"
 Enum.WidgetClass = require("ui.widgets.properties.Enum")
 Enum.validValues = { "one", "two", "three" }
-Enum.DEFAULT_VALUE = Enum.validValues[1]
+Enum.defaultValue = Enum.validValues[1]
 
 _G.propClassList:add(Enum, Enum.typeName)
 

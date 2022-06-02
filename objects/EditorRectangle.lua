@@ -40,13 +40,13 @@ end
 function EditorRectangle.initProperties(self)
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
-	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight })
-	self:addProperty(Float, "lineWidth", 1)
-	self:addProperty(Bool, "filled", self.isFilled)
+	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true)
+	self:addProperty(Float, "lineWidth", 1, true)
+	self:addProperty(Bool, "filled", self.isFilled, true)
 	self:addProperty(Color, "color")
 	self:addProperty(Float, "roundX", 0)
 	self:addProperty(Float, "roundY", 0)
-	self:addProperty(Float, "roundSegments", 2)
+	self:addProperty(Float, "roundSegments", 2, true)
 end
 
 function EditorRectangle.propertyWasSet(self, name, value, property)

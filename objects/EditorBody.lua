@@ -30,7 +30,7 @@ function EditorBody.initProperties(self)
 	self:addProperty(Float, "angDamp")
 	self:addProperty(Bool, "bullet")
 	self:addProperty(Bool, "fixedRot")
-	self:addProperty(Float, "gScale", 1)
+	self:addProperty(Float, "gScale", 1, true)
 end
 
 function EditorBody.draw(self)
