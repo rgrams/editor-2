@@ -24,6 +24,7 @@ Tool.edgeHandleSize = 9
 Tool.pivotRadius = 6
 Tool.rotateKey = "alt"
 Tool.snapKey = "ctrl"
+Tool.snapToAxisKey = "shift"
 Tool.dragInWorldSpace = true
 
 function Tool.set(self, ruu)
@@ -250,6 +251,15 @@ function Tool.drag(wgt, dx, dy, dragType)
 			snapIncr = config.translateSnapIncrement
 		end
 		local roundX, roundY = snapIncr, snapIncr
+		if modkeys.isPressed(self.snapToAxisKey) then
+			if math.abs(totalDX) > math.abs(totalDY) then
+				totalDY = 0
+				roundY = config.roundAllPropsTo
+			else
+				totalDX = 0
+				roundX = config.roundAllPropsTo
+			end
+		end
 
 		if not self.startedDragCommand then
 			self.startedDragCommand = true
