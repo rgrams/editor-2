@@ -25,7 +25,11 @@ Tool.pivotRadius = 6
 Tool.rotateKey = "alt"
 Tool.snapKey = "ctrl"
 Tool.snapToAxisKey = "shift"
+Tool.bigNudgeKey = "shift"
+Tool.smallNudgeKey = "ctrl"
 Tool.dragInWorldSpace = true
+
+local dirKey = { left = {-1,0}, right = {1,0}, up = {0,-1}, down = {0,1} }
 
 function Tool.set(self, ruu)
 	Tool.super.set(self, 1, 1, "C", "C", "fill")
@@ -636,6 +640,34 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		if scene.selection[1] then
 			local enclosures = scene.selection:copyList()
 			scene.history:perform("setSamePropertyOnMultiple", self, enclosures, "angle", 0)
+			updateHover(self)
+		end
+	elseif dirKey[action] and (change == 1 or isRepeat) then
+		local self, scene = wgt.object, scenes.active
+		if scene.selection[1] then
+			local vec = dirKey[action]
+			local dx, dy = vec[1], vec[2]
+			local dist = 1
+			if modkeys.isPressed(self.bigNudgeKey) then
+				dist = config.translateSnapIncrement
+			elseif modkeys.isPressed(self.smallNudgeKey) then
+				dist = 0.1
+			end
+			dx, dy = dx*dist, dy*dist
+			local enclosures = scene.selection:copyList()
+			objectFn.removeDescendantsFromList(enclosures)
+			local argsList = {}
+			for i,enclosure in ipairs(enclosures) do
+				local obj = enclosure[1]
+				local pos = obj:getProperty("pos")
+				if pos then
+					local x, y = obj:getWorldPos()
+					x, y = obj:toLocalPos(x + dx, y + dy)
+					local args = { self, enclosure, "pos", { x = x, y = y } }
+					table.insert(argsList, args)
+				end
+			end
+			scene.history:perform("setMultiPropertiesOnMultiple", self, argsList)
 			updateHover(self)
 		end
 	end
