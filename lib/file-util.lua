@@ -16,6 +16,7 @@ function M.loadScriptFromAbsolutePath(path)
 		return result
 	else
 		print(result)
+		return false
 	end
 end
 
@@ -23,7 +24,7 @@ function M.loadFontFromAbsolutePath(path, size)
 	local file, error = io.open(path, "rb")
 	if error then
 		print(error)
-		return
+		return false
 	end
 	local _, filename, ext = M.splitFilepath(path)
 	ext = ext or ".ttf"
@@ -45,13 +46,14 @@ function M.loadFontFromAbsolutePath(path, size)
 	else
 		print("Error reading file:\n   "..error)
 	end
+	return false
 end
 
 function M.loadImageFromAbsolutePath(path)
 	local file, error = io.open(path, "rb")
 	if error then
 		print(error)
-		return
+		return false
 	end
 	local _, filename, ext = M.splitFilepath(path)
 	ext = ext or ".jpg"
@@ -68,6 +70,7 @@ function M.loadImageFromAbsolutePath(path)
 	else
 		print("Error reading file:\n   "..error)
 	end
+	return false
 end
 
 return M
