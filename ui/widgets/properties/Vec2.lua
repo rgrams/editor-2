@@ -17,8 +17,8 @@ local function Sublabel(text)
 	return label
 end
 
-function Vec2.set(self, name, value, PropClass)
-	Vec2.super.set(self, name, nil, PropClass)
+function Vec2.set(self, name, value, PropClass, propObj)
+	Vec2.super.set(self, name, nil, PropClass, propObj)
 
 	self.xValue = value.x or 0
 	self.yValue = value.y or 0

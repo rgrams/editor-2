@@ -14,8 +14,8 @@ local lastOpenFolder
 File.labelWidth = File.width/3
 local dialogBtnWidth = 24
 
-function File.set(self, name, value, PropClass)
-	File.super.set(self, name, value, PropClass)
+function File.set(self, name, value, PropClass, propObj)
+	File.super.set(self, name, value, PropClass, propObj)
 
 	self.field = InputField(self.value, 150)
 	table.insert(self.children, self.field)

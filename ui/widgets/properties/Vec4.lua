@@ -20,15 +20,15 @@ local function Sublabel(text)
 	return label
 end
 
-function Vec4.set(self, name, value, PropClass)
-	Vec4.super.set(self, name, nil, PropClass)
+function Vec4.set(self, name, value, PropClass, propObj)
+	Vec4.super.set(self, name, nil, PropClass, propObj)
 
 	self.X = value[1] or 1
 	self.Y = value[2] or 1
 	self.Z = value[3] or 1
 	self.W = value[4] or 1
 
-	local labels = PropClass.wgtFieldLabels or defaultLabels
+	local labels = propObj.wgtFieldLabels or defaultLabels
 
 	table.insert(self.children, Sublabel(labels[1]))
 	table.insert(self.children, InputField(self.X, fieldWidth))

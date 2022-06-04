@@ -6,8 +6,8 @@ Float.className = "Float"
 local InputField = require "ui.widgets.InputField"
 local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 
-function Float.set(self, name, value, PropClass)
-	Float.super.set(self, name, value, PropClass)
+function Float.set(self, name, value, PropClass, propObj)
+	Float.super.set(self, name, value, PropClass, propObj)
 	self.field = InputField(self.value)
 	table.insert(self.children, self.field)
 end

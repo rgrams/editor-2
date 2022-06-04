@@ -7,11 +7,12 @@ BaseClass.spacing = 2
 BaseClass.width = 100
 BaseClass.height = 26
 
-function BaseClass.set(self, name, value, PropClass)
+function BaseClass.set(self, name, value, PropClass, propObj)
 	BaseClass.super.set(self, self.spacing, false, -1, self.width, self.height)
 	self:mode("fill", "none")
 	self.layer = "gui"
 	self.propertyName = name
+	self.propertyObj = propObj
 	self.propertyClass = PropClass
 
 	self.label = gui.Text(name, self.font, self.labelWidth or self.width, "W", "W", "left")

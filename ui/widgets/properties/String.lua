@@ -8,8 +8,8 @@ local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 
 String.labelWidth = String.width/4
 
-function String.set(self, name, value, PropClass)
-	String.super.set(self, name, value, PropClass)
+function String.set(self, name, value, PropClass, propObj)
+	String.super.set(self, name, value, PropClass, propObj)
 	self.field = InputField(self.value, 175)
 	table.insert(self.children, self.field)
 end

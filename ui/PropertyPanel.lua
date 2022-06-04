@@ -52,8 +52,8 @@ function PropertyPanel.addProperty(self, propType, propName)
 	self:updateProperties(selection) -- We'll ignore the signal from ourself, so manually update.
 end
 
-local function addPropertyWidget(self, selection, name, Class, value)
-	local object = Class.WidgetClass(name, value, Class)
+local function addPropertyWidget(self, selection, name, Class, value, obj)
+	local object = Class.WidgetClass(name, value, Class, obj)
 	self.wgtForProp[name] = object
 	self.tree:add(object, self)
 	object:setSelection(selection)
@@ -107,14 +107,14 @@ function PropertyPanel.updateProperties(self, selection)
 	-- Need properties and value.
 	local votesForName = {} -- Lookup table by name.
 	local classForName = {} -- Lookup table by name.
-	local commonProperties = {} -- [1] = { Class= , name= , value= }, [2]...
+	local commonProperties = {} -- [1] = { Class= , obj=, name= , value= }, [2]...
 
 	-- Copy property list from the first object.
 	local firstObj = selection[1][1]
 	for i,property in ipairs(firstObj.properties) do
 		local Class, name = getmetatable(property), property.name
 		local value = property:getValue()
-		table.insert(commonProperties, { Class = Class, name = name, value = value })
+		table.insert(commonProperties, { Class = Class, obj = property, name = name, value = value })
 		votesForName[name] = 1
 		classForName[name] = Class
 	end
@@ -147,7 +147,7 @@ function PropertyPanel.updateProperties(self, selection)
 		else
 			local object = getPropertyWidget(self, propData.name, propData.Class)
 			if not object then
-				addPropertyWidget(self, selection, propData.name, propData.Class, propData.value)
+				addPropertyWidget(self, selection, propData.name, propData.Class, propData.value, propData.obj)
 			else
 				object:updateValue(propData.value)
 			end

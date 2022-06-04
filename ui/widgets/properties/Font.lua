@@ -15,8 +15,8 @@ local lastOpenFolder
 Font.labelWidth = Font.width/3
 local dialogBtnWidth = 24
 
-function Font.set(self, name, value, PropClass)
-	Font.super.set(self, name, value, PropClass)
+function Font.set(self, name, value, PropClass, propObj)
+	Font.super.set(self, name, value, PropClass, propObj)
 
 	self.sizeField = InputField(self.value[2], 35)
 	table.insert(self.children, self.sizeField)

@@ -6,8 +6,8 @@ Enum.className = "Enum"
 local Button = require "ui.widgets.Button"
 local Dropdown = require "ui.widgets.Dropdown"
 
-function Enum.set(self, name, value, PropClass)
-	Enum.super.set(self, name, value, PropClass)
+function Enum.set(self, name, value, PropClass, propObj)
+	Enum.super.set(self, name, value, PropClass, propObj)
 	self.PropClass = PropClass
 
 	self.button = Button(value, nil, "center")

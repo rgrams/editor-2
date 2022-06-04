@@ -6,8 +6,8 @@ Bool.className = "Bool"
 local Checkbox = require "ui.widgets.Checkbox"
 local CheckboxTheme = require "ui.widgets.themes.CheckboxTheme"
 
-function Bool.set(self, name, value, PropClass)
-	Bool.super.set(self, name, value, PropClass)
+function Bool.set(self, name, value, PropClass, propObj)
+	Bool.super.set(self, name, value, PropClass, propObj)
 	self.checkbox = Checkbox()
 	self.checkbox.color = { 1.65, 0.65, 0.65, 1 }
 	table.insert(self.children, self.checkbox)
