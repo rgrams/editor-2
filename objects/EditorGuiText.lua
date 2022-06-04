@@ -42,7 +42,7 @@ function EditorGuiText.set(self)
 	self.blendMode = "alpha"
 	self.color = { 1, 1, 1, 1 }
 	self.isWrapping = false
-	self.hAlign = TextAlign.DEFAULT_VALUE
+	self.hAlign = TextAlign.defaultValue
 end
 
 function EditorGuiText.initProperties(self)
