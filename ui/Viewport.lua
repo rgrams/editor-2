@@ -8,8 +8,6 @@ local signals = require "signals"
 local BackgroundGrid = require "ui.BackgroundGrid"
 local Tool = require "tools.Tool"
 local objectFn = require "commands.functions.object-functions"
-local InputField = require "ui.widgets.InputField"
-local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 
 function Viewport.set(self, ruu)
 	Viewport.super.set(self, 50, 50, "C", "C", "fill")
