@@ -146,6 +146,8 @@ function UI.saveScene(self, scene, filepath)
 	if scenes.active == scene then
 		love.window.setTitle("Editor - " .. scene.name)
 	end
+	local tabBar = self.tree:get("/Window/UI/MainRow/VPColumn/TabBar")
+	tabBar:setTabText(scene, scene.name)
 	local exporter = require "io.defaultLuaImportExport"
 	exporter.export(scene, filepath)
 end

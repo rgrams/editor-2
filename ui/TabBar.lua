@@ -79,6 +79,14 @@ function TabBar.removeTab(self, scene)
 	end
 end
 
+function TabBar.setTabText(self, scene, text)
+	for i,wgt in ipairs(self.tabWidgets) do
+		if wgt.scene == scene then
+			wgt.object.text.text = text
+		end
+	end
+end
+
 function TabBar.tabBtnPressed(self, wgt)
 	wgt:setChecked(true)
 	scenes.setActive(wgt.scene, self)
