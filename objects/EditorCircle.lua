@@ -24,6 +24,7 @@ EditorCircle.isBuiltinProperty = {
 	pos = true,
 	angle = true,
 	radius = true,
+	skew = true,
 	segments = true,
 	lineWidth = true,
 	filled = true,
@@ -39,6 +40,8 @@ function EditorCircle.initProperties(self)
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
 	self:addProperty(Float, "radius", self.radius, true)
+	self:addProperty(Vec2, "scale", { x = 1, y = 1 }, true)
+	self:addProperty(Vec2, "skew")
 	self:addProperty(Float, "segments", self.segments, true)
 	self:addProperty(Float, "lineWidth", 1, true)
 	self:addProperty(Bool, "filled", self.isFilled, true)

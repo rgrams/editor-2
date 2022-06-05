@@ -23,6 +23,7 @@ local Color = require "objects.properties.Color"
 EditorRectangle.isBuiltinProperty = {
 	pos = true,
 	angle = true,
+	skew = true,
 	size = true,
 	lineWidth = true,
 	filled = true,
@@ -41,6 +42,7 @@ function EditorRectangle.initProperties(self)
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
 	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true)
+	self:addProperty(Vec2, "skew")
 	self:addProperty(Float, "lineWidth", 1, true)
 	self:addProperty(Bool, "filled", self.isFilled, true)
 	self:addProperty(Color, "color")
