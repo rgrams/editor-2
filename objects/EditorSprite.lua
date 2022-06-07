@@ -9,6 +9,7 @@ _G.objClassList:add(EditorSprite, EditorSprite.displayName)
 
 local Image = require "objects.properties.Image"
 local Color = require "objects.properties.Color"
+local BlendMode = require "objects.properties.Enum_BlendMode"
 
 EditorSprite.isBuiltinProperty = {
 	pos = true,
@@ -17,17 +18,20 @@ EditorSprite.isBuiltinProperty = {
 	skew = true,
 	image = true,
 	color = true,
+	blendMode = true,
 }
 
 function EditorSprite.set(self)
 	EditorSprite.super.set(self)
 	self.color = { 1, 1, 1, 1 }
+	self.blendMode = "alpha"
 end
 
 function EditorSprite.initProperties(self)
 	EditorSprite.super.initProperties(self)
 	self:addProperty(Image, "image")
 	self:addProperty(Color, "color")
+	self:addProperty(BlendMode, "blendMode")
 end
 
 function EditorSprite.propertyWasSet(self, name, value, property)
@@ -36,6 +40,8 @@ function EditorSprite.propertyWasSet(self, name, value, property)
 		self:setImage(property.image)
 	elseif name == "color" then
 		self.color = property:getValue()
+	elseif name == "blendMode" then
+		self.blendMode = value
 	end
 end
 
@@ -54,8 +60,10 @@ end
 
 function EditorSprite.draw(self)
 	if self.image then
+		love.graphics.setBlendMode(self.blendMode)
 		love.graphics.setColor(self.color)
 		love.graphics.draw(self.image, self.ox, self.oy)
+		love.graphics.setBlendMode("alpha")
 	else
 		love.graphics.setColor(self.color)
 		local r = self.hitWidth*0.35
