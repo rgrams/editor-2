@@ -6,7 +6,7 @@ local config = require "config"
 local scenes = require "scenes"
 local signals = require "signals"
 local BackgroundGrid = require "ui.BackgroundGrid"
-local Tool = require "tools.Tool"
+local MultiTool = require "tools.Tool"
 local objectFn = require "commands.functions.object-functions"
 
 function Viewport.set(self, ruu)
@@ -22,23 +22,39 @@ function Viewport.set(self, ruu)
 	-- Subscribe before tool so camera updates before tool AABB.
 	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
 
-	self.children = {
-		Tool(ruu),
+	self.tools = {
+		default = MultiTool(ruu),
 	}
-	self.tool = self.children[1]
+
+	self.curToolName = "default"
+	self.tool = self.tools[self.curToolName] -- Used in wgt.scroll
+	self.children = {
+		self.tool
+	}
 end
 
 function Viewport.init(self)
 	Viewport.super.init(self)
 	-- Add Background Grid to scene-tree root so our Node transform doesn't make things difficult.
 	self.tree:add( BackgroundGrid(self) )
-	self.ruu:setFocus(self.children[1].widget)
+	self.ruu:setFocus(self.tool.widget)
 end
 
 function Viewport.allocate(self, ...)
 	Viewport.super.allocate(self, ...)
 	local left, top = self._to_world.x - self.w/2, self._to_world.y - self.h/2
 	Camera.current:setViewport(left, top, self.w, self.h)
+end
+
+function Viewport.setTool(self, toolName)
+	assert(self.tools[toolName], "Viewport.setTool - No tool by the name: '"..tostring(toolName).."'.")
+	if toolName == self.curToolName then  return  end
+	local curTool = self.tools[self.curToolName]
+	self.tree:remove(curTool)
+	self.curToolName = toolName
+	self.tool = self.tools[toolName]
+	self.tree:add(self.tool, self)
+	self.ruu:setFocus(self.tool.widget)
 end
 
 function Viewport.onActiveSceneChanged(self, sender, signal, scene)
@@ -106,6 +122,10 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 			scene.history:perform("paste", wgt.object, scene, parentEnclosures, argsList)
 			return true
 		end
+	elseif action == "default tool" and change == 1 then
+		wgt.object:setTool("default")
+	elseif action == "polygon tool" and change == 1 then
+		-- wgt.object:setTool("polygon")
 	end
 end
 

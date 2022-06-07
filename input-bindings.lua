@@ -52,4 +52,6 @@ return {
 	{ "button", "ctrl shift tab", "prev tab" },
 	{ "button", "ctrl w", "close tab" },
 	{ "button", "ctrl n", "new scene" },
+	{ "button", "1", "default tool" },
+	{ "button", "2", "polygon tool" },
 }

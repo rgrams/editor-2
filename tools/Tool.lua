@@ -35,21 +35,8 @@ function Tool.set(self, ruu)
 	Tool.super.set(self, 1, 1, "C", "C", "fill")
 	self.layer = "viewport"
 	self.ruu = ruu
-	self.widget = ruu:Panel(self)
-	self.widget.ruuInput = self.ruuInput
-	self.widget.press = self.press
-	self.widget.release = self.release
-	self.widget.drag = self.drag
 	self.lastAddClass = EditorObject
 	self.AABB = { lt = 0, top = 0, rt = 0, bot = 0 }
-
-	signals.subscribe(self, self.onObjectsChanged,
-		"objects added",
-		"objects deleted",
-		"selected objects modified",
-		"selection changed",
-		"active scene changed"
-	)
 
 	local cornerW = self.cornerHandleSize
 	local edgeW = self.edgeHandleSize
@@ -62,9 +49,39 @@ function Tool.set(self, ruu)
 	}
 end
 
+
 function Tool.init(self)
 	Tool.super.init(self)
 	self.propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
+
+	self.widget = self.ruu:Panel(self)
+	self.widget.ruuInput = self.ruuInput
+	self.widget.press = self.press
+	self.widget.release = self.release
+	self.widget.drag = self.drag
+
+	signals.subscribe(self, self.onObjectsChanged,
+		"objects added",
+		"objects deleted",
+		"selected objects modified",
+		"selection changed",
+		"active scene changed"
+	)
+end
+
+local function stopDrag(self)
+	self.isDragging = false
+	self.isBoxSelecting = false
+	self.isRotateDragging = false
+	self.ruu:stopDraggingWidget(self.widget)
+	self.startedDragCommand = false
+end
+
+function Tool.final(self)
+	if self.isDragging then
+		stopDrag(self)
+	end
+	self.ruu:destroy(self.widget)
 end
 
 local function startDrag(self, dragType)
@@ -75,14 +92,6 @@ local function startDrag(self, dragType)
 	local wmx, wmy = Camera.current:screenToWorld(self.ruu.mx, self.ruu.my)
 	self.lastDragX, self.lastDragY = wmx, wmy
 	self.dragStartX, self.dragStartY = wmx, wmy
-end
-
-local function stopDrag(self)
-	self.isDragging = false
-	self.isBoxSelecting = false
-	self.isRotateDragging = false
-	self.ruu:stopDraggingWidget(self.widget)
-	self.startedDragCommand = false
 end
 
 local function AABBsOverlap(lt1, top1, rt1, bot1, lt2, top2, rt2, bot2)
