@@ -11,6 +11,7 @@ local Image = require "objects.properties.Image"
 local Color = require "objects.properties.Color"
 
 EditorGuiSprite.isBuiltinProperty = {
+	name = true,
 	pos = true,
 	angle = true,
 	size = true,

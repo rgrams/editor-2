@@ -12,6 +12,7 @@ local Vec4 = require "objects.properties.Vec4"
 local Color = require "objects.properties.Color"
 
 EditorGuiNode.isBuiltinProperty = {
+	name = true,
 	pos = true,
 	angle = true,
 	size = true,

@@ -12,6 +12,7 @@ local Color = require "objects.properties.Color"
 local BlendMode = require "objects.properties.Enum_BlendMode"
 
 EditorSprite.isBuiltinProperty = {
+	name = true,
 	pos = true,
 	angle = true,
 	scale = true,

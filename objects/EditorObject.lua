@@ -12,9 +12,11 @@ _G.objClassList:add(EditorObject, EditorObject.displayName)
 
 local Float = require "objects.properties.Property"
 local Vec2 = require "objects.properties.Vec2"
+local String = require "objects.properties.String"
 local Script = require "objects.properties.Script"
 
 EditorObject.isBuiltinProperty = {
+	name = true,
 	pos = true,
 	angle = true,
 	scale = true,
@@ -32,6 +34,7 @@ function EditorObject.set(self)
 end
 
 function EditorObject.initProperties(self)
+	self:addProperty(String, "name")
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
 	self:addProperty(Vec2, "scale", { x = 1, y = 1 }, true)

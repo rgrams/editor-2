@@ -16,11 +16,13 @@ EditorRectangle.roundSegments = 2
 _G.objClassList:add(EditorRectangle, EditorRectangle.displayName)
 
 local Float = require "objects.properties.Property"
+local String = require "objects.properties.String"
 local Bool = require "objects.properties.Bool"
 local Vec2 = require "objects.properties.Vec2"
 local Color = require "objects.properties.Color"
 
 EditorRectangle.isBuiltinProperty = {
+	name = true,
 	pos = true,
 	angle = true,
 	skew = true,
@@ -39,6 +41,7 @@ function EditorRectangle.set(self)
 end
 
 function EditorRectangle.initProperties(self)
+	self:addProperty(String, "name")
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
 	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true)

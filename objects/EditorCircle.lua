@@ -19,8 +19,10 @@ local Float = require "objects.properties.Property"
 local Bool = require "objects.properties.Bool"
 local Vec2 = require "objects.properties.Vec2"
 local Color = require "objects.properties.Color"
+local String = require "objects.properties.String"
 
 EditorCircle.isBuiltinProperty = {
+	name = true,
 	pos = true,
 	angle = true,
 	radius = true,
@@ -37,6 +39,7 @@ function EditorCircle.set(self)
 end
 
 function EditorCircle.initProperties(self)
+	self:addProperty(String, "name")
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
 	self:addProperty(Float, "radius", self.radius, true)

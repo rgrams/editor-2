@@ -13,6 +13,7 @@ local Float = require "objects.properties.Property"
 local Bool = require "objects.properties.Bool"
 
 EditorGuiColumn.isBuiltinProperty = {
+	name = true,
 	pos = true,
 	angle = true,
 	size = true,

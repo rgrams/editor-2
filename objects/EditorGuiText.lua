@@ -18,6 +18,7 @@ local Cardinal = require "objects.properties.Enum_CardinalDir"
 local ResizeMode = require "objects.properties.Enum_GuiResizeMode"
 
 EditorGuiText.isBuiltinProperty = {
+	name = true,
 	pos = true,
 	angle = true,
 	size = true,
@@ -46,6 +47,7 @@ function EditorGuiText.set(self)
 end
 
 function EditorGuiText.initProperties(self)
+	self:addProperty(String, "name")
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
 	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true)
