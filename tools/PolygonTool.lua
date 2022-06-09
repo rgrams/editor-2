@@ -238,8 +238,11 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 				scene.history:perform("setSelection", self, scene.selection, { enclosure })
 			end
 		else -- Clicked on nothing.
-			clearVertSelection(scene.isVertSelected)
-			scene.history:perform("clearSelection", self, scene.selection)
+			if next(scene.isVertSelected) then
+				clearVertSelection(scene.isVertSelected)
+			else
+				scene.history:perform("clearSelection", self, scene.selection)
+			end
 		end
 	end
 end
