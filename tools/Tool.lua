@@ -49,7 +49,6 @@ function Tool.set(self, ruu)
 	}
 end
 
-
 function Tool.init(self)
 	Tool.super.init(self)
 	self.propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
@@ -78,6 +77,13 @@ local function stopDrag(self)
 end
 
 function Tool.final(self)
+	signals.unsubscribe(self,
+		"objects added",
+		"objects deleted",
+		"selected objects modified",
+		"selection changed",
+		"active scene changed"
+	)
 	if self.isDragging then
 		stopDrag(self)
 	end

@@ -7,6 +7,7 @@ local scenes = require "scenes"
 local signals = require "signals"
 local BackgroundGrid = require "ui.BackgroundGrid"
 local MultiTool = require "tools.Tool"
+local PolygonTool = require "tools.PolygonTool"
 local objectFn = require "commands.functions.object-functions"
 
 function Viewport.set(self, ruu)
@@ -24,6 +25,7 @@ function Viewport.set(self, ruu)
 
 	self.tools = {
 		default = MultiTool(ruu),
+		polygon = PolygonTool(ruu),
 	}
 
 	self.curToolName = "default"
@@ -125,7 +127,7 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 	elseif action == "default tool" and change == 1 then
 		wgt.object:setTool("default")
 	elseif action == "polygon tool" and change == 1 then
-		-- wgt.object:setTool("polygon")
+		wgt.object:setTool("polygon")
 	end
 end
 
