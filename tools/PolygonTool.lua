@@ -5,16 +5,24 @@ PolygonTool.className = "PolygonTool"
 local scenes = require "scenes"
 local config = require "config"
 local modkeys = require "modkeys"
+local signals = require "signals"
+local polygonCmd = require "commands.polygon-commands"
 
 PolygonTool.snapKey = "ctrl"
 PolygonTool.snapToAxisKey = "shift"
+PolygonTool.normalVertColor = { 0.5, 0.5, 0.5, 1 }
 
+local vertNormalAlpha = 0.4
+local vertHoverAlpha = 1.0
+local vertNormalRadius = 6
+local vertHoverRadius = 8
 local vertHitRadius = 10
 
 function PolygonTool.set(self, ruu)
 	PolygonTool.super.set(self, 1, 1, "C", "C", "fill")
 	self.layer = "viewport"
 	self.ruu = ruu
+	signals.subscribe(self, self.onSceneAdded, "scene added")
 end
 
 function PolygonTool.init(self)
@@ -24,6 +32,10 @@ function PolygonTool.init(self)
 	self.widget.press = self.press
 	self.widget.release = self.release
 	self.widget.ruuInput = self.ruuInput
+end
+
+function PolygonTool.onSceneAdded(self, sender, signal, scene)
+	scene.isVertSelected = scene.isVertSelected or {}
 end
 
 local function stopDrag(self)
@@ -104,6 +116,30 @@ local function updateHover(self, mx, my)
 	end
 end
 
+local function getDragStartOffsets(self, mwx, mwy, obj, selectedVertMap)
+	local startX, startY = self.dragStartX, self.dragStartY
+	local offsets = {}
+	for idx,_ in pairs(selectedVertMap) do
+		local lx, ly = obj:getVertPos(idx)
+		local wx, wy = obj:toWorld(lx, ly)
+		local val = { i = idx, x = wx - startX, y = wy - startY }
+		table.insert(offsets, val)
+	end
+	return offsets
+end
+
+local function getPosDragArgList(self, enclosure, startOffsets, totalDX, totalDY, roundX, roundY)
+	local argList = {}
+	local startX, startY = self.dragStartX, self.dragStartY
+	for i,offset in ipairs(startOffsets) do
+		local wx, wy = startX + offset.x + totalDX, startY + offset.y + totalDY
+		wx, wy = math.round(wx, roundX), math.round(wy, roundY)
+		local lx, ly = self.hoverObj:toLocal(wx, wy)
+		table.insert(argList, { self, enclosure, offset.i, lx, ly })
+	end
+	return argList
+end
+
 function PolygonTool.drag(wgt, dx, dy, dragType)
 	local self, scene = wgt.object, scenes.active
 
@@ -129,18 +165,20 @@ function PolygonTool.drag(wgt, dx, dy, dragType)
 			end
 		end
 
-		local vi = self.hoverIdx
 		local enclosure = self.hoverObj.enclosure
-		local wx = self.dragStartX + totalWDX + self.dragOX
-		local wy = self.dragStartY + totalWDY + self.dragOY
-		wx, wy = math.round(wx, roundX), math.round(wy, roundY)
-		local lx, ly = self.hoverObj:toLocal(wx, wy)
-		if self.startedDragCommand then
-			self.hoverObj:setVertPos(vi, lx, ly)
-			scene.history:update(self, enclosure, vi, lx, ly)
-		else
+
+		if not self.startedDragCommand then
 			self.startedDragCommand = true
-			scene.history:perform("setVertexPos", self, enclosure, vi, lx, ly)
+			local _x, _y = self.dragStartX, self.dragStartY
+			local obj = self.hoverObj
+			self.dragStartOffsets = getDragStartOffsets(self, _x, _y, obj, scene.isVertSelected)
+			local argList = getPosDragArgList(self, enclosure, self.dragStartOffsets, totalWDX, totalWDY, roundX, roundY)
+			scene.history:perform("setMultiVertexPos", self, argList)
+		else
+			local argList = getPosDragArgList(self, enclosure, self.dragStartOffsets, totalWDX, totalWDY, roundX, roundY)
+			local doCmd = polygonCmd.setMultiVertexPos[1]
+			doCmd(self, argList)
+			scene.history:update(self, argList)
 		end
 	end
 end
@@ -154,6 +192,12 @@ local function startDrag(self)
 	self.dragStartX, self.dragStartY = wmx, wmy
 end
 
+local function clearVertSelection(selection)
+	for k,v in pairs(selection) do
+		selection[k] = nil
+	end
+end
+
 function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 	local self, scene = wgt.object, scenes.active
 	if scene then
@@ -164,21 +208,37 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 				local obj = enclosure[1]
 				local lx, ly = obj:toLocal(wx, wy)
 				scene.history:perform("addVertex", self, enclosure, lx, ly)
-				return
+				updateHover(self, mx, my)
 			end
 		end
 
 		if self.hoverObj then
 			if self.hoverIdx then -- Clicked on vertex.
-				startDrag(self)
-				local vx, vy = self.hoverObj:getVertPos(self.hoverIdx)
-				local wvx, wvy = self.hoverObj:toWorld(vx, vy)
-				self.dragOX, self.dragOY = wvx - self.dragStartX, wvy - self.dragStartY
+				local shouldToggle = modkeys.isPressed("shift")
+				local isSelected = scene.isVertSelected[self.hoverIdx]
+				if not isSelected then
+					if shouldToggle then                 -- Add to selection.
+						scene.isVertSelected[self.hoverIdx] = true
+					else                                 -- Set selection.
+						clearVertSelection(scene.isVertSelected)
+						scene.isVertSelected[self.hoverIdx] = true
+					end
+				elseif isSelected and shouldToggle then -- Remove from selection.
+					scene.isVertSelected[self.hoverIdx] = nil
+				end
+
+				if next(scene.isVertSelected) then
+					startDrag(self)
+					local vx, vy = self.hoverObj:getVertPos(self.hoverIdx)
+					local wvx, wvy = self.hoverObj:toWorld(vx, vy)
+					self.dragOX, self.dragOY = wvx - self.dragStartX, wvy - self.dragStartY
+				end
 			else -- Clicked on object but not vertex.
 				local enclosure = self.hoverObj.enclosure
 				scene.history:perform("setSelection", self, scene.selection, { enclosure })
 			end
 		else -- Clicked on nothing.
+			clearVertSelection(scene.isVertSelected)
 			scene.history:perform("clearSelection", self, scene.selection)
 		end
 	end
@@ -199,6 +259,20 @@ function PolygonTool.ruuInput(wgt, depth, action, value, change, rawChange, isRe
 		if not self.isDragging then
 			updateHover(self, x, y)
 		end
+	elseif action == "delete" and change == 1 then
+		local scene = scenes.active
+		if scene and next(scene.isVertSelected) then
+			local enclosure = scene.selection[1]
+			if enclosure and enclosure[1].vertices then
+				local indicesToDelete = {}
+				for idx,_ in pairs(scene.isVertSelected) do
+					table.insert(indicesToDelete, idx)
+					scene.isVertSelected[idx] = nil
+				end
+				local self = wgt.object
+				scene.history:perform("deleteMultiVertex", self, enclosure, indicesToDelete)
+			end
+		end
 	end
 end
 
@@ -209,16 +283,24 @@ function PolygonTool.draw(self)
 		local obj = enclosure[1]
 		local verts = obj.vertices
 		if verts then
-			love.graphics.setColor(0.2, 0.75, 1, 1)
+			love.graphics.setLineStyle("smooth")
+			local isVertSelected = scenes.active.isVertSelected
+			local normalColor = self.normalVertColor
+			local selectColor = config.selectedHighlightColor
 			for i=2,#verts,2 do
 				local isHovered = self.hoverIdx and self.hoverIdx == i/2
+				local alpha = isHovered and vertHoverAlpha or vertNormalAlpha
+				local r = isHovered and vertHoverRadius or vertNormalRadius
 				local x, y = verts[i-1], verts[i]
 				x, y = Camera.current:worldToScreen(obj:toWorld(x, y))
 				x, y = x - self._to_world.x, y - self._to_world.y
-				if isHovered then  love.graphics.setColor(0.5, 1, 1, 1)  end
-				love.graphics.circle("fill", x, y, 5, 8)
-				if isHovered then  love.graphics.setColor(0.2, 0.75, 1, 1)  end
+				local color = isVertSelected[i/2] and selectColor or normalColor
+				love.graphics.setColor(color[1], color[2], color[3], alpha)
+				love.graphics.circle("fill", x, y, r, 16)
+				love.graphics.setColor(color)
+				love.graphics.circle("line", x, y, r, 16)
 			end
+			love.graphics.setLineStyle("rough")
 		end
 	end
 end
