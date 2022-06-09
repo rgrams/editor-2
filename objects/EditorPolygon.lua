@@ -45,6 +45,19 @@ function EditorPolygon.setVertPos(self, i, x, y)
 	verts[ix], verts[ix+1] = x, y
 end
 
+function EditorPolygon.insertVert(self, i, x, y)
+	local ix = i*2 - 1
+	table.insert(self.vertices, ix, y)
+	table.insert(self.vertices, ix, x)
+end
+
+function EditorPolygon.deleteVert(self, i)
+	local ix = i*2 - 1
+	local oldX = table.remove(self.vertices, ix)
+	local oldY = table.remove(self.vertices, ix)
+	return oldX, oldY
+end
+
 function EditorPolygon.draw(self)
 	local lineWidth = 1
 	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2

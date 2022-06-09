@@ -154,17 +154,28 @@ end
 function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 	local self, scene = wgt.object, scenes.active
 	if scene then
+		local enclosure = scene.selection[1]
+		if enclosure and enclosure[1].vertices then
+			if Input.isPressed("add modifier") then
+				local wx, wy = Camera.current:screenToWorld(mx, my)
+				local obj = enclosure[1]
+				local lx, ly = obj:toLocal(wx, wy)
+				scene.history:perform("addVertex", self, enclosure, lx, ly)
+				return
+			end
+		end
+
 		if self.hoverObj then
-			if self.hoverIdx then
+			if self.hoverIdx then -- Clicked on vertex.
 				startDrag(self)
 				local vx, vy = self.hoverObj:getVertPos(self.hoverIdx)
 				local wvx, wvy = self.hoverObj:toWorld(vx, vy)
 				self.dragOX, self.dragOY = wvx - self.dragStartX, wvy - self.dragStartY
-			else
+			else -- Clicked on object but not vertex.
 				local enclosure = self.hoverObj.enclosure
 				scene.history:perform("setSelection", self, scene.selection, { enclosure })
 			end
-		else
+		else -- Clicked on nothing.
 			scene.history:perform("clearSelection", self, scene.selection)
 		end
 	end
