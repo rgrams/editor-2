@@ -9,6 +9,8 @@ local modkeys = require "modkeys"
 PolygonTool.snapKey = "ctrl"
 PolygonTool.snapToAxisKey = "shift"
 
+local vertHitRadius = 10
+
 function PolygonTool.set(self, ruu)
 	PolygonTool.super.set(self, 1, 1, "C", "C", "fill")
 	self.layer = "viewport"
@@ -87,7 +89,8 @@ local function updateHover(self, mx, my)
 			local verts = obj.vertices
 			if verts then
 				local lx, ly = obj:toLocal(wx, wy)
-				local closestIdx = hitCheckVertices(verts, lx, ly, 10)
+				local hitR = vertHitRadius / Camera.current.zoom
+				local closestIdx = hitCheckVertices(verts, lx, ly, hitR)
 				if closestIdx then
 					self.hoverIdx = closestIdx
 					self.hoverObj = obj
