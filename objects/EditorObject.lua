@@ -226,6 +226,7 @@ end
 
 function EditorObject.touchesPoint(self, wx, wy)
 	local lx, ly = self:toLocal(wx, wy)
+	lx, ly = lx - (self.hitOX or 0), ly - (self.hitOY or 0)
 	local hw, hh = self.hitWidth/2, self.hitHeight/2
 	if lx >= -hw and lx <= hw and ly >= -hh and ly <= hh then
 		-- Funky calculation so smaller objects are more "sensitive" for when obj positions are identical.
@@ -370,11 +371,12 @@ local function drawSkewedRectangle(self, mode, pad, sx, sy, cam)
 	rtX, rtY = vec2.normalize(rtX - wx, rtY - wy)
 	upX, upY, rtX, rtY = upX*pad, upY*pad, rtX*pad, rtY*pad
 
+	local ox, oy = self.hitOX or 0, self.hitOY or 0
 	local hw, hh = self.hitWidth/2, self.hitHeight/2
-	local x1, y1 = cam:worldToScreen( self:toWorld(-hw, -hh) )
-	local x2, y2 = cam:worldToScreen( self:toWorld(hw, -hh) )
-	local x3, y3 = cam:worldToScreen( self:toWorld(hw, hh) )
-	local x4, y4 = cam:worldToScreen( self:toWorld(-hw, hh) )
+	local x1, y1 = cam:worldToScreen( self:toWorld(ox-hw, oy-hh) )
+	local x2, y2 = cam:worldToScreen( self:toWorld(ox+hw, oy-hh) )
+	local x3, y3 = cam:worldToScreen( self:toWorld(ox+hw, oy+hh) )
+	local x4, y4 = cam:worldToScreen( self:toWorld(ox-hw, oy+hh) )
 	x1, y1 = x1 - rtX - upX, y1 - rtY - upY
 	x2, y2 = x2 + rtX - upX, y2 + rtY - upY
 	x3, y3 = x3 + rtX + upX, y3 + rtY + upY
@@ -400,7 +402,7 @@ function EditorObject.drawSelectionHighlight(self, node)
 	else
 		local zoom = Camera.current.zoom
 		local hw, hh = self.hitWidth/2 * zoom, self.hitHeight/2 * zoom
-		local objX, objY = self:toWorld(0, 0)
+		local objX, objY = self:toWorld(self.hitOX or 0, self.hitOY or 0)
 		local scrnX, scrnY = Camera.current:worldToScreen(objX, objY)
 		local lx, ly = scrnX, scrnY
 
