@@ -16,7 +16,8 @@ end
 
 local function addVertex(caller, enclosure, x, y)
 	local obj = enclosure[1]
-	local index = #obj.vertices/2 + 1
+	local verts = obj:getProperty("vertices")
+	local index = #verts/2 + 1
 	return insertVertex(caller, enclosure, index, x, y)
 end
 

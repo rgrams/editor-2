@@ -14,12 +14,6 @@ function M.insertVertex(caller, enclosure, i, x, y)
 	return caller, enclosure, i
 end
 
-function M.addVertex(caller, enclosure, x, y)
-	local obj = enclosure[1]
-	local index = #obj.vertices/2 + 1
-	return M.insertVertex(caller, enclosure, index, x, y)
-end
-
 function M.deleteVertex(caller, enclosure, i)
 	local obj = enclosure[1]
 	local oldX, oldY = obj:deleteVert(i)
@@ -65,7 +59,7 @@ end
 
 function M.deleteMultiVertex(caller, enclosure, indices)
 	local obj = enclosure[1]
-	local verts = obj.vertices
+	local verts = obj:getProperty("vertices")
 	local oldCount = #verts
 	local oldPoints = {}
 	for i,index in ipairs(indices) do

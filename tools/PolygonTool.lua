@@ -98,7 +98,7 @@ local function updateHover(self, mx, my)
 		local enc1 = scenes.active.selection[1]
 		if enc1 then
 			local obj = enc1[1]
-			local verts = obj.vertices
+			local verts = obj:getProperty("vertices")
 			if verts then
 				local lx, ly = obj:toLocal(wx, wy)
 				local hitR = vertHitRadius / Camera.current.zoom
@@ -202,7 +202,7 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 	local self, scene = wgt.object, scenes.active
 	if scene then
 		local enclosure = scene.selection[1]
-		if enclosure and enclosure[1].vertices then
+		if enclosure and enclosure[1]:hasProperty("vertices") then
 			if Input.isPressed("add modifier") then
 				local wx, wy = Camera.current:screenToWorld(mx, my)
 				local obj = enclosure[1]
@@ -266,7 +266,7 @@ function PolygonTool.ruuInput(wgt, depth, action, value, change, rawChange, isRe
 		local scene = scenes.active
 		if scene and next(scene.isVertSelected) then
 			local enclosure = scene.selection[1]
-			if enclosure and enclosure[1].vertices then
+			if enclosure and enclosure[1]:hasProperty("vertices") then
 				local indicesToDelete = {}
 				for idx,_ in pairs(scene.isVertSelected) do
 					table.insert(indicesToDelete, idx)
@@ -284,7 +284,7 @@ function PolygonTool.draw(self)
 		local selection = scenes.active.selection
 		local enclosure = selection[1]
 		local obj = enclosure[1]
-		local verts = obj.vertices
+		local verts = obj:getProperty("vertices")
 		if verts then
 			love.graphics.setLineStyle("smooth")
 			local isVertSelected = scenes.active.isVertSelected
