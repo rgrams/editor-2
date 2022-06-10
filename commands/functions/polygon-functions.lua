@@ -69,6 +69,7 @@ function M.deleteMultiVertex(caller, enclosure, indices)
 		table.insert(oldPoints, { index, oldX, oldY })
 	end
 	removeHolesInList(verts, oldCount)
+	obj:setProperty("vertices", verts)
 	return caller, enclosure, oldPoints
 end
 
