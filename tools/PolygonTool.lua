@@ -16,6 +16,8 @@ PolygonTool.normalVertColor = { 0.5, 0.5, 0.5, 1 }
 PolygonTool.boxSelectAddChord = "shift "
 PolygonTool.boxSelectToggleChord = "ctrl "
 PolygonTool.boxSelectSubtractChord = "alt "
+PolygonTool.bigNudgeKey = "shift"
+PolygonTool.smallNudgeKey = "ctrl"
 
 local vertNormalAlpha = 0.4
 local vertHoverAlpha = 1.0
@@ -25,6 +27,8 @@ local vertHitRadius = 10
 local segmentHitRadius = 8
 local segmentIntersectionRadius = 6
 local segmentIntersectColor = PolygonTool.normalVertColor
+
+local dirKey = { left = {-1,0}, right = {1,0}, up = {0,-1}, down = {0,1} }
 
 function PolygonTool.set(self, ruu)
 	PolygonTool.super.set(self, 1, 1, "C", "C", "fill")
@@ -388,7 +392,36 @@ function PolygonTool.ruuInput(wgt, depth, action, value, change, rawChange, isRe
 				end
 				local self = wgt.object
 				scene.history:perform("deleteMultiVertex", self, enclosure, indicesToDelete)
+				updateHover(self)
 			end
+		end
+	elseif dirKey[action] and (change == 1 or isRepeat) then
+		local self, scene = wgt.object, scenes.active
+		local enclosure = scene.selection[1]
+		if enclosure and enclosure[1]:hasProperty("vertices") then
+			if not next(scene.isVertSelected) then  return  end
+			local obj = enclosure[1]
+			local vec = dirKey[action]
+			local dx, dy = vec[1], vec[2]
+			local dist = 1
+			if modkeys.isPressed(self.bigNudgeKey) then
+				dist = config.translateSnapIncrement
+			elseif modkeys.isPressed(self.smallNudgeKey) then
+				dist = 0.1
+			end
+			dx, dy = dx*dist, dy*dist
+			local verts = obj:getProperty("vertices")
+			local argList = {}
+			for iy=2,#verts,2 do
+				local vi = iy/2
+				if scene.isVertSelected[vi] then
+					local vx, vy = verts[iy-1], verts[iy]
+					vx, vy = vx + dx, vy + dy
+					table.insert(argList, { self, enclosure, vi, vx, vy })
+				end
+			end
+			scene.history:perform("setMultiVertexPos", self, argList)
+			updateHover(self)
 		end
 	end
 end
