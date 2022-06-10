@@ -195,12 +195,13 @@ local function getBoxSelectMode(self)
 	return mode
 end
 
-local function getVertsInBox(verts, lt, top, rt, bot)
+local function getVertsInBox(obj, verts, lt, top, rt, bot)
+	-- Bounds are in world coordinates (and obj can be skewed, scaled, rotated, etc.)
 	local hitIndices = {}
 	local vertCount = #verts/2
 	for i=1,vertCount do
 		local iy = i*2
-		local x, y = verts[iy-1], verts[iy]
+		local x, y = obj:toWorld(verts[iy-1], verts[iy])
 		if x >= lt and x <= rt and y >= top and y <= bot then
 			table.insert(hitIndices, i)
 		end
@@ -269,9 +270,7 @@ function PolygonTool.drag(wgt, dx, dy, dragType)
 		local verts = obj:getProperty("vertices")
 		local lt, top = math.min(mwx, self.dragStartX), math.min(mwy, self.dragStartY)
 		local rt, bot = math.max(mwx, self.dragStartX), math.max(mwy, self.dragStartY)
-		lt, top = obj:toLocal(lt, top)
-		rt, bot = obj:toLocal(rt, bot)
-		local hitIndices = getVertsInBox(verts, lt, top, rt, bot)
+		local hitIndices = getVertsInBox(obj, verts, lt, top, rt, bot)
 		local mode = getBoxSelectMode(self)
 		local origSelection = self.originalSelection
 		local newSelection
