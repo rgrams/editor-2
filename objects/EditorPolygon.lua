@@ -126,11 +126,13 @@ function EditorPolygon.updateAABB(self)
 end
 
 function EditorPolygon.draw(self)
+	love.graphics.setLineStyle("smooth")
 	local lineWidth = 1
 	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2
 	local verts = self:getProperty("vertices")
+	local isLoop = self:getProperty("isLoop")
 
-	if self.isHovered then
+	if self.isHovered and isLoop then
 		love.graphics.setColor(1, 1, 1, 0.03)
 		love.graphics.polygon("fill", verts)
 	end
@@ -142,9 +144,16 @@ function EditorPolygon.draw(self)
 	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
 	love.graphics.circle("line", 0, 0, 0.5, 4)
 
-	love.graphics.polygon("line", verts)
+	if isLoop then
+		love.graphics.polygon("line", verts)
+	else
+		if self.isHovered then  love.graphics.setColor(1, 1, 1, 0.6)  end
+		love.graphics.line(verts)
+	end
 
 	self:drawParentChildLines()
+
+	love.graphics.setLineStyle("rough")
 end
 
 return EditorPolygon
