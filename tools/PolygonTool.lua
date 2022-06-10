@@ -8,6 +8,7 @@ local modkeys = require "modkeys"
 local signals = require "signals"
 local polygonCmd = require "commands.polygon-commands"
 local list = require "lib.list"
+local pointHitsLine = require "lib.pointHitsLine"
 
 PolygonTool.snapKey = "ctrl"
 PolygonTool.snapToAxisKey = "shift"
@@ -21,6 +22,9 @@ local vertHoverAlpha = 1.0
 local vertNormalRadius = 6
 local vertHoverRadius = 8
 local vertHitRadius = 10
+local segmentHitRadius = 8
+local segmentIntersectionRadius = 6
+local segmentIntersectColor = PolygonTool.normalVertColor
 
 function PolygonTool.set(self, ruu)
 	PolygonTool.super.set(self, 1, 1, "C", "C", "fill")
@@ -73,8 +77,9 @@ local function hitCheckChildren(children, x, y, minDist, closestObj)
 	return closestObj, minDist
 end
 
-local function hitCheckVertices(verts, x, y, r, minDist, closestIdx)
+local function hitCheckVertices(verts, x, y, r, minDist)
 	minDist = minDist or math.huge
+	local closestIdx
 	for i=2,#verts,2 do
 		local vx, vy = verts[i-1], verts[i]
 		local dist = vec2.len(vx - x, vy - y)
@@ -84,6 +89,28 @@ local function hitCheckVertices(verts, x, y, r, minDist, closestIdx)
 		end
 	end
 	return closestIdx, minDist
+end
+
+local function hitCheckSegments(verts, x, y, r, isLoop, minDist)
+	minDist = minDist or math.huge
+	local closestIdx, hitX, hitY
+	local len = #verts
+	for i=2,len,2 do
+		local x1, y1, x2, y2
+		if i == len then
+			if not isLoop then  break
+			else  x2, y2 = verts[1], verts[2]  end
+		else
+			x2, y2 = verts[i+1], verts[i+2]
+		end
+		x1, y1 = verts[i-1], verts[i]
+		local dist, _hitX, _hitY = pointHitsLine(x, y, x1, y1, x2, y2, r)
+		if dist and dist < minDist then
+			minDist = dist
+			closestIdx, hitX, hitY = i/2, _hitX, _hitY
+		end
+	end
+	return closestIdx, minDist, hitX, hitY
 end
 
 local function updateHover(self, mx, my)
@@ -100,6 +127,7 @@ local function updateHover(self, mx, my)
 		self.hoverObj = hoverObj
 
 		self.hoverIdx = nil
+		self.hoverSegIdx = nil
 		local enc1 = scenes.active.selection[1]
 		if enc1 then
 			local obj = enc1[1]
@@ -111,6 +139,14 @@ local function updateHover(self, mx, my)
 				if closestIdx then
 					self.hoverIdx = closestIdx
 					self.hoverObj = obj
+				else
+					local r = segmentHitRadius / Camera.current.zoom
+					local isLoop = obj:getProperty("isLoop")
+					local segIdx, dist, hitX, hitY = hitCheckSegments(verts, lx, ly, r, isLoop)
+					if segIdx then
+						self.hoverSegIdx = segIdx
+						self.intersectX, self.intersectY = hitX, hitY
+					end
 				end
 			end
 		end
@@ -275,10 +311,16 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 		local enclosure = scene.selection[1]
 		if enclosure and enclosure[1]:hasProperty("vertices") then
 			if Input.isPressed("add modifier") then
-				local wx, wy = Camera.current:screenToWorld(mx, my)
-				local obj = enclosure[1]
-				local lx, ly = obj:toLocal(wx, wy)
-				scene.history:perform("addVertex", self, enclosure, lx, ly)
+				if self.hoverSegIdx then
+					local lx, ly = self.intersectX, self.intersectY
+					local vi = self.hoverSegIdx + 1
+					scene.history:perform("insertVertex", self, enclosure, vi, lx, ly)
+				else
+					local wx, wy = Camera.current:screenToWorld(mx, my)
+					local obj = enclosure[1]
+					local lx, ly = obj:toLocal(wx, wy)
+					scene.history:perform("addVertex", self, enclosure, lx, ly)
+				end
 				updateHover(self, mx, my)
 			end
 		end
@@ -351,6 +393,12 @@ function PolygonTool.ruuInput(wgt, depth, action, value, change, rawChange, isRe
 	end
 end
 
+-- Convert an obj-local vertex position to a Tool/Viewport-local position for drawing.
+local function vertPosToViewPos(self, obj, x, y)
+	x, y = Camera.current:worldToScreen(obj:toWorld(x, y))
+	return x - self._to_world.x, y - self._to_world.y
+end
+
 function PolygonTool.draw(self)
 	if self.isBoxSelecting then
 		local sx1, sy1 = Camera.current:worldToScreen(self.dragStartX, self.dragStartY)
@@ -375,13 +423,22 @@ function PolygonTool.draw(self)
 			local isVertSelected = scenes.active.isVertSelected
 			local normalColor = self.normalVertColor
 			local selectColor = config.selectedHighlightColor
+			local hoverSegIdx = self.hoverSegIdx
+
 			for i=2,#verts,2 do
-				local isHovered = self.hoverIdx and self.hoverIdx == i/2
+				local vertIdx = i/2
+				local isHovered = self.hoverIdx and self.hoverIdx == vertIdx
 				local alpha = isHovered and vertHoverAlpha or vertNormalAlpha
 				local r = isHovered and vertHoverRadius or vertNormalRadius
-				local x, y = verts[i-1], verts[i]
-				x, y = Camera.current:worldToScreen(obj:toWorld(x, y))
-				x, y = x - self._to_world.x, y - self._to_world.y
+				local x, y = vertPosToViewPos(self, obj, verts[i-1], verts[i])
+
+				if hoverSegIdx and hoverSegIdx == vertIdx then
+					local hitX, hitY = self.intersectX, self.intersectY
+					hitX, hitY = vertPosToViewPos(self, obj, hitX, hitY)
+					love.graphics.setColor(segmentIntersectColor)
+					love.graphics.circle("line", hitX, hitY, segmentIntersectionRadius, 16)
+				end
+
 				local color = isVertSelected[i/2] and selectColor or normalColor
 				love.graphics.setColor(color[1], color[2], color[3], alpha)
 				love.graphics.circle("fill", x, y, r, 16)
