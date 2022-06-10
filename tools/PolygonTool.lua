@@ -7,10 +7,14 @@ local config = require "config"
 local modkeys = require "modkeys"
 local signals = require "signals"
 local polygonCmd = require "commands.polygon-commands"
+local list = require "lib.list"
 
 PolygonTool.snapKey = "ctrl"
 PolygonTool.snapToAxisKey = "shift"
 PolygonTool.normalVertColor = { 0.5, 0.5, 0.5, 1 }
+PolygonTool.boxSelectAddChord = "shift "
+PolygonTool.boxSelectToggleChord = "ctrl "
+PolygonTool.boxSelectSubtractChord = "alt "
 
 local vertNormalAlpha = 0.4
 local vertHoverAlpha = 1.0
@@ -41,6 +45,7 @@ end
 local function stopDrag(self)
 	self.isDragging = false
 	self.startedDragCommand = false
+	self.isBoxSelecting = false
 	self.ruu:stopDraggingWidget(self.widget)
 end
 
@@ -140,6 +145,35 @@ local function getPosDragArgList(self, enclosure, startOffsets, totalDX, totalDY
 	return argList
 end
 
+local function getBoxSelectMode(self)
+	local curModChord = modkeys.getString()
+	local mode = "set"
+	if     curModChord == self.boxSelectAddChord      then  mode = "add"
+	elseif curModChord == self.boxSelectToggleChord   then  mode = "toggle"
+	elseif curModChord == self.boxSelectSubtractChord then  mode = "subtract"
+	end
+	return mode
+end
+
+local function getVertsInBox(verts, lt, top, rt, bot)
+	local hitIndices = {}
+	local vertCount = #verts/2
+	for i=1,vertCount do
+		local iy = i*2
+		local x, y = verts[iy-1], verts[iy]
+		if x >= lt and x <= rt and y >= top and y <= bot then
+			table.insert(hitIndices, i)
+		end
+	end
+	return hitIndices
+end
+
+local function clearVertSelection(selection)
+	for k,v in pairs(selection) do
+		selection[k] = nil
+	end
+end
+
 function PolygonTool.drag(wgt, dx, dy, dragType)
 	local self, scene = wgt.object, scenes.active
 
@@ -148,6 +182,8 @@ function PolygonTool.drag(wgt, dx, dy, dragType)
 	self.lastDragX, self.lastDragY = mwx, mwy
 
 	if dragType == "translate vertex" then
+		if not self.hoverObj then  return  end
+
 		local totalWDX, totalWDY = mwx - self.dragStartX, mwy - self.dragStartY
 
 		local snapIncr = config.roundAllPropsTo
@@ -180,22 +216,57 @@ function PolygonTool.drag(wgt, dx, dy, dragType)
 			doCmd(self, argList)
 			scene.history:update(self, argList)
 		end
+
+	elseif dragType == "box select" then
+		self.isBoxSelecting = true
+
+		local enclosure = scene.selection[1]
+		if not enclosure or not enclosure[1]:hasProperty("vertices") then
+			return
+		end
+
+		local obj = enclosure[1]
+		local verts = obj:getProperty("vertices")
+		local lt, top = math.min(mwx, self.dragStartX), math.min(mwy, self.dragStartY)
+		local rt, bot = math.max(mwx, self.dragStartX), math.max(mwy, self.dragStartY)
+		lt, top = obj:toLocal(lt, top)
+		rt, bot = obj:toLocal(rt, bot)
+		local hitIndices = getVertsInBox(verts, lt, top, rt, bot)
+		local mode = getBoxSelectMode(self)
+		local origSelection = self.originalSelection
+		local newSelection
+		if mode == "set" then
+			newSelection = hitIndices
+		elseif mode == "add" then
+			newSelection = list.getUnion(origSelection, hitIndices)
+		elseif mode == "toggle" then
+			newSelection = list.getDifference(origSelection, hitIndices)
+		elseif mode == "subtract" then
+			newSelection = list.getSubtraction(origSelection, hitIndices)
+		end
+
+		clearVertSelection(scene.isVertSelected)
+		for i,idx in ipairs(newSelection) do
+			scene.isVertSelected[idx] = true
+		end
 	end
 end
 
-local function startDrag(self)
+local function startDrag(self, dragType)
 	self.isDragging = true
-	self.ruu:startDrag(self.widget, "translate vertex")
+	self.ruu:startDrag(self.widget, dragType)
 
 	local wmx, wmy = Camera.current:screenToWorld(self.ruu.mx, self.ruu.my)
 	self.lastDragX, self.lastDragY = wmx, wmy
 	self.dragStartX, self.dragStartY = wmx, wmy
 end
 
-local function clearVertSelection(selection)
-	for k,v in pairs(selection) do
-		selection[k] = nil
+local function getSelectedVertList(isSelected)
+	local indices = {}
+	for idx,_ in pairs(isSelected) do
+		table.insert(indices, idx)
 	end
+	return indices
 end
 
 function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
@@ -228,7 +299,7 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 				end
 
 				if next(scene.isVertSelected) then
-					startDrag(self)
+					startDrag(self, "translate vertex")
 					local vx, vy = self.hoverObj:getVertPos(self.hoverIdx)
 					local wvx, wvy = self.hoverObj:toWorld(vx, vy)
 					self.dragOX, self.dragOY = wvx - self.dragStartX, wvy - self.dragStartY
@@ -239,11 +310,11 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 				scene.history:perform("setSelection", self, scene.selection, { enclosure })
 			end
 		else -- Clicked on nothing.
-			if next(scene.isVertSelected) then
+			if modkeys.getString() == "" and next(scene.isVertSelected) then
 				clearVertSelection(scene.isVertSelected)
-			else
-				scene.history:perform("clearSelection", self, scene.selection)
 			end
+			startDrag(self, "box select")
+			self.originalSelection = getSelectedVertList(scene.isVertSelected)
 		end
 	end
 end
@@ -281,6 +352,19 @@ function PolygonTool.ruuInput(wgt, depth, action, value, change, rawChange, isRe
 end
 
 function PolygonTool.draw(self)
+	if self.isBoxSelecting then
+		local sx1, sy1 = Camera.current:worldToScreen(self.dragStartX, self.dragStartY)
+		local sx2, sy2 = Camera.current:worldToScreen(self.lastDragX, self.lastDragY)
+		local lx1, ly1 = self:toLocal(sx1, sy1)
+		local lx2, ly2 = self:toLocal(sx2, sy2)
+		local sw, sh = lx2 - lx1, ly2 - ly1
+		local col = config.selectedHighlightColor
+		love.graphics.setColor(col)
+		love.graphics.rectangle("line", lx1, ly1, sw, sh)
+		love.graphics.setColor(col[1], col[2], col[3], 0.02)
+		love.graphics.rectangle("fill", lx1, ly1, sw, sh)
+	end
+
 	if scenes.active and scenes.active.selection[1] then
 		local selection = scenes.active.selection
 		local enclosure = selection[1]
