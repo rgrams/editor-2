@@ -66,6 +66,7 @@ function Tool.init(self)
 		"selection changed",
 		"active scene changed"
 	)
+	self:onObjectsChanged()
 end
 
 local function stopDrag(self)
