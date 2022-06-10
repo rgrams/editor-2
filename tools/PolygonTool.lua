@@ -234,6 +234,7 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 					self.dragOX, self.dragOY = wvx - self.dragStartX, wvy - self.dragStartY
 				end
 			else -- Clicked on object but not vertex.
+				clearVertSelection(scene.isVertSelected)
 				local enclosure = self.hoverObj.enclosure
 				scene.history:perform("setSelection", self, scene.selection, { enclosure })
 			end
