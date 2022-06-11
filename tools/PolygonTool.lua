@@ -379,6 +379,14 @@ function PolygonTool.ruuInput(wgt, depth, action, value, change, rawChange, isRe
 		if not self.isDragging then
 			updateHover(self, x, y)
 		end
+	elseif action == "cancel" and change == 1 then
+		local scene = scenes.active
+		if scene and next(scene.isVertSelected) then
+			clearVertSelection(scene.isVertSelected)
+		else
+			local viewport = wgt.object.parent
+			viewport:setTool("default")
+		end
 	elseif action == "delete" and change == 1 then
 		local scene = scenes.active
 		if scene and next(scene.isVertSelected) then

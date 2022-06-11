@@ -7,6 +7,7 @@ local scenes = require "scenes"
 local signals = require "signals"
 local EditorObject = require "objects.EditorObject"
 local Vec2Property = require "objects.properties.Vec2"
+local VertexArray = require "objects.properties.VertexArray"
 local objectFn = require "commands.functions.object-functions"
 local objectCmd = require "commands.object-commands"
 local selectCmd = require "commands.selection-commands"
@@ -614,6 +615,19 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		local self = wgt.object
 		if self.isDragging then  return  end
 		updateHover(self, x, y)
+	elseif action == "click" and change == 1 then
+		local self = wgt.object
+		if presses >= 2 and self.hoverObj then
+			if modkeys.getString() ~= "" then  return  end
+			local vertProp = self.hoverObj:getPropertyObj("vertices")
+			if vertProp and getmetatable(vertProp) == VertexArray then
+				local scene = scenes.active
+				local selection = scenes.active.selection
+				scene.history:perform("setSelection", self, selection, { self.hoverObj.enclosure })
+				local viewport = self.parent
+				viewport:setTool("polygon")
+			end
+		end
 	elseif action == "delete" and change == 1 then
 		local scene = scenes.active
 		if scene then
