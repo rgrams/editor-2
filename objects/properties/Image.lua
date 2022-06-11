@@ -39,9 +39,4 @@ function Image._setValidValue(self, filepath, image)
 	self.image = image
 end
 
-function Image.isAtDefault(self)
-	local curVal = self:getValue()
-	return curVal ~= self.defaultValue
-end
-
 return Image
