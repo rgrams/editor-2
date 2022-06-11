@@ -24,7 +24,7 @@ local vertHoverAlpha = 1.0
 local vertNormalRadius = 6
 local vertHoverRadius = 8
 local vertHitRadius = 10
-local segmentHitRadius = 8
+local segmentHitRadius = 20
 local segmentIntersectionRadius = 6
 local segmentIntersectColor = PolygonTool.normalVertColor
 
@@ -324,14 +324,45 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 		local activePoly, enclosure = getActivePolygon()
 		if activePoly then
 			if Input.isPressed("add modifier") then
-				if self.hoverSegIdx then
+				local verts = activePoly:getProperty("vertices")
+				local isLoop = activePoly:getProperty("isLoop")
+				local vertCount = #verts/2
+
+				if not isLoop and vertCount >= 3 and (self.hoverIdx == 1 or self.hoverIdx == vertCount) then
+					scene.history:perform("setProperty", self, enclosure, "isLoop", true) -- Close the loop.
+				elseif self.hoverSegIdx then
 					local lx, ly = self.intersectX, self.intersectY
 					local vi = self.hoverSegIdx + 1
 					scene.history:perform("insertVertex", self, enclosure, vi, lx, ly)
 				else
 					local wx, wy = Camera.current:screenToWorld(mx, my)
 					local lx, ly = activePoly:toLocal(wx, wy)
-					scene.history:perform("addVertex", self, enclosure, lx, ly)
+					if not activePoly:getProperty("isLoop") then
+						-- Decide which end of the polyline to add to.
+						local vertIdx
+						local isSelected = scene.isVertSelected
+						if vertCount == 0 or vertCount == 1 then
+							vertIdx = vertCount + 1
+						else
+							-- If one end or the other is selected, use the selected end.
+							if isSelected[1] and not isSelected[vertCount] then
+								vertIdx = 1
+							elseif isSelected[vertCount] and not isSelected[1] then
+								vertIdx = vertCount + 1
+							else -- Otherwise use the closer end.
+								local x1, y1 = activePoly:getVertPos(1)
+								local x2, y2 = activePoly:getVertPos(vertCount)
+								if vec2.len2(lx - x1, ly - y1) <= vec2.len2(lx - x2, ly - y2) then
+									vertIdx = 1
+								else
+									vertIdx = vertCount + 1
+								end
+							end
+						end
+						scene.history:perform("insertVertex", self, enclosure, vertIdx, lx, ly)
+					else
+						scene.history:perform("addVertex", self, enclosure, lx, ly)
+					end
 				end
 				updateHover(self, mx, my)
 			end
