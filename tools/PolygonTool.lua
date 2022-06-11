@@ -215,6 +215,19 @@ local function clearVertSelection(selection)
 	end
 end
 
+local function getActivePolygon()
+	if scenes.active then
+		local selection = scenes.active.selection
+		local enclosure = selection[1]
+		if enclosure then
+			local obj = enclosure[1]
+			if obj:hasProperty("vertices") then
+				return obj, enclosure
+			end
+		end
+	end
+end
+
 function PolygonTool.drag(wgt, dx, dy, dragType)
 	local self, scene = wgt.object, scenes.active
 
@@ -261,12 +274,9 @@ function PolygonTool.drag(wgt, dx, dy, dragType)
 	elseif dragType == "box select" then
 		self.isBoxSelecting = true
 
-		local enclosure = scene.selection[1]
-		if not enclosure or not enclosure[1]:hasProperty("vertices") then
-			return
-		end
+		local obj, enclosure = getActivePolygon()
+		if not obj then  return  end
 
-		local obj = enclosure[1]
 		local verts = obj:getProperty("vertices")
 		local lt, top = math.min(mwx, self.dragStartX), math.min(mwy, self.dragStartY)
 		local rt, bot = math.max(mwx, self.dragStartX), math.max(mwy, self.dragStartY)
@@ -311,8 +321,8 @@ end
 function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 	local self, scene = wgt.object, scenes.active
 	if scene then
-		local enclosure = scene.selection[1]
-		if enclosure and enclosure[1]:hasProperty("vertices") then
+		local activePoly, enclosure = getActivePolygon()
+		if activePoly then
 			if Input.isPressed("add modifier") then
 				if self.hoverSegIdx then
 					local lx, ly = self.intersectX, self.intersectY
@@ -320,41 +330,45 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 					scene.history:perform("insertVertex", self, enclosure, vi, lx, ly)
 				else
 					local wx, wy = Camera.current:screenToWorld(mx, my)
-					local obj = enclosure[1]
-					local lx, ly = obj:toLocal(wx, wy)
+					local lx, ly = activePoly:toLocal(wx, wy)
 					scene.history:perform("addVertex", self, enclosure, lx, ly)
 				end
 				updateHover(self, mx, my)
 			end
 		end
 
-		if self.hoverObj then
-			if self.hoverIdx then -- Clicked on vertex.
-				local shouldToggle = modkeys.isPressed("shift")
-				local isSelected = scene.isVertSelected[self.hoverIdx]
-				if not isSelected then
-					if shouldToggle then                 -- Add to selection.
-						scene.isVertSelected[self.hoverIdx] = true
-					else                                 -- Set selection.
-						clearVertSelection(scene.isVertSelected)
-						scene.isVertSelected[self.hoverIdx] = true
-					end
-				elseif isSelected and shouldToggle then -- Remove from selection.
-					scene.isVertSelected[self.hoverIdx] = nil
-				end
+		local modkeyChord = modkeys.getString()
 
-				if next(scene.isVertSelected) then
-					startDrag(self, "translate vertex")
-					local vx, vy = self.hoverObj:getVertPos(self.hoverIdx)
-					local wvx, wvy = self.hoverObj:toWorld(vx, vy)
-					self.dragOX, self.dragOY = wvx - self.dragStartX, wvy - self.dragStartY
+		if activePoly and self.hoverIdx then -- Clicked on vertex.
+			local shouldToggle = modkeys.isPressed("shift")
+			local isSelected = scene.isVertSelected[self.hoverIdx]
+			if not isSelected then
+				if shouldToggle then                 -- Add to selection.
+					scene.isVertSelected[self.hoverIdx] = true
+				else                                 -- Set selection.
+					clearVertSelection(scene.isVertSelected)
+					scene.isVertSelected[self.hoverIdx] = true
 				end
-			else -- Clicked on object but not vertex.
-				clearVertSelection(scene.isVertSelected)
-				local enclosure = self.hoverObj.enclosure
-				scene.history:perform("setSelection", self, scene.selection, { enclosure })
+			elseif isSelected and shouldToggle then -- Remove from selection.
+				scene.isVertSelected[self.hoverIdx] = nil
 			end
-		else -- Clicked on nothing.
+
+			if next(scene.isVertSelected) then
+				startDrag(self, "translate vertex")
+				local vx, vy = activePoly:getVertPos(self.hoverIdx)
+				local wvx, wvy = activePoly:toWorld(vx, vy)
+				self.dragOX, self.dragOY = wvx - self.dragStartX, wvy - self.dragStartY
+			end
+		elseif self.hoverObj and self.hoverObj ~= activePoly then -- Clicked on a different object.
+			if modkeyChord == "" then
+				clearVertSelection(scene.isVertSelected)
+				local newSelection = { self.hoverObj.enclosure }
+				scene.history:perform("setSelection", self, scene.selection, newSelection)
+			else
+				startDrag(self, "box select")
+				self.originalSelection = getSelectedVertList(scene.isVertSelected)
+			end
+		else -- Clicked on active polygon or on nothing.
 			if modkeys.getString() == "" and next(scene.isVertSelected) then
 				clearVertSelection(scene.isVertSelected)
 			end
@@ -390,8 +404,8 @@ function PolygonTool.ruuInput(wgt, depth, action, value, change, rawChange, isRe
 	elseif action == "delete" and change == 1 then
 		local scene = scenes.active
 		if scene and next(scene.isVertSelected) then
-			local enclosure = scene.selection[1]
-			if enclosure and enclosure[1]:hasProperty("vertices") then
+			local obj, enclosure = getActivePolygon()
+			if obj then
 				local indicesToDelete = {}
 				for idx,_ in pairs(scene.isVertSelected) do
 					table.insert(indicesToDelete, idx)
@@ -404,10 +418,9 @@ function PolygonTool.ruuInput(wgt, depth, action, value, change, rawChange, isRe
 		end
 	elseif dirKey[action] and (change == 1 or isRepeat) then
 		local self, scene = wgt.object, scenes.active
-		local enclosure = scene.selection[1]
-		if enclosure and enclosure[1]:hasProperty("vertices") then
+		local obj, enclosure = getActivePolygon()
+		if obj then
 			if not next(scene.isVertSelected) then  return  end
-			local obj = enclosure[1]
 			local vec = dirKey[action]
 			local dx, dy = vec[1], vec[2]
 			local dist = 1
