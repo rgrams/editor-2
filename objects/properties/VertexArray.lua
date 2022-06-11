@@ -5,7 +5,7 @@ local VertexArray = Vec2:extend()
 VertexArray.name = "vertices"
 VertexArray.typeName = "vertexArray"
 VertexArray.WidgetClass = require("ui.widgets.properties.Blank")
-VertexArray.defaultValue = { -16, 16, 0, -16, 16, 16 }
+VertexArray.defaultValue = {}
 
 _G.propClassList:add(VertexArray, VertexArray.typeName)
 

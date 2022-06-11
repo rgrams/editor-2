@@ -6,8 +6,9 @@ EditorPolygon.className = "EditorPolygon"
 local config = require "config"
 
 EditorPolygon.displayName = "Polygon"
-EditorPolygon.hitWidth = 32
-EditorPolygon.hitHeight = 32
+local minHitWidth, minHitHeight = 16, 16
+EditorPolygon.hitWidth = minHitWidth
+EditorPolygon.hitHeight = minHitHeight
 
 _G.objClassList:add(EditorPolygon, EditorPolygon.displayName)
 
@@ -26,7 +27,7 @@ EditorPolygon.isBuiltinProperty = {
 
 function EditorPolygon.initProperties(self)
 	EditorPolygon.super.initProperties(self)
-	self:addProperty(Bool, "isLoop", true, true)
+	self:addProperty(Bool, "isLoop", false, true)
 	self:addProperty(VertexArray, "vertices")
 end
 
@@ -70,10 +71,16 @@ end
 local min, max = math.min, math.max
 
 function EditorPolygon.updateAABB(self)
+	local verts = self:getProperty("vertices")
+	if #verts < 4 then
+		self.hitWidth, self.hitHeight = minHitWidth, minHitHeight
+		self.hitOX, self.hitOY = 0, 0
+		EditorPolygon.super.updateAABB(self)
+		return
+	end
 	if self.parent then  self:updateTransform()  end
 	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
 	local AABB = self.AABB
-	local verts = self:getProperty("vertices")
 	local inf = math.huge
 	local lt, rt, top, bot = inf, -inf, inf, -inf
 	local llt, lrt, ltop, lbot = inf, -inf, inf, -inf -- Local-space bounds.
@@ -110,8 +117,8 @@ function EditorPolygon.updateAABB(self)
 	AABB.h = bot - top
 	AABB.lt, AABB.top, AABB.rt, AABB.bot = lt, top, rt, bot
 
-	self.hitWidth = lrt - llt
-	self.hitHeight = lbot - ltop
+	self.hitWidth = math.max(lrt - llt, minHitWidth)
+	self.hitHeight = math.max(lbot - ltop, minHitHeight)
 	self.hitOX = (llt + lrt)/2
 	self.hitOY = (ltop + lbot)/2
 
@@ -131,8 +138,9 @@ function EditorPolygon.draw(self)
 	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2
 	local verts = self:getProperty("vertices")
 	local isLoop = self:getProperty("isLoop")
+	local vertCount = #verts/2
 
-	if self.isHovered and isLoop then
+	if self.isHovered and isLoop and vertCount >= 3 then
 		love.graphics.setColor(1, 1, 1, 0.03)
 		love.graphics.polygon("fill", verts)
 	end
@@ -144,11 +152,14 @@ function EditorPolygon.draw(self)
 	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
 	love.graphics.circle("line", 0, 0, 0.5, 4)
 
-	if isLoop then
+	if isLoop and vertCount >= 3 then
 		love.graphics.polygon("line", verts)
-	else
+	elseif vertCount >= 2 then
 		if self.isHovered then  love.graphics.setColor(1, 1, 1, 0.6)  end
 		love.graphics.line(verts)
+	elseif vertCount == 1 then
+		if self.isHovered then  love.graphics.setColor(1, 1, 1, 0.6)  end
+		love.graphics.circle("fill", verts[1], verts[2], 1, 8)
 	end
 
 	self:drawParentChildLines()
