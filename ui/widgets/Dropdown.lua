@@ -88,7 +88,7 @@ end
 function Dropdown.draw(self)
 	local w, h = self.w, self.h
 	love.graphics.setColor(0, 0, 0, 1)
-	love.graphics.rectangle("line", -w/2, -h/2, w, h)
+	love.graphics.rectangle("line", -w/2-0.5, -h/2-0.5, w+1, h+1)
 	love.graphics.setColor(0.2, 0.2, 0.2, 1)
 	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
 end

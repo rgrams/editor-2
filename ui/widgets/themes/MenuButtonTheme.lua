@@ -27,7 +27,7 @@ function MenuButtonTheme.draw(self, obj)
 
 	if self.isFocused then
 		love.graphics.setColor(1, 1, 1, 0.05)
-		love.graphics.rectangle("line", -obj.w/2, -obj.h/2, obj.w, obj.h)
+		love.graphics.rectangle("line", -hw-0.5, -hh-0.5, obj.w+1, obj.h+1)
 	end
 end
 
