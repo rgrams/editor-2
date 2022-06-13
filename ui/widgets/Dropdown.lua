@@ -14,6 +14,15 @@ local width = Button.width + pad*2
 function Dropdown.set(self, x, y, items, focusedIndex)
 	self.initFocusIndex = focusedIndex or 1
 	local height = #items * (Button.height + spacing) - spacing + pad*2
+
+	local fnt = MenuButtonTheme.font
+	local maxTextWidth = 0
+	for i,item in ipairs(items) do
+		local w = fnt:getWidth(item.text)
+		if w >= maxTextWidth then  maxTextWidth = w  end
+	end
+	local width = maxTextWidth + pad*4 + 16
+
 	Dropdown.super.set(self, spacing, false, -1, width, height, "NW", "NW")
 	self:pad(pad, pad)
 	self.layer = "dropdown"
@@ -56,7 +65,7 @@ function Dropdown.final(self)
 end
 
 function Dropdown.addButtonObject(self, btnText)
-	local btn = Button(btnText)
+	local btn = Button(btnText, self.w - pad*2)
 	btn.layer = "dropdown"
 	btn.text.layer = "dropdown text"
 	table.insert(self.children, btn)

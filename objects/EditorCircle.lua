@@ -26,6 +26,7 @@ EditorCircle.isBuiltinProperty = {
 	pos = true,
 	angle = true,
 	radius = true,
+	scale = true,
 	skew = true,
 	segments = true,
 	lineWidth = true,

@@ -5,6 +5,7 @@ local MenuButtonTheme = ButtonTheme:extend()
 local font = { "assets/font/OpenSans-Regular.ttf", 13 }
 local textValue = 1.0
 
+MenuButtonTheme.font = new.font(unpack(font))
 MenuButtonTheme.normalValue = 0.2
 MenuButtonTheme.hoverValue = 0.35
 MenuButtonTheme.pressValue = 0.4
@@ -14,7 +15,7 @@ function MenuButtonTheme.init(self, themeData)
 
 	local textNode = self.object.text
 	MenuButtonTheme.setValue(textNode.color, textValue)
-	textNode.font = new.font(unpack(font))
+	textNode.font = MenuButtonTheme.font
 	textNode.fontFilename, textNode.fontSize = font[1], font[2]
 	textNode:setPos(16)
 end

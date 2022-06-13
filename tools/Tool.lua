@@ -610,6 +610,22 @@ function Tool.zoomUpdated(self)
 	end
 end
 
+local function addPhysicsShapeProps(self)
+	local scene = scenes.active
+	if scene and scene.selection[1] then
+		local enclosures = scene.selection:copyList()
+		scene.history:perform("addPhysicsShapeProperties", self, enclosures)
+	end
+end
+
+local function removePhysicsShapeProps(self)
+	local scene = scenes.active
+	if scene and scene.selection[1] then
+		local enclosures = scene.selection:copyList()
+		scene.history:perform("removePhysicsShapeProperties", self, enclosures)
+	end
+end
+
 function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
 	if action == wgt.ruu.MOUSE_MOVED then
 		local self = wgt.object
@@ -628,6 +644,15 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 				viewport:setTool("polygon")
 			end
 		end
+	elseif action == "right click" and change == 1 then
+		local self = wgt.object
+		local items = {
+			{ text = "add physics shape prop.", fn = addPhysicsShapeProps, args = {self} },
+			{ text = "remove physics shape prop.", fn = removePhysicsShapeProps, args = {self} },
+		}
+		local mx, my = love.mouse.getPosition()
+		local dropdown = Dropdown(mx, my, items)
+		self.tree:add(dropdown, self.tree:get("/Window"))
 	elseif action == "delete" and change == 1 then
 		local scene = scenes.active
 		if scene then
