@@ -25,6 +25,12 @@ EditorPolygon.isBuiltinProperty = {
 	vertices = true,
 }
 
+function EditorPolygon.set(self)
+	EditorPolygon.super.set(self)
+	local rand = math.random
+	self.color = { rand()*0.8+0.4, rand()*0.8+0.4, rand()*0.8+0.4, 1 }
+end
+
 function EditorPolygon.initProperties(self)
 	EditorPolygon.super.initProperties(self)
 	self:addProperty(Bool, "isLoop", false, true)
@@ -140,8 +146,12 @@ function EditorPolygon.draw(self)
 	local isLoop = self:getProperty("isLoop")
 	local vertCount = #verts/2
 
-	if self.isHovered and isLoop and vertCount >= 3 then
-		love.graphics.setColor(1, 1, 1, 0.03)
+	local col = self.color
+
+	if isLoop and vertCount >= 3 then
+		local alpha = 0.03
+		if self.isHovered then  alpha = 0.07  end
+		love.graphics.setColor(col[1], col[2], col[3], alpha)
 		love.graphics.polygon("fill", verts)
 	end
 
@@ -152,13 +162,14 @@ function EditorPolygon.draw(self)
 	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
 	love.graphics.circle("line", 0, 0, 0.5, 4)
 
+	local alpha = 0.7
+	if self.isHovered then  alpha = 1  end
+	love.graphics.setColor(col[1], col[2], col[3], alpha)
 	if isLoop and vertCount >= 3 then
 		love.graphics.polygon("line", verts)
 	elseif vertCount >= 2 then
-		if self.isHovered then  love.graphics.setColor(1, 1, 1, 0.6)  end
 		love.graphics.line(verts)
 	elseif vertCount == 1 then
-		if self.isHovered then  love.graphics.setColor(1, 1, 1, 0.6)  end
 		love.graphics.circle("fill", verts[1], verts[2], 1, 8)
 	end
 

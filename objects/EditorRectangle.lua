@@ -6,72 +6,35 @@ EditorRectangle.displayName = "Rectangle"
 
 local config = require "config"
 
-EditorRectangle.lineWidth = 1
-EditorRectangle.isFilled = true
-
-EditorRectangle.rx = 0
-EditorRectangle.ry = 0
-EditorRectangle.roundSegments = 2
-
 _G.objClassList:add(EditorRectangle, EditorRectangle.displayName)
 
 local Float = require "objects.properties.Property"
-local String = require "objects.properties.String"
-local Bool = require "objects.properties.Bool"
 local Vec2 = require "objects.properties.Vec2"
-local Color = require "objects.properties.Color"
 
 EditorRectangle.isBuiltinProperty = {
-	name = true,
 	pos = true,
 	angle = true,
 	size = true,
-	skew = true,
-	lineWidth = true,
-	filled = true,
-	color = true,
-	roundX = true,
-	roundY = true,
-	roundSegments = true,
 }
 
 function EditorRectangle.set(self)
 	EditorRectangle.super.set(self)
-	self.color = { 1, 1, 1, 1 }
+	local rand = math.random
+	self.color = { rand()*0.8+0.4, rand()*0.8+0.4, rand()*0.8+0.4, 1 }
 end
 
 function EditorRectangle.initProperties(self)
-	self:addProperty(String, "name")
 	self:addProperty(Vec2, "pos")
 	self:addProperty(Float, "angle")
 	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true)
-	self:addProperty(Vec2, "skew")
-	self:addProperty(Float, "lineWidth", 1, true)
-	self:addProperty(Bool, "filled", self.isFilled, true)
-	self:addProperty(Color, "color")
-	self:addProperty(Float, "roundX", 0)
-	self:addProperty(Float, "roundY", 0)
-	self:addProperty(Float, "roundSegments", 2, true)
 end
 
 function EditorRectangle.propertyWasSet(self, name, value, property)
 	EditorRectangle.super.propertyWasSet(self, name, value, property)
 	if name == "size" then
-		local size = property:getValue()
-		self.hitWidth, self.hitHeight = size.x, size.y
+		value = property:getValue()
+		self.hitWidth, self.hitHeight = value.x, value.y
 		self:updateAABB()
-	elseif name == "lineWidth" then
-		self.lineWidth = value
-	elseif name == "filled" then
-		self.isFilled = value
-	elseif name == "color" then
-		self.color = property:getValue()
-	elseif name == "roundX" then
-		self.rx = value
-	elseif name == "roundY" then
-		self.ry = value
-	elseif name == "roundSegments" then
-		self.rSegments = value
 	end
 end
 
@@ -82,24 +45,16 @@ end
 function EditorRectangle.draw(self)
 	love.graphics.setBlendMode("alpha")
 	love.graphics.setLineStyle("smooth")
-	local hw, hh = self.hitWidth/2, self.hitHeight/2
+	local lineWidth = 1
+	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2
 
-	love.graphics.setLineWidth(self.lineWidth)
-	love.graphics.setColor(self.color)
-	local rx, ry, seg = self.rx, self.ry, self.rSegments
-	do
-		local hw, hh = hw, hh
-		if not self.isFilled then
-			hw, hh = hw - self.lineWidth/2, hh - self.lineWidth/2 -- Lines are -inside- bounds.
-		end
-		love.graphics.rectangle(self.isFilled and "fill" or "line", -hw, -hh, hw*2, hh*2, rx, ry, seg)
-	end
-	love.graphics.setLineWidth(1)
-
+	local col = self.color
+	local alpha = 0.03
 	if self.isHovered then
-		love.graphics.setColor(1, 1, 1, 0.03)
-		love.graphics.rectangle("fill", -hw, -hh, hw*2, hh*2, rx, ry, seg)
+		alpha = 0.07
 	end
+	love.graphics.setColor(col[1], col[2], col[3], alpha)
+	love.graphics.rectangle("fill", -hw, -hh, hw*2, hh*2)
 
 	love.graphics.setColor(config.xAxisColor)
 	love.graphics.line(0, 0, hw, 0)
@@ -107,6 +62,9 @@ function EditorRectangle.draw(self)
 	love.graphics.line(0, 0, 0, -hh)
 	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
 	love.graphics.circle("line", 0, 0, 0.5, 4)
+
+	love.graphics.setColor(col)
+	love.graphics.rectangle("line", -hw, -hh, hw*2, hh*2)
 
 	self:drawParentChildLines()
 

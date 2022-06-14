@@ -626,6 +626,14 @@ local function removePhysicsShapeProps(self)
 	end
 end
 
+local function addShapeDrawingScript(self)
+	local scene = scenes.active
+	if scene and scene.selection[1] then
+		local enclosures = scene.selection:copyList()
+		scene.history:perform("addShapeDrawingScript", self, enclosures)
+	end
+end
+
 function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
 	if action == wgt.ruu.MOUSE_MOVED then
 		local self = wgt.object
@@ -649,6 +657,7 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		local items = {
 			{ text = "add physics shape prop.", fn = addPhysicsShapeProps, args = {self} },
 			{ text = "remove physics shape prop.", fn = removePhysicsShapeProps, args = {self} },
+			{ text = "add shape drawing script", fn = addShapeDrawingScript, args = {self} },
 		}
 		local mx, my = love.mouse.getPosition()
 		local dropdown = Dropdown(mx, my, items)
