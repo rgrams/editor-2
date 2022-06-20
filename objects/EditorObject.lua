@@ -54,6 +54,7 @@ function EditorObject.addProperty(self, Class, name, value, isDefault)
 	assert(Class, "EditorObject.addProperty - No class given for property: '"..tostring(name).."', value: '"..tostring(value).."'.")
 	local property = Class(self, name)
 	name = property.name
+	if self.propertyMap[name] then  return  end
 	if value ~= nil then
 		property:setValue(value)
 		if isDefault then
