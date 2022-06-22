@@ -5,6 +5,7 @@ local signals = require "signals"
 
 local Float = require "objects.properties.Property"
 local Bool = require "objects.properties.Bool"
+local String = require "objects.properties.String"
 
 local function addPhysicsShapeProperties(caller, enclosures)
 	local undoArgList = {}
@@ -18,6 +19,10 @@ local function addPhysicsShapeProperties(caller, enclosures)
 		args = { objectFn.addProperty(caller, enclosure, Float, "density", 1) }
 		table.insert(undoArgList, args)
 		args = { objectFn.addProperty(caller, enclosure, Float, "restitution", 0) }
+		table.insert(undoArgList, args)
+		args = { objectFn.addProperty(caller, enclosure, String, "categories", "") }
+		table.insert(undoArgList, args)
+		args = { objectFn.addProperty(caller, enclosure, String, "mask", "") }
 		table.insert(undoArgList, args)
 
 		oneWasSelected = oneWasSelected or args[4]
@@ -40,6 +45,10 @@ local function removePhysicsShapeProperties(caller, enclosures)
 		args = { objectFn.removeProperty(caller, enclosure, "density") }
 		table.insert(undoArgList, args)
 		args = { objectFn.removeProperty(caller, enclosure, "restitution") }
+		table.insert(undoArgList, args)
+		args = { objectFn.removeProperty(caller, enclosure, "categories") }
+		table.insert(undoArgList, args)
+		args = { objectFn.removeProperty(caller, enclosure, "mask") }
 		table.insert(undoArgList, args)
 
 		oneWasSelected = oneWasSelected or args[6]
