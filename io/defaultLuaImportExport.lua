@@ -103,10 +103,10 @@ function M.import(scene, filepath, options)
 		return
 	end
 
-	-- if not data.isSceneFile then
-		-- print("Lua module is not flagged as a scene file.")
-		-- return
-	-- end
+	if not data.isSceneFile then
+		print("Lua module is not flagged as a scene file.")
+		return
+	end
 
 	local addArgsList = {}
 	local caller = false
