@@ -7,10 +7,9 @@ function M.add(caller, scene, Class, enclosure, properties, isSelected, parentEn
 	object.enclosure = enclosure
 
 	if properties then
-		for name,data in pairs(properties) do
-			local value = data[1]
+		for i,propData in ipairs(properties) do
+			local name, value, PropertyClass = unpack(propData)
 			if not object:hasProperty(name) then
-				local PropertyClass = data[2]
 				object:addProperty(PropertyClass, name, value)
 			else
 				object:setProperty(name, value)

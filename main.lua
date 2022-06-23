@@ -119,8 +119,8 @@ function love.filedropped(file)
 				local Class = require "objects.EditorSprite"
 				local x, y = Camera.current:screenToWorld(love.mouse.getPosition())
 				local properties = {
-					image = { filepath },
-					pos = { { x = x, y = y } }
+					{ "image", filepath },
+					{ "pos", { x = x, y = y } }
 				}
 				scene.history:perform("addObject", false, scene, Class, {}, properties)
 				_G.shouldRedraw = true

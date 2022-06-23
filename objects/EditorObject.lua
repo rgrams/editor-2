@@ -169,8 +169,9 @@ end
 function EditorObject.getModifiedProperties(self)
 	local properties
 	for i,property in ipairs(self.properties) do
+		local name = property.name
 		local value
-		if self.isBuiltinProperty[property.name] then
+		if self.isBuiltinProperty[name] then
 			if not property:isAtDefault() then
 				value = property:copyValue()
 			end
@@ -180,7 +181,7 @@ function EditorObject.getModifiedProperties(self)
 		if value ~= nil then
 			properties = properties or {}
 			local Class = getmetatable(property)
-			properties[property.name] = { value, Class }
+			table.insert(properties, { name, value, Class })
 		end
 	end
 	return properties

@@ -11,6 +11,7 @@ M.defaultOptions = {
 
 local function copyChildrenData(children, options)
 	local output = {}
+	local omitUnmod = options.omitUnmodifiedBuiltins
 	for i=1,children.maxn or #children do
 		local child = children[i]
 		if child then
@@ -18,14 +19,13 @@ local function copyChildrenData(children, options)
 			local data = {}
 			local Class = getmetatable(child)
 			data.class = Class.displayName
-			for _,property in ipairs(child.properties) do
-				if options.omitUnmodifiedBuiltins and child.isBuiltinProperty[property.name] and property:isAtDefault() then
+			data.properties = {}
+			for _,prop in ipairs(child.properties) do
+				if omitUnmod and child.isBuiltinProperty[prop.name] and prop:isAtDefault() then
 					-- skip
 				else
-					data[property.name] = {
-						value = property:getValue(),
-						type = property.typeName
-					}
+					local pData = { name = prop.name, value = prop:getValue(), type = prop.typeName }
+					table.insert(data.properties, pData)
 				end
 			end
 			if child.children then
@@ -60,12 +60,9 @@ local function makeAddObjArgs(caller, scene, obj, parentEnclosure)
 	local Class = classList:get(obj.class)
 	local enclosure = {}
 	local properties = {}
-	for name,value in pairs(obj) do
-		if name ~= "class" and name ~= "children" then
-			local property = value
-			local propertyClass = propClassList:get(property.type)
-			properties[name] = { property.value, propertyClass }
-		end
+	for i,prop in ipairs(obj.properties) do
+		local propertyClass = propClassList:get(prop.type)
+		table.insert(properties, { prop.name, prop.value, propertyClass })
 	end
 	local isSelected = false
 	local children

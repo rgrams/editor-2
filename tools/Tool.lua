@@ -520,7 +520,7 @@ function Tool.addAt(self, Class, wx, wy)
 		for i,parentEnclosure in ipairs(scene.selection) do
 			local parentObj = parentEnclosure[1]
 			local lx, ly = parentObj:toLocal(wx, wy)
-			local properties = { pos = { { x = lx, y = ly }, Vec2Property } }
+			local properties = { { "pos", { x = lx, y = ly }, Vec2Property } }
 			local args = {
 				self, scene, Class, {}, properties, isSelected, parentEnclosure
 			}
@@ -528,7 +528,7 @@ function Tool.addAt(self, Class, wx, wy)
 		end
 		scene.history:perform("addObjects", self, scene, argsList)
 	else
-		local properties = { pos = { { x = wx, y = wy }, Vec2Property } }
+		local properties = { { "pos", { x = wx, y = wy }, Vec2Property } }
 		scene.history:perform("addObject", self, scene, Class, {}, properties, isSelected, false)
 	end
 	updateHover(self)
