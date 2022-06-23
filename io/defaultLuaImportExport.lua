@@ -5,7 +5,11 @@ local objToStr = require "philtre.lib.object-to-string"
 local classList = _G.objClassList
 local propClassList = _G.propClassList
 
-local function copyChildrenData(children)
+M.defaultOptions = {
+	omitUnmodifiedBuiltins = true
+}
+
+local function copyChildrenData(children, options)
 	local output = {}
 	for i=1,children.maxn or #children do
 		local child = children[i]
@@ -15,13 +19,17 @@ local function copyChildrenData(children)
 			local Class = getmetatable(child)
 			data.class = Class.displayName
 			for _,property in ipairs(child.properties) do
-				data[property.name] = {
-					value = property:getValue(),
-					type = property.typeName
-				}
+				if options.omitUnmodifiedBuiltins and child.isBuiltinProperty[property.name] and property:isAtDefault() then
+					-- skip
+				else
+					data[property.name] = {
+						value = property:getValue(),
+						type = property.typeName
+					}
+				end
 			end
 			if child.children then
-				data.children = copyChildrenData(child.children)
+				data.children = copyChildrenData(child.children, options)
 			end
 
 			table.insert(output, data)
@@ -39,7 +47,7 @@ function M.export(scene, filepath, options)
 		return
 	end
 
-	options = options or {}
+	options = options or M.defaultOptions
 	local data = copyChildrenData(scene.children, options)
 	data.isSceneFile = true
 	local str = "return " .. objToStr(data) .. "\n"
