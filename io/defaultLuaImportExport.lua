@@ -2,6 +2,7 @@
 local M = {}
 
 local objToStr = require "philtre.lib.object-to-string"
+local fileUtil = require "lib.file-util"
 local classList = _G.objClassList
 local propClassList = _G.propClassList
 
@@ -9,7 +10,22 @@ M.defaultOptions = {
 	omitUnmodifiedBuiltins = true
 }
 
-local function copyChildrenData(children, options)
+local function getPropExportValue(prop, filepath)
+	local val = prop:copyValue()
+	local propType = prop.typeName
+	if propType == "file" or propType == "image" or propType == "script" then
+		if val ~= "" then
+			val = fileUtil.getRelativePath(filepath, val)
+		end
+	elseif propType == "font" then
+		if val[1] ~= "" then
+			val[1] = fileUtil.getRelativePath(filepath, val[1])
+		end
+	end
+	return val
+end
+
+local function copyChildrenData(children, options, filepath)
 	local output = {}
 	local omitUnmod = options.omitUnmodifiedBuiltins
 	for i=1,children.maxn or #children do
@@ -24,12 +40,16 @@ local function copyChildrenData(children, options)
 				if omitUnmod and child.isBuiltinProperty[prop.name] and prop:isAtDefault() then
 					-- skip
 				else
-					local pData = { name = prop.name, value = prop:getValue(), type = prop.typeName }
+					local pData = {
+						name = prop.name,
+						value = getPropExportValue(prop, filepath),
+						type = prop.typeName
+					}
 					table.insert(data.properties, pData)
 				end
 			end
 			if child.children then
-				data.children = copyChildrenData(child.children, options)
+				data.children = copyChildrenData(child.children, options, filepath)
 			end
 
 			table.insert(output, data)
@@ -48,7 +68,7 @@ function M.export(scene, filepath, options)
 	end
 
 	options = options or M.defaultOptions
-	local data = copyChildrenData(scene.children, options)
+	local data = copyChildrenData(scene.children, options, filepath)
 	data.isSceneFile = true
 	local str = "return " .. objToStr(data) .. "\n"
 	file:write(str)
@@ -56,20 +76,44 @@ function M.export(scene, filepath, options)
 	file:close()
 end
 
-local function makeAddObjArgs(caller, scene, obj, parentEnclosure)
+local function isAbsPath(path)
+	return path:match("^[\\/]")
+end
+
+local function getPropImportValue(val, name, Class, filepath)
+	local propType = Class.typeName
+	if propType == "file" or propType == "image" or propType == "script" then
+		if val ~= "" and not isAbsPath(val) then
+			val = fileUtil.resolveRelativePath(filepath, val)
+		end
+	elseif propType == "font" then
+		if val[1] ~= "" and not isAbsPath(val[1]) then
+			val[1] = fileUtil.resolveRelativePath(filepath, val[1])
+		end
+	end
+	return val
+end
+
+local function makeAddObjArgs(caller, scene, obj, parentEnclosure, filepath)
 	local Class = classList:get(obj.class)
 	local enclosure = {}
 	local properties = {}
 	for i,prop in ipairs(obj.properties) do
-		local propertyClass = propClassList:get(prop.type)
-		table.insert(properties, { prop.name, prop.value, propertyClass })
+		local PropertyClass = propClassList:get(prop.type)
+		local name, value = prop.name, prop.value
+		local propArgs = {
+			name,
+			getPropImportValue(value, name, PropertyClass, filepath),
+			PropertyClass
+		}
+		table.insert(properties, propArgs)
 	end
 	local isSelected = false
 	local children
 	if obj.children then
 		children = {}
 		for i,child in ipairs(obj.children) do
-			table.insert(children, makeAddObjArgs(caller, scene, child, enclosure))
+			table.insert(children, makeAddObjArgs(caller, scene, child, enclosure, filepath))
 		end
 	end
 	return { caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children }
@@ -114,7 +158,7 @@ function M.import(scene, filepath, options)
 			print("   Error parsing objects: No object class property found.")
 			return
 		end
-		table.insert(addArgsList, makeAddObjArgs(caller, scene, obj, false))
+		table.insert(addArgsList, makeAddObjArgs(caller, scene, obj, false, filepath))
 	end
 
 	return addArgsList

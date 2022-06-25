@@ -1,6 +1,46 @@
 
 local M = {}
 
+local folderPattern = "[^\\/]+[\\/]"
+
+function M.getRelativePath(from, to)
+	from = from:gsub("^[\\/]", "") -- Cut off starting \ or / if it exists.
+	to = to:gsub("^[\\/]", "")
+	local fromFolder = M.splitFilepath(from)
+	local i1, i2 = string.find(to, fromFolder, nil, true)
+	if i1 and i1 == 1 then
+		return string.sub(to, i2+1)
+	else
+		local _to = to
+		local foldersUp = 0
+		for folder in string.gmatch(fromFolder, folderPattern) do
+			local i1, i2 = string.find(_to, folder, nil, true)
+			if i1 and i1 == 1 then
+				_to = string.sub(_to, i2+1)
+			else
+				foldersUp = foldersUp + 1
+			end
+		end
+		local upStr = string.rep("../", foldersUp)
+		_to = upStr .. _to
+		return _to
+	end
+end
+
+local upFolderPattern = "%.%.[\\/]"
+
+function M.resolveRelativePath(from, relPath)
+	local fromFolder = M.splitFilepath(from)
+	if string.find(relPath, "^"..upFolderPattern) then
+		local foldersUp
+		relPath, foldersUp = string.gsub(relPath, upFolderPattern, "")
+		for i=1,foldersUp do
+			fromFolder = string.gsub(fromFolder, "[^\\/]+[\\/]$", "")
+		end
+	end
+	return fromFolder .. relPath
+end
+
 -- Returns folder, filename, extension (extension can be nil, dot is included)
 function M.splitFilepath(path)
 	if string.find(path, "%.[^%.][^%.]-$") then
