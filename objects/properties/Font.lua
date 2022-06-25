@@ -15,6 +15,11 @@ _G.propClassList:add(Font, Font.typeName)
 
 local fontLoader = fileUtil.loadFontFromAbsolutePath
 
+function Font.getDefaultValue(self)
+	local def = self.defaultValue
+	return { def[1], def[2] }
+end
+
 function Font.isValid(self, filepath, size)
 	filepath = filepath or self.value[1]
 	size = size or self.value[2] -- UI Widget does the size == number validation.
@@ -45,7 +50,7 @@ end
 
 function Font.isAtDefault(self)
 	local cur, def = self.value, self.defaultValue
-	return cur[1] ~= def[1] or cur[2] ~= def[2]
+	return cur[1] == def[1] and cur[2] == def[2]
 end
 
 return Font
