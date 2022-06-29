@@ -158,7 +158,13 @@ function M.import(scene, filepath, options)
 			print("   Error parsing objects: No object class property found.")
 			return
 		end
-		table.insert(addArgsList, makeAddObjArgs(caller, scene, obj, false, filepath))
+		local isSuccess, result = pcall(makeAddObjArgs, caller, scene, obj, false, filepath)
+		if not isSuccess then
+			print("   Error creating command args for creating scene objects: "..tostring(result)..".")
+			return
+		else
+			table.insert(addArgsList, result)
+		end
 	end
 
 	return addArgsList
