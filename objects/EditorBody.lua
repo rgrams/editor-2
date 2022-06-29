@@ -12,28 +12,16 @@ local Vec2 = require "objects.properties.Vec2"
 local String = require "objects.properties.String"
 local BodyType = require "objects.properties.Enum_BodyType"
 
-EditorBody.isBuiltinProperty = {
-	name = true,
-	pos = true,
-	angle = true,
-	bodyType = true,
-	linDamp = true,
-	angDamp = true,
-	bullet = true,
-	fixedRot = true,
-	gScale = true,
-}
-
 function EditorBody.initProperties(self)
-	self:addProperty(String, "name")
-	self:addProperty(Vec2, "pos")
-	self:addProperty(Float, "angle")
-	self:addProperty(BodyType, "bodyType")
-	self:addProperty(Float, "linDamp")
-	self:addProperty(Float, "angDamp")
-	self:addProperty(Bool, "bullet")
-	self:addProperty(Bool, "fixedRot")
-	self:addProperty(Float, "gScale", 1, true)
+	self:addProperty(String,   "name",     nil, nil, true)
+	self:addProperty(Vec2,     "pos",      nil, nil, true)
+	self:addProperty(Float,    "angle",    nil, nil, true)
+	self:addProperty(BodyType, "bodyType", nil, nil, true)
+	self:addProperty(Float,    "linDamp",  nil, nil, true)
+	self:addProperty(Float,    "angDamp",  nil, nil, true)
+	self:addProperty(Bool,     "bullet",   nil, nil, true)
+	self:addProperty(Bool,     "fixedRot", nil, nil, true)
+	self:addProperty(Float,    "gScale",   1,  true, true)
 end
 
 function EditorBody.draw(self)

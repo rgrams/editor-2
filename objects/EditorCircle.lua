@@ -16,11 +16,6 @@ EditorCircle.segments = 24
 local Float = require "objects.properties.Property"
 local Vec2 = require "objects.properties.Vec2"
 
-EditorCircle.isBuiltinProperty = {
-	pos = true,
-	radius = true,
-}
-
 function EditorCircle.set(self)
 	EditorCircle.super.set(self)
 	local rand = math.random
@@ -28,8 +23,8 @@ function EditorCircle.set(self)
 end
 
 function EditorCircle.initProperties(self)
-	self:addProperty(Vec2, "pos")
-	self:addProperty(Float, "radius", self.radius, true)
+	self:addProperty(Vec2, "pos", nil, nil, true)
+	self:addProperty(Float, "radius", self.radius, true, true)
 end
 
 function EditorCircle.propertyWasSet(self, name, value, property)

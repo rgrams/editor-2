@@ -11,12 +11,6 @@ _G.objClassList:add(EditorRectangle, EditorRectangle.displayName)
 local Float = require "objects.properties.Property"
 local Vec2 = require "objects.properties.Vec2"
 
-EditorRectangle.isBuiltinProperty = {
-	pos = true,
-	angle = true,
-	size = true,
-}
-
 function EditorRectangle.set(self)
 	EditorRectangle.super.set(self)
 	local rand = math.random
@@ -24,9 +18,9 @@ function EditorRectangle.set(self)
 end
 
 function EditorRectangle.initProperties(self)
-	self:addProperty(Vec2, "pos")
-	self:addProperty(Float, "angle")
-	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true)
+	self:addProperty(Vec2, "pos", nil, nil, true)
+	self:addProperty(Float, "angle", nil, nil, true)
+	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true, true)
 end
 
 function EditorRectangle.propertyWasSet(self, name, value, property)

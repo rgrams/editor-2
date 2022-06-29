@@ -11,22 +11,6 @@ local Image = require "objects.properties.Image"
 local Vec4 = require "objects.properties.Vec4"
 local Color = require "objects.properties.Color"
 
-EditorGuiNode.isBuiltinProperty = {
-	name = true,
-	pos = true,
-	angle = true,
-	size = true,
-	skew = true,
-	pivot = true,
-	anchor = true,
-	modeX = true,
-	modeY = true,
-	pad = true,
-	image = true,
-	color = true,
-	margins = true,
-}
-
 EditorGuiSlice.updateScale = gui.Slice.updateScale
 EditorGuiSlice.updateInnerSize = gui.Slice.updateInnerSize
 
@@ -41,9 +25,9 @@ end
 
 function EditorGuiSlice.initProperties(self)
 	EditorGuiSlice.super.initProperties(self)
-	self:addProperty(Image, "image")
-	self:addProperty(Color, "color")
-	self:addProperty(Vec4, "margins", { 2, 2, 2, 2 }, true)
+	self:addProperty(Image, "image", nil, nil, true)
+	self:addProperty(Color, "color", nil, nil, true)
+	self:addProperty(Vec4, "margins", { 2, 2, 2, 2 }, true, true)
 	local margins = self:getPropertyObj("margins")
 	margins.wgtFieldLabels = { "lt", "tp", "rt", "bt" }
 end

@@ -15,14 +15,6 @@ local Vec2 = require "objects.properties.Vec2"
 local String = require "objects.properties.String"
 local Script = require "objects.properties.Script"
 
-EditorObject.isBuiltinProperty = {
-	name = true,
-	pos = true,
-	angle = true,
-	scale = true,
-	skew = true,
-}
-
 function EditorObject.set(self)
 	EditorObject.super.set(self)
 	self.isSelected = false
@@ -34,11 +26,11 @@ function EditorObject.set(self)
 end
 
 function EditorObject.initProperties(self)
-	self:addProperty(String, "name")
-	self:addProperty(Vec2, "pos")
-	self:addProperty(Float, "angle")
-	self:addProperty(Vec2, "scale", { x = 1, y = 1 }, true)
-	self:addProperty(Vec2, "skew")
+	self:addProperty(String, "name",  nil,              nil,  true)
+	self:addProperty(Vec2,   "pos",   nil,              nil,  true)
+	self:addProperty(Float,  "angle", nil,              nil,  true)
+	self:addProperty(Vec2,   "scale", { x = 1, y = 1 }, true, true)
+	self:addProperty(Vec2,   "skew",  nil,              nil,  true)
 end
 
 function EditorObject.init(self)
@@ -50,9 +42,9 @@ function EditorObject.wasRemoved(self, fromParent)
 	self:wasModified(fromParent)
 end
 
-function EditorObject.addProperty(self, Class, name, value, isDefault)
+function EditorObject.addProperty(self, Class, name, value, isDefault, isNonRemovable)
 	assert(Class, "EditorObject.addProperty - No class given for property: '"..tostring(name).."', value: '"..tostring(value).."'.")
-	local property = Class(self, name)
+	local property = Class(self, name, isNonRemovable)
 	name = property.name
 	if self.propertyMap[name] then  return  end
 	if value ~= nil then
@@ -69,10 +61,11 @@ function EditorObject.addProperty(self, Class, name, value, isDefault)
 end
 
 function EditorObject.removeProperty(self, name)
-	if not self.isBuiltinProperty[name] and self:getPropertyObj(name) then
+	local property = self:getPropertyObj(name)
+	if property and not property.isNonRemovable then
 		self.propertyMap[name] = nil
-		for i,property in ipairs(self.properties) do
-			if property.name == name then
+		for i,prop in ipairs(self.properties) do
+			if prop == property then
 				table.remove(self.properties, i)
 				self:call("propertyWasRemoved", name, property)
 				self:wasModified()
@@ -171,7 +164,7 @@ function EditorObject.getModifiedProperties(self)
 	for i,property in ipairs(self.properties) do
 		local name = property.name
 		local value
-		if self.isBuiltinProperty[name] then
+		if property.isNonRemovable then
 			if not property:isAtDefault() then
 				value = property:copyValue()
 			end

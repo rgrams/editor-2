@@ -12,22 +12,6 @@ _G.objClassList:add(EditorGuiColumn, EditorGuiColumn.displayName)
 local Float = require "objects.properties.Property"
 local Bool = require "objects.properties.Bool"
 
-EditorGuiColumn.isBuiltinProperty = {
-	name = true,
-	pos = true,
-	angle = true,
-	size = true,
-	skew = true,
-	pivot = true,
-	anchor = true,
-	modeX = true,
-	modeY = true,
-	pad = true,
-	spacing = true,
-	homogeneous = true,
-	dir = true,
-}
-
 function EditorGuiColumn.set(self)
 	EditorGuiColumn.super.set(self)
 	self.spacing = 0
@@ -37,9 +21,9 @@ end
 
 function EditorGuiColumn.initProperties(self)
 	EditorGuiColumn.super.initProperties(self)
-	self:addProperty(Float, "spacing")
-	self:addProperty(Bool, "homogeneous", false, true)
-	self:addProperty(Float, "dir", -1, true)
+	self:addProperty(Float, "spacing",     nil,   nil,  true)
+	self:addProperty(Bool,  "homogeneous", false, true, true)
+	self:addProperty(Float, "dir",         -1,    true, true)
 end
 
 function EditorGuiColumn.allocateChildren(self, forceUpdate)

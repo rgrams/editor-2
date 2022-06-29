@@ -37,7 +37,7 @@ local function copyChildrenData(children, options, filepath)
 			data.class = Class.displayName
 			data.properties = {}
 			for _,prop in ipairs(child.properties) do
-				if omitUnmod and child.isBuiltinProperty[prop.name] and prop:isAtDefault() then
+				if omitUnmod and prop.isNonRemovable and prop:isAtDefault() then
 					-- skip
 				else
 					local pData = {

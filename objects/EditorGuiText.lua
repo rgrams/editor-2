@@ -17,22 +17,6 @@ local TextAlign = require "objects.properties.Enum_TextAlign"
 local Cardinal = require "objects.properties.Enum_CardinalDir"
 local ResizeMode = require "objects.properties.Enum_GuiResizeMode"
 
-EditorGuiText.isBuiltinProperty = {
-	name = true,
-	pos = true,
-	angle = true,
-	size = true,
-	skew = true,
-	pivot = true,
-	anchor = true,
-	modeX = true,
-	pad = true,
-	text = true,
-	font = true,
-	align = true,
-	isWrapping = true,
-}
-
 function EditorGuiText.set(self)
 	EditorGuiText.super.set(self)
 	self:size(nil, self.hitHeight, true)
@@ -47,19 +31,19 @@ function EditorGuiText.set(self)
 end
 
 function EditorGuiText.initProperties(self)
-	self:addProperty(String, "name")
-	self:addProperty(Vec2, "pos")
-	self:addProperty(Float, "angle")
-	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true)
-	self:addProperty(Vec2, "skew")
-	self:addProperty(Cardinal, "pivot")
-	self:addProperty(Cardinal, "anchor")
-	self:addProperty(ResizeMode, "modeX")
-	self:addProperty(Vec2, "pad")
-	self:addProperty(String, "text")
-	self:addProperty(Font, "font")
-	self:addProperty(TextAlign, "align")
-	self:addProperty(Bool, "isWrapping")
+	self:addProperty(String,     "name",       nil, nil, true)
+	self:addProperty(Vec2,       "pos",        nil, nil, true)
+	self:addProperty(Float,      "angle",      nil, nil, true)
+	self:addProperty(Vec2,       "size",       { x = self.hitWidth, y = self.hitHeight }, true)
+	self:addProperty(Vec2,       "skew",       nil, nil, true)
+	self:addProperty(Cardinal,   "pivot",      nil, nil, true)
+	self:addProperty(Cardinal,   "anchor",     nil, nil, true)
+	self:addProperty(ResizeMode, "modeX",      nil, nil, true)
+	self:addProperty(Vec2,       "pad",        nil, nil, true)
+	self:addProperty(String,     "text",       nil, nil, true)
+	self:addProperty(Font,       "font",       nil, nil, true)
+	self:addProperty(TextAlign,  "align",      nil, nil, true)
+	self:addProperty(Bool,       "isWrapping", nil, nil, true)
 end
 
 function EditorGuiText.updateScale(self, alloc)

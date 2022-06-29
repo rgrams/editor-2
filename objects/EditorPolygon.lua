@@ -15,16 +15,6 @@ _G.objClassList:add(EditorPolygon, EditorPolygon.displayName)
 local Bool = require "objects.properties.Bool"
 local VertexArray = require "objects.properties.VertexArray"
 
-EditorPolygon.isBuiltinProperty = {
-	name = true,
-	pos = true,
-	angle = true,
-	scale = true,
-	skew = true,
-	isLoop = true,
-	vertices = true,
-}
-
 function EditorPolygon.set(self)
 	EditorPolygon.super.set(self)
 	local rand = math.random
@@ -33,8 +23,8 @@ end
 
 function EditorPolygon.initProperties(self)
 	EditorPolygon.super.initProperties(self)
-	self:addProperty(Bool, "isLoop", false, true)
-	self:addProperty(VertexArray, "vertices")
+	self:addProperty(Bool, "isLoop", false, true, true)
+	self:addProperty(VertexArray, "vertices", nil, nil, true)
 end
 
 function EditorPolygon.propertyWasSet(self, name, value, property)

@@ -11,17 +11,6 @@ local Image = require "objects.properties.Image"
 local Color = require "objects.properties.Color"
 local BlendMode = require "objects.properties.Enum_BlendMode"
 
-EditorSprite.isBuiltinProperty = {
-	name = true,
-	pos = true,
-	angle = true,
-	scale = true,
-	skew = true,
-	image = true,
-	color = true,
-	blendMode = true,
-}
-
 function EditorSprite.set(self)
 	EditorSprite.super.set(self)
 	self.color = { 1, 1, 1, 1 }
@@ -30,9 +19,9 @@ end
 
 function EditorSprite.initProperties(self)
 	EditorSprite.super.initProperties(self)
-	self:addProperty(Image, "image")
-	self:addProperty(Color, "color")
-	self:addProperty(BlendMode, "blendMode")
+	self:addProperty(Image, "image", nil, nil, true)
+	self:addProperty(Color, "color", nil, nil, true)
+	self:addProperty(BlendMode, "blendMode", nil, nil, true)
 end
 
 function EditorSprite.propertyWasSet(self, name, value, property)

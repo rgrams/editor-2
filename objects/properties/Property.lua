@@ -13,10 +13,11 @@ Property.defaultValue = 0
 
 _G.propClassList:add(Property, Property.typeName)
 
-function Property.set(self, obj, name)
+function Property.set(self, obj, name, isNonRemovable)
 	self.obj = obj
 	self.name = name or self.name
 	self.value = self:getDefaultValue()
+	self.isNonRemovable = isNonRemovable
 end
 
 function Property.getDefaultValue(self)

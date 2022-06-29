@@ -20,19 +20,6 @@ local Float = require "objects.properties.Property"
 local Cardinal = require "objects.properties.Enum_CardinalDir"
 local ResizeMode = require "objects.properties.Enum_GuiResizeMode"
 
-EditorGuiNode.isBuiltinProperty = {
-	name = true,
-	pos = true,
-	angle = true,
-	size = true,
-	skew = true,
-	pivot = true,
-	anchor = true,
-	modeX = true,
-	modeY = true,
-	pad = true,
-}
-
 function EditorGuiNode.set(self)
 	EditorGuiNode.super.set(self)
 	self.isSelected = false
@@ -49,16 +36,16 @@ function EditorGuiNode.init(self)
 end
 
 function EditorGuiNode.initProperties(self)
-	self:addProperty(String, "name")
-	self:addProperty(Vec2, "pos")
-	self:addProperty(Float, "angle")
-	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true)
-	self:addProperty(Vec2, "skew")
-	self:addProperty(Cardinal, "pivot")
-	self:addProperty(Cardinal, "anchor")
-	self:addProperty(ResizeMode, "modeX")
-	self:addProperty(ResizeMode, "modeY")
-	self:addProperty(Vec2, "pad")
+	self:addProperty(String,     "name",   nil, nil, true)
+	self:addProperty(Vec2,       "pos",    nil, nil, true)
+	self:addProperty(Float,      "angle",  nil, nil, true)
+	self:addProperty(Vec2,       "size",   { x = self.hitWidth, y = self.hitHeight }, true)
+	self:addProperty(Vec2,       "skew",   nil, nil, true)
+	self:addProperty(Cardinal,   "pivot",  nil, nil, true)
+	self:addProperty(Cardinal,   "anchor", nil, nil, true)
+	self:addProperty(ResizeMode, "modeX",  nil, nil, true)
+	self:addProperty(ResizeMode, "modeY",  nil, nil, true)
+	self:addProperty(Vec2,       "pad",    nil, nil, true)
 end
 
 function EditorGuiNode.allocate(self, ...)
