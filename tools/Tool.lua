@@ -79,7 +79,7 @@ local function stopDrag(self)
 end
 
 function Tool.final(self)
-	signals.unsubscribe(self,
+	signals.unsubscribe(self, self.onObjectsChanged,
 		"objects added",
 		"objects deleted",
 		"selected objects modified",

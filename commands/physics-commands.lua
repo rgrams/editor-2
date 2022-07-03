@@ -28,7 +28,8 @@ local function addPhysicsShapeProperties(caller, enclosures)
 		oneWasSelected = oneWasSelected or args[4]
 	end
 	if oneWasSelected then
-		signals.send("selected objects modified", caller)
+		local scene = enclosures[1][1].tree
+		signals.send("selected objects modified", caller, scene)
 	end
 	return caller, undoArgList, oneWasSelected
 end
@@ -54,7 +55,8 @@ local function removePhysicsShapeProperties(caller, enclosures)
 		oneWasSelected = oneWasSelected or args[6]
 	end
 	if oneWasSelected then
-		signals.send("selected objects modified", caller)
+		local scene = enclosures[1][1].tree
+		signals.send("selected objects modified", caller, scene)
 	end
 	return caller, undoArgList, oneWasSelected
 end

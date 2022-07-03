@@ -30,13 +30,14 @@ function M.subscribe(obj, fn, ...)
 	end
 end
 
-function M.unsubscribe(obj, ...)
+function M.unsubscribe(obj, fn, ...)
 	local signals = {...}
 	for _,signal in ipairs(signals) do
 		local list = subscribers[signal]
 		if list then
 			for i=#list,1,-1 do
-				if list[i].obj == obj then
+				local entry = list[i]
+				if entry.obj == obj and entry.fn == fn then
 					table.remove(list, i)
 				end
 			end

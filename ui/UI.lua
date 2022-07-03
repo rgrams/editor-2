@@ -12,6 +12,8 @@ local scenes = require "scenes"
 local fileDialog = require "lib.native-file-dialog.dialog"
 local fileUtil = require "lib.file-util"
 local objectFn = require "commands.functions.object-functions"
+local signals = require "signals"
+local updateSceneTitleScript = require "ui.updateSceneTitle_script"
 
 local lastOpenFolder
 local lastSaveFolder
@@ -55,6 +57,8 @@ function UI.set(self)
 	mainRow.children[2]:initRuu(self.ruu)
 
 	self.propertyPanel = mainRow.children[3]
+
+	self.scripts = { updateSceneTitleScript }
 end
 
 function UI.init(self)
@@ -78,6 +82,7 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 			local undoArgs = cmd[3]
 			undoArgs[1] = self -- Set caller to ourself.
 			scenes.active.history:undo()
+			signals.send("undo", self, cmd)
 		end
 	elseif action == "redo" and (change == 1 or isRepeat) then
 		local future = scenes.active.history.future
@@ -86,6 +91,7 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 			local redoArgs = cmd[2]
 			redoArgs[1] = self -- Set caller to ourself.
 			scenes.active.history:redo()
+			signals.send("redo", self, cmd)
 		end
 	elseif action == "next tab" and (change == 1 or isRepeat) then
 		if #scenes > 1 then
@@ -143,13 +149,11 @@ function UI.saveScene(self, scene, filepath)
 	scene.filepath = filepath
 	local _, filename = fileUtil.splitFilepath(filepath)
 	scene.name = filename
-	if scenes.active == scene then
-		love.window.setTitle("Editor - " .. scene.name)
-	end
 	local tabBar = self.tree:get("/Window/UI/MainRow/VPColumn/TabBar")
 	tabBar:setTabText(scene, scene.name)
 	local exporter = require "io.defaultLuaImportExport"
 	exporter.export(scene, filepath)
+	signals.send("file saved", self, scene, filepath)
 end
 
 function UI.openScene(self, filepath)

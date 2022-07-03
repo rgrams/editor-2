@@ -15,6 +15,7 @@ function M.create(name, filepath)
 	local scene = SceneTree(layers, defaultLayer)
 	scene.selection = Selection(scene)
 	scene.history = History(commands)
+	scene.isDirty = false
 	scene.filepath = filepath
 	scene.name = name or "Untitled"
 	scene.properties = {}
@@ -61,7 +62,6 @@ end
 
 function M.setActive(scene, sender)
 	M.active = scene
-	love.window.setTitle("Editor - " .. scene.name)
 	signals.send("active scene changed", sender, scene)
 	_G.shouldRedraw = true
 end
