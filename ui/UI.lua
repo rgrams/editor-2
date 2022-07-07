@@ -168,9 +168,15 @@ function UI.openScene(self, filepath)
 	local _, filename = fileUtil.splitFilepath(filepath)
 	local importer = require "io.defaultLuaImportExport"
 	local scene = scenes.create(filename, filepath)
-	local addArgsList = importer.import(scene, filepath)
+	local addArgsList, addPropsList = importer.import(scene, filepath)
 	if addArgsList then
 		objectFn.addObjects(self, scene, addArgsList)
+		if addPropsList then
+			for i,prop in ipairs(addPropsList) do
+				local name, value, Class = unpack(prop)
+				objectFn.addProperty(self, scene.enclosure, Class, name, value)
+			end
+		end
 		scenes.add(scene)
 		_G.shouldRedraw = true
 	end

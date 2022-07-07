@@ -11,9 +11,31 @@ local layers = { "default" }
 local defaultLayer = "default"
 local commands = require("commands.all")
 
+-- Define EditorScene class (so scene can have properties).
+local EditorObject = require "objects.EditorObject"
+local EditorScene = SceneTree:extend()
+EditorScene:implements(EditorObject, "skip")
+
+function EditorScene.set(self, layers, defaultLayer)
+	SceneTree.set(self, layers, defaultLayer)
+
+	self.tree = self -- For commands, they get the tree to pass to update signals.
+
+	-- From EditorObject.set:
+	self.isSelected = true -- So signals will be sent to update properties panel.
+	self.isHovered = false
+	self.AABB = {}
+	self.properties = {}
+	self.propertyMap = {}
+	self:initProperties()
+end
+
 function M.create(name, filepath)
-	local scene = SceneTree(layers, defaultLayer)
+	local scene = EditorScene(layers, defaultLayer)
+	scene.enclosure = { scene }
 	scene.selection = Selection(scene)
+	scene.selfSelection = Selection(scene)
+	scene.selfSelection:add(scene.enclosure)
 	scene.history = History(commands)
 	scene.isDirty = false
 	scene.filepath = filepath

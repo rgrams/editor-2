@@ -25,6 +25,23 @@ local function getPropExportValue(prop, filepath)
 	return val
 end
 
+local function copyPropertyData(child, omitUnmod, filepath)
+	local properties = {}
+	for _,prop in ipairs(child.properties) do
+		if omitUnmod and prop.isNonRemovable and prop:isAtDefault() then
+			-- skip
+		else
+			local pData = {
+				name = prop.name,
+				value = getPropExportValue(prop, filepath),
+				type = prop.typeName
+			}
+			table.insert(properties, pData)
+		end
+	end
+	return properties
+end
+
 local function copyChildrenData(children, options, filepath)
 	local output = {}
 	local omitUnmod = options.omitUnmodifiedBuiltins
@@ -35,23 +52,10 @@ local function copyChildrenData(children, options, filepath)
 			local data = {}
 			local Class = getmetatable(child)
 			data.class = Class.displayName
-			data.properties = {}
-			for _,prop in ipairs(child.properties) do
-				if omitUnmod and prop.isNonRemovable and prop:isAtDefault() then
-					-- skip
-				else
-					local pData = {
-						name = prop.name,
-						value = getPropExportValue(prop, filepath),
-						type = prop.typeName
-					}
-					table.insert(data.properties, pData)
-				end
-			end
+			data.properties = copyPropertyData(child, omitUnmod, filepath)
 			if child.children then
 				data.children = copyChildrenData(child.children, options, filepath)
 			end
-
 			table.insert(output, data)
 		end
 	end
@@ -70,6 +74,9 @@ function M.export(scene, filepath, options)
 	options = options or M.defaultOptions
 	local data = copyChildrenData(scene.children, options, filepath)
 	data.isSceneFile = true
+	if #scene.properties > 0 then
+		data.properties = copyPropertyData(scene, options.omitUnmodifiedBuiltins, filepath)
+	end
 	local str = "return " .. objToStr(data) .. "\n"
 	file:write(str)
 
@@ -94,9 +101,7 @@ local function getPropImportValue(val, name, Class, filepath)
 	return val
 end
 
-local function makeAddObjArgs(caller, scene, obj, parentEnclosure, filepath)
-	local Class = classList:get(obj.class)
-	local enclosure = {}
+local function makeAddPropArgs(obj, filepath)
 	local properties = {}
 	for i,prop in ipairs(obj.properties) do
 		local PropertyClass = propClassList:get(prop.type)
@@ -108,6 +113,13 @@ local function makeAddObjArgs(caller, scene, obj, parentEnclosure, filepath)
 		}
 		table.insert(properties, propArgs)
 	end
+	return properties
+end
+
+local function makeAddObjArgs(caller, scene, obj, parentEnclosure, filepath)
+	local Class = classList:get(obj.class)
+	local enclosure = {}
+	local properties = makeAddPropArgs(obj, filepath)
 	local isSelected = false
 	local children
 	if obj.children then
@@ -150,7 +162,12 @@ function M.import(scene, filepath, options)
 	end
 
 	local addArgsList = {}
+	local addPropsList
 	local caller = false
+
+	if data.properties then
+		addPropsList = makeAddPropArgs(data, filepath)
+	end
 
 	-- Just need to add the objects at the base level, any children will be added along with.
 	for i,obj in ipairs(data) do
@@ -167,7 +184,7 @@ function M.import(scene, filepath, options)
 		end
 	end
 
-	return addArgsList
+	return addArgsList, addPropsList
 end
 
 return M

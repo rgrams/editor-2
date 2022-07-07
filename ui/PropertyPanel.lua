@@ -34,7 +34,7 @@ end
 
 function PropertyPanel.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
 	if action == "add property" and change == 1 then
-		if scenes.active and scenes.active.selection[1] then
+		if scenes.active then
 			local self = wgt.object
 			local guiRoot = self.tree:get("/Window")
 			local dialog = AddPropertyDialog(self.addProperty, { self })
@@ -47,6 +47,9 @@ end
 function PropertyPanel.addProperty(self, propType, propName)
 	local selection = scenes.active.selection
 	local enclosures = selection:copyList()
+	if not enclosures or not enclosures[1] then
+		enclosures = scenes.active.selfSelection
+	end
 	local Class = propClass:get(propType)
 	scenes.active.history:perform("addSamePropertyToMultiple", self, enclosures, Class, propName)
 	self:updateProperties(selection) -- We'll ignore the signal from ourself, so manually update.
@@ -99,8 +102,8 @@ end
 
 function PropertyPanel.updateProperties(self, selection)
 	if not selection or not selection[1] then
-		clearPropertyWidgets(self)
-		return
+		-- If nothing else is selected, pretend we've selected the scene itself.
+		selection = scenes.active.selfSelection
 	end
 
 	-- Get list of properties that all objects have in common.
