@@ -67,7 +67,7 @@ function M.export(scene, filepath, options)
 	print("   "..filepath)
 	local file, errMsg = io.open(filepath, "w")
 	if not file then
-		print(errMsg)
+		editor.messageBox(errMsg, "Export Failed: Could not access target file")
 		return
 	end
 
@@ -137,7 +137,7 @@ function M.import(scene, filepath, options)
 	print("   "..filepath)
 	local file, errMsg = io.open(filepath, "r")
 	if not file then
-		print("Error opening file", errMsg)
+		editor.messageBox(errMsg, "Import Failed: Error opening file")
 		return
 	end
 
@@ -146,18 +146,23 @@ function M.import(scene, filepath, options)
 
 	local isSuccess, result = pcall(loadstring, str)
 	if not isSuccess then
-		print("Error loading contents of file as lua code", result)
+		editor.messageBox("Error loading contents of file as lua code: "..tostring(result), "Import Failed: Error loading as lua")
 		return
 	end
 
 	local isSuccess, data = pcall(result)
 	if not isSuccess then
-		print("Error executing loaded lua code: "..tostring(data))
+		editor.messageBox(tostring(data), "Import Failed: Error executing loaded lua code")
+		return
+	end
+
+	if type(data) ~= "table" then
+		editor.messageBox("Loaded lua code returns a '"..type(data).."' value instead of a table.", "Import Failed: Invalid scene file")
 		return
 	end
 
 	if not data.isSceneFile then
-		print("Lua module is not flagged as a scene file.")
+		editor.messageBox("Lua module is not flagged as a scene file.", "Import Failed: Invalid scene file")
 		return
 	end
 
@@ -172,12 +177,12 @@ function M.import(scene, filepath, options)
 	-- Just need to add the objects at the base level, any children will be added along with.
 	for i,obj in ipairs(data) do
 		if not obj.class then
-			print("   Error parsing objects: No object class property found.")
+			editor.messageBox("Error parsing objects: No object class property found.", "Import Failed: Invalid object")
 			return
 		end
 		local isSuccess, result = pcall(makeAddObjArgs, caller, scene, obj, false, filepath)
 		if not isSuccess then
-			print("   Error creating command args for creating scene objects: "..tostring(result)..".")
+			editor.messageBox("Error creating command args for creating scene objects: "..tostring(result), "Import Failed: Invalid object")
 			return
 		else
 			table.insert(addArgsList, result)

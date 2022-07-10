@@ -16,6 +16,8 @@ local IndexedList = require "lib.IndexedList"
 _G.objClassList = IndexedList()
 _G.propClassList = IndexedList()
 
+_G.editor = require "editor"
+
 local scenes = require "scenes"
 local editorTree
 local window
@@ -64,6 +66,9 @@ function love.load()
 
 	editorTree:add( Camera(0, 0, 0, {800,600}, "expand view") )
 	window = editorTree:add( require("ui.Window")() )
+
+	_G.editor.tree = editorTree
+	_G.editor.window = window
 
 	-- Add default editing scene.
 	scenes.add( scenes.create() )

@@ -1,0 +1,91 @@
+
+local DialogBox = gui.Column:extend()
+
+local Ruu = require "ui.ruu.ruu"
+local Button = require "ui.widgets.Button"
+local PanelTheme = require "ui.widgets.themes.PanelTheme"
+
+local spacing = 0
+DialogBox.width = 400
+DialogBox.height = 150
+DialogBox.padW = 4
+DialogBox.titleHeight = 25
+DialogBox.btnBoxHeight = 35
+
+local titleFontData = { "assets/font/OpenSans-Semibold.ttf", 16 }
+
+function DialogBox.set(self, title, x, y)
+	title = title or "Notification"
+	x, y = x or 0, y or 0
+
+	DialogBox.super.set(self, spacing, nil, -1, self.width, self.height)
+	self:setPos(x, y)
+	self:pad(self.padW, self.padW)
+	self.layer = "gui"
+
+	local titleBox = gui.Node(100, self.titleHeight, "C", "C", "fill", "none")
+	local titleText = gui.Text(title, titleFontData, 100, "C", "C", "center", "fill")
+	titleBox.children = { titleText }
+
+	local contentBox = gui.Node(100, 10, "C", "C", "fill", "fill")
+	contentBox.isGreedy = true
+
+	local buttonBox = gui.Node(100, self.btnBoxHeight):mode("fill"):pad(0, 5)
+
+	self.children = {
+		titleBox,
+		contentBox,
+		buttonBox
+	}
+
+	self.ruu = Ruu()
+	self.ruu:registerLayers({"viewport", "gui"}) -- Bottom to top.
+	self.widget = self.ruu:Panel(self, PanelTheme)
+
+	self:addContent(contentBox)
+	self:addButtons(buttonBox)
+end
+
+function DialogBox.addContent(self, contentBox)
+end
+
+function DialogBox.addButtons(self, buttonBox)
+	self.OKBtn = Button("OK", nil, "center")
+	buttonBox.children = { self.OKBtn }
+	self.ruu:Button(self.OKBtn, self.close):args(self)
+end
+
+function DialogBox.init(self)
+	DialogBox.super.init(self)
+
+	-- map buttons
+	-- set initial focus (cancel button)
+	self.ruu:setFocus(self.OKBtn.widget)
+
+	Input.enable(self)
+end
+
+function DialogBox.final(self)
+	Input.disable(self)
+end
+
+function DialogBox.close(self)
+	self.tree:remove(self)
+end
+
+function DialogBox.input(self, action, value, change, ...)
+	self.ruu:input(action, value, change, ...)
+	if action == Ruu.CANCEL and change == 1 then
+		self:close()
+	end
+	return true
+end
+
+function DialogBox.draw(self)
+	local widget = self.widget
+	if widget then
+		widget.wgtTheme.draw(widget, self)
+	end
+end
+
+return DialogBox
