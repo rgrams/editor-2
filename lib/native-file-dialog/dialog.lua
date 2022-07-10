@@ -2,14 +2,14 @@
 local ffi = package.preload.ffi()
 local OS = love.system.getOS()
 
-local libPath
-
 local sourceDir = love.filesystem.getSource()
 
 if not sourceDir:sub(-1, -1):match("[\\/]") then
 	-- If the source dir and working dir match, then it omits the trailing separator.
 	sourceDir = sourceDir .. "/"
 end
+
+local libPath
 
 if OS == "Linux" then
 	libPath = "lib/native-file-dialog/nfd.so"
@@ -36,6 +36,14 @@ ffi.cdef[[
 -- TODO: Add open multiple option.
 -- Need to define `nfdpathset_t` struct type https://github.com/Alloyed/nativefiledialog/blob/master/src/include/nfd.h
 -- unsigned int NFD_OpenDialogMultiple(const char *filterList, const char *defaultPath, nfdpathset_t *outPaths);
+
+-- 	File Filter Syntax:
+-- A wildcard filter is always added to every dialog.
+-- ';' Begin a new filter.
+-- ',' Add a separate type to the filter.
+
+-- EXAMPLE: 'txt' The default filter is for text files. There is a wildcard option in a dropdown.
+-- EXAMPLE: 'png,jpg;psd' The default filter is for png and jpg files. A second filter is available for psd files. There is a wildcard option in a dropdown.
 
 local dialog = {}
 
