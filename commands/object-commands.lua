@@ -23,7 +23,7 @@ end
 
 local function addObjects(caller, ...)
 	local _, scene, enclosures, oneWasSelected = objectFn.addObjects(caller, ...)
-	signals.send("objects added", caller)
+	signals.send("objects added", caller, scene)
 	if oneWasSelected then
 		signals.send("selection changed", caller, scene)
 	end
@@ -32,7 +32,7 @@ end
 
 local function deleteObjects(caller, ...)
 	local _, scene, undoArgs, oneWasSelected = objectFn.deleteObjects(caller, ...)
-	signals.send("objects deleted", caller)
+	signals.send("objects deleted", caller, scene)
 	if oneWasSelected then
 		signals.send("selection changed", caller, scene)
 	end
@@ -155,7 +155,6 @@ local function removePropertyFromMultiple(caller, ...)
 	end
 	return caller, undoArgList, oneWasSelected
 end
-
 
 return {
 	addObject = { add, delete },
