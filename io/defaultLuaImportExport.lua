@@ -3,6 +3,8 @@ local M = {}
 
 local objToStr = require "philtre.lib.object-to-string"
 local fileUtil = require "lib.file-util"
+local scenes = require "scenes"
+local objectFn = require "commands.functions.object-functions"
 local classList = _G.objClassList
 local propClassList = _G.propClassList
 
@@ -74,6 +76,10 @@ function M.export(scene, filepath, options)
 	options = options or M.defaultOptions
 	local data = copyChildrenData(scene.children, options, filepath)
 	data.isSceneFile = true
+	data.lastUsedExporter = scene.lastUsedExporter
+	if scene.lastExportFilepath then
+		data.lastExportFilepath = fileUtil.getRelativePath(filepath, scene.lastExportFilepath)
+	end
 	if #scene.properties > 0 then
 		data.properties = copyPropertyData(scene, options.omitUnmodifiedBuiltins, filepath)
 	end
@@ -131,7 +137,7 @@ local function makeAddObjArgs(caller, scene, obj, parentEnclosure, filepath)
 	return { caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children }
 end
 
-function M.import(scene, filepath, options)
+function M.import(filepath, options)
 	options = options or {}
 	print("----  IMPORT  ----")
 	print("   "..filepath)
@@ -167,11 +173,26 @@ function M.import(scene, filepath, options)
 	end
 
 	local addArgsList = {}
-	local addPropsList
+	local addScenePropsList
 	local caller = false
 
+	local _, filename = fileUtil.splitFilepath(filepath)
+	local scene = scenes.create(filename, filepath)
+
+	scene.lastUsedExporter = data.lastUsedExporter
+	if data.lastExportFilepath then
+		scene.lastExportFilepath = fileUtil.resolveRelativePath(filepath, data.lastExportFilepath)
+		print("lastExportFilepath", scene.lastExportFilepath)
+	end
+
 	if data.properties then
-		addPropsList = makeAddPropArgs(data, filepath)
+		addScenePropsList = makeAddPropArgs(data, filepath)
+		if addScenePropsList then
+			for i,prop in ipairs(addScenePropsList) do
+				local name, value, Class = unpack(prop)
+				objectFn.addProperty(self, scene.enclosure, Class, name, value)
+			end
+		end
 	end
 
 	-- Just need to add the objects at the base level, any children will be added along with.
@@ -189,7 +210,9 @@ function M.import(scene, filepath, options)
 		end
 	end
 
-	return addArgsList, addPropsList
+	objectFn.addObjects(caller, scene, addArgsList)
+
+	return scene
 end
 
 return M
