@@ -15,6 +15,7 @@ _G.Input = require "input"
 local IndexedList = require "lib.IndexedList"
 _G.objClassList = IndexedList()
 _G.propClassList = IndexedList()
+_G.exporterList = IndexedList()
 
 _G.editor = require "editor"
 
@@ -61,6 +62,9 @@ function love.load()
 
 	-- Load editor object classes.
 	requireModulesInFolder("objects/")
+
+	-- Load exporters.
+	requireModulesInFolder("io/")
 
 	editorTree = SceneTree(layers, defaultLayer)
 

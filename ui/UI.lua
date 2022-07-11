@@ -17,6 +17,7 @@ local updateSceneTitleScript = require "ui.updateSceneTitle_script"
 
 local lastOpenFolder
 local lastSaveFolder
+local lastExportFolder
 
 Ruu.isHoverAction["pan camera"] = true
 Ruu.isHoverAction["right click"] = true
@@ -69,6 +70,14 @@ end
 
 function UI.final(self)
 	Input.disable(self)
+end
+
+local function getExporterNameList()
+	local list = {}
+	for i,exporter in ipairs(_G.exporterList) do
+		list[i] = _G.exporterList:getName(exporter)
+	end
+	return list
 end
 
 function UI.input(self, action, value, change, rawChange, isRepeat, ...)
@@ -142,6 +151,31 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 		lastOpenFolder = folder
 
 		self:openScene(filepath)
+	elseif action == "export" and change == 1 then
+		if scenes.active then
+			local exporterName = scenes.active.lastUsedExporter
+			if not exporterName then
+				local cb = function(choice)
+					exporterName = choice
+					if not exporterName then  return -- Canceled.
+					else  self:exportScene(scenes.active, exporterName)  end -- Continue export.
+				end
+				editor.multipleChoiceBox(getExporterNameList(), cb, "Choose an exporter:")
+				return -- multiChoiceBox callback will continue the export (or not).
+			else
+				self:exportScene(scenes.active, exporterName)
+			end
+		end
+	elseif action == "export as" and change == 1 then
+		if scenes.active then
+			local cb = function(choice)
+				local exporterName = choice
+				if not exporterName then  return -- Canceled.
+				else  self:exportScene(scenes.active, exporterName, true)  end -- Continue export.
+			end
+			editor.multipleChoiceBox(getExporterNameList(), cb, "Choose an exporter:")
+			return -- multiChoiceBox callback will continue the export (or not).
+		end
 	end
 end
 
@@ -154,6 +188,20 @@ function UI.saveScene(self, scene, filepath)
 	local exporter = require "io.defaultLuaImportExport"
 	exporter.export(scene, filepath)
 	signals.send("file saved", self, scene, filepath)
+end
+
+function UI.exportScene(self, scene, exporterName, isExportAs)
+	local exporter = _G.exporterList:get(exporterName)
+
+	local filepath = not isExportAs and scene.lastExportFilepath
+	if not filepath then  filepath = fileDialog.save(lastExportFolder or lastSaveFolder)  end
+	if not filepath then  return  end
+	lastExportFolder = fileUtil.splitFilepath(filepath)
+	scene.lastExportFilepath = filepath
+	scene.lastUsedExporter = exporterName
+
+	exporter.export(scene, filepath)
+	signals.send("file exported", self, scene, filepath, exporter)
 end
 
 function UI.openScene(self, filepath)

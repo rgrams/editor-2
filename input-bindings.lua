@@ -54,4 +54,6 @@ return {
 	{ "button", "ctrl n", "new scene" },
 	{ "button", "1", "default tool" },
 	{ "button", "2", "polygon tool" },
+	{ "button", "ctrl e", "export" },
+	{ "button", "ctrl shift e", "export as" },
 }
