@@ -65,7 +65,7 @@ function Dropdown.final(self)
 end
 
 function Dropdown.addButtonObject(self, btnText)
-	local btn = Button(btnText, self.w - pad*2)
+	local btn = Button(btnText, self.w - pad*2):mode("fill")
 	btn.layer = "dropdown"
 	btn.text.layer = "dropdown text"
 	table.insert(self.children, btn)

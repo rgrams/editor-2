@@ -50,9 +50,10 @@ function DialogBox.addContent(self, contentBox)
 end
 
 function DialogBox.addButtons(self, buttonBox)
-	self.OKBtn = Button("OK", nil, "center")
-	buttonBox.children = { self.OKBtn }
-	self.ruu:Button(self.OKBtn, self.close):args(self)
+	local okBtn = Button("OK", nil, "center")
+	buttonBox.children = { okBtn }
+	self.ruu:Button(okBtn, self.close):args(self)
+	self.initialFocusWidget = okBtn.widget
 end
 
 function DialogBox.init(self)
@@ -60,7 +61,7 @@ function DialogBox.init(self)
 
 	-- map buttons
 	-- set initial focus (cancel button)
-	self.ruu:setFocus(self.OKBtn.widget)
+	self.ruu:setFocus(self.initialFocusWidget)
 
 	Input.enable(self)
 end
