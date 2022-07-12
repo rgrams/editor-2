@@ -81,15 +81,6 @@ local function removePropertyWidget(self, name, Class)
 	if object then  destroyPropertyWidget(self, object)  end
 end
 
-local function clearPropertyWidgets(self)
-	for i=self.children.maxn,2,-1 do
-		local child = self.children[i]
-		if child then
-			destroyPropertyWidget(self, child)
-		end
-	end
-end
-
 function PropertyPanel.onActiveSceneChanged(self, sender)
 	self:updateProperties(scenes.active.selection)
 end
@@ -155,6 +146,11 @@ function PropertyPanel.updateProperties(self, selection)
 				object:updateValue(propData.value)
 			end
 		end
+	end
+
+	-- Update the selection reference on each widget so they don't modify the wrong scene.
+	for name,obj in pairs(self.wgtForProp) do
+		obj:setSelection(selection)
 	end
 
 	self:allocateChildren()
