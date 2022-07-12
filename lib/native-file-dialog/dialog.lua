@@ -1,5 +1,5 @@
 
-local ffi = package.preload.ffi()
+local ffi = require "ffi"
 local OS = love.system.getOS()
 
 local sourceDir = love.filesystem.getSource()
