@@ -99,6 +99,22 @@ function M.export(scene, filepath, options)
 		return
 	end
 
+	local relFilepathFolder = filepath
+
+	if scene:getProperty("useProjectLocalPaths") then
+		local projectFolder = fileUtil.findProject(filepath, config.projectFileExtension)
+		if not projectFolder then
+			local startFolder = fileUtil.splitFilepath(filepath)
+			local msg = "This scene is flagged to use project-local paths, "..
+				"but we couldn't find the project file that it's associated with.\n\n"..
+				"Searched all folders from '"..startFolder.."' and up.\n\n"..
+				"Will fall back to using scene-local paths."
+			editor.messageBox(msg, "Export Warning: Failed to find project")
+		else
+			relFilepathFolder = projectFolder
+		end
+	end
+
 	_file = file
 	resetIndent()
 	options = options or M.defaultOptions
@@ -108,7 +124,7 @@ function M.export(scene, filepath, options)
 
 	write("objects = {\n")
 	addIndent()
-	writeChildrenData(scene.children, options, filepath)
+	writeChildrenData(scene.children, options, relFilepathFolder)
 	removeIndent()
 	write("},\n")
 

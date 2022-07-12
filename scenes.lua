@@ -11,7 +11,7 @@ local layers = { "default" }
 local defaultLayer = "default"
 local commands = require("commands.all")
 
--- Define EditorScene class (so scene can have properties).
+----------  Define EditorScene class (so scene can have properties)  ----------
 local EditorObject = require "objects.EditorObject"
 local EditorScene = SceneTree:extend()
 EditorScene:implements(EditorObject, "skip")
@@ -30,6 +30,9 @@ function EditorScene.set(self, layers, defaultLayer)
 	self:initProperties()
 end
 
+function EditorScene.initProperties()  end
+----------  -  ----------
+
 function M.create(name, filepath)
 	local scene = EditorScene(layers, defaultLayer)
 	scene.enclosure = { scene }
@@ -41,6 +44,8 @@ function M.create(name, filepath)
 	scene.filepath = filepath
 	scene.name = name or "Untitled"
 	scene.properties = {}
+	local Bool = require("objects.properties.Bool")
+	scene:addProperty(Bool, "useProjectLocalPaths", false, true, true)
 	scene.camX, scene.camY, scene.camZoom = 0, 0, 1
 	return scene
 end

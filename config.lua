@@ -1,6 +1,8 @@
 
 local M = {}
 
+M.projectFileExtension = ".project"
+
 M.zoomRate = 0.1
 
 M.translateSnapIncrement = 8

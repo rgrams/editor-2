@@ -7,6 +7,7 @@ local scenes = require "scenes"
 local objectFn = require "commands.functions.object-functions"
 local classList = _G.objClassList
 local propClassList = _G.propClassList
+local config = require "config"
 
 M.defaultOptions = {
 	omitUnmodifiedBuiltins = true
@@ -73,15 +74,31 @@ function M.export(scene, filepath, options)
 		return
 	end
 
+	local relFilepathFolder = filepath
+
+	if scene:getProperty("useProjectLocalPaths") then
+		local projectFolder = fileUtil.findProject(filepath, config.projectFileExtension)
+		if not projectFolder then
+			local startFolder = fileUtil.splitFilepath(filepath)
+			local msg = "This scene is flagged to use project-local paths, "..
+				"but we couldn't find the project file that it's associated with.\n\n"..
+				"Searched all folders from '"..startFolder.."' and up.\n\n"..
+				"Will fall back to using scene-local paths."
+			editor.messageBox(msg, "Export Warning: Failed to find project")
+		else
+			relFilepathFolder = projectFolder
+		end
+	end
+
 	options = options or M.defaultOptions
-	local data = copyChildrenData(scene.children, options, filepath)
+	local data = copyChildrenData(scene.children, options, relFilepathFolder)
 	data.isSceneFile = true
 	data.lastUsedExporter = scene.lastUsedExporter
 	if scene.lastExportFilepath then
 		data.lastExportFilepath = fileUtil.getRelativePath(filepath, scene.lastExportFilepath)
 	end
 	if #scene.properties > 0 then
-		data.properties = copyPropertyData(scene, options.omitUnmodifiedBuiltins, filepath)
+		data.properties = copyPropertyData(scene, options.omitUnmodifiedBuiltins, relFilepathFolder)
 	end
 	local str = "return " .. objToStr(data) .. "\n"
 	file:write(str)
@@ -182,15 +199,42 @@ function M.import(filepath, options)
 	scene.lastUsedExporter = data.lastUsedExporter
 	if data.lastExportFilepath then
 		scene.lastExportFilepath = fileUtil.resolveRelativePath(filepath, data.lastExportFilepath)
-		print("lastExportFilepath", scene.lastExportFilepath)
+	end
+
+	local relFilepathFolder = filepath
+
+	local useProjectPaths
+	if data.properties then
+		for i,prop in ipairs(data.properties) do
+			if prop.name == "useProjectLocalPaths" then
+				useProjectPaths = prop.value
+			end
+		end
+	end
+	if useProjectPaths then
+		local projectFolder = fileUtil.findProject(filepath, config.projectFileExtension)
+		if not projectFolder then
+			local startFolder = fileUtil.splitFilepath(filepath)
+			local msg = "This scene is flagged to use project-local paths, "..
+				"but we couldn't find the project file that it's associated with.\n\n"..
+				"Searched all folders from '"..startFolder.."' and up.\n\n"..
+				"Will try to interpret paths as scene-local."
+			editor.messageBox(msg, "Import Warning: Failed to find project")
+		else
+			relFilepathFolder = projectFolder
+		end
 	end
 
 	if data.properties then
-		addScenePropsList = makeAddPropArgs(data, filepath)
+		addScenePropsList = makeAddPropArgs(data, relFilepathFolder)
 		if addScenePropsList then
 			for i,prop in ipairs(addScenePropsList) do
 				local name, value, Class = unpack(prop)
-				objectFn.addProperty(self, scene.enclosure, Class, name, value)
+				if scene:hasProperty(name) then
+					scene:setProperty(name, value)
+				else
+					objectFn.addProperty(caller, scene.enclosure, Class, name, value)
+				end
 			end
 		end
 	end
@@ -201,7 +245,7 @@ function M.import(filepath, options)
 			editor.messageBox("Error parsing objects: No object class property found.", "Import Failed: Invalid object")
 			return
 		end
-		local isSuccess, result = pcall(makeAddObjArgs, caller, scene, obj, false, filepath)
+		local isSuccess, result = pcall(makeAddObjArgs, caller, scene, obj, false, relFilepathFolder)
 		if not isSuccess then
 			editor.messageBox("Error creating command args for creating scene objects: "..tostring(result), "Import Failed: Invalid object")
 			return

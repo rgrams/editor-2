@@ -1,6 +1,8 @@
 
 local M = {}
 
+local urfs = require "lib.urfs"
+
 local folderPattern = "[^\\/]+[\\/]"
 
 function M.getRelativePath(from, to)
@@ -111,6 +113,53 @@ function M.loadImageFromAbsolutePath(path)
 		print("Error reading file:\n   "..error)
 	end
 	return false
+end
+
+function M.goUp(from, foldersUp)
+	local path = M.splitFilepath(from)
+	for i=1,foldersUp or 1 do
+		local i1, i2 = path:find("[\\/][^\\/]+[\\/]?$")
+		if i1 then
+			path = path:sub(1, i1)
+		else
+			break
+		end
+	end
+	return path
+end
+
+-- Returns folder, filename (or nil).
+function M.findProject(sceneFilepath, projectFileExtension)
+	print("Searching for Project...")
+	local mountPoint = "_searchFolder/"
+	local fromFolder = M.splitFilepath(sceneFilepath)
+	while true do
+		print("   mounting", fromFolder)
+		if not urfs.mount(fromFolder, mountPoint) then
+			print("      urfs.mount failed with folder: '"..tostring(fromFolder).."'.")
+			return
+		end
+		for i,path in ipairs(love.filesystem.getDirectoryItems(mountPoint)) do
+			local _, _, extension = M.splitFilepath(path)
+			-- print("      checking", path, "has extension", extension)
+			if extension == projectFileExtension then
+				print("      extension matches", extension)
+				local fullPath = mountPoint .. path
+				if love.filesystem.getInfo(fullPath).type == "file" then
+					print("         FOUND", fullPath, fromFolder)
+					print("         "..love.filesystem.getRealDirectory(fullPath)..path)
+					urfs.unmount(fromFolder, mountPoint)
+					return fromFolder, path
+				end
+			end
+		end
+		urfs.unmount(fromFolder, mountPoint)
+		if #fromFolder <= 1 then
+			print("Hit root again, aborting search.", fromFolder)
+			return
+		end
+		fromFolder = M.goUp(fromFolder)
+	end
 end
 
 return M
