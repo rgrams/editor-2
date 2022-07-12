@@ -74,10 +74,14 @@ function DialogBox.close(self)
 	self.tree:remove(self)
 end
 
+function DialogBox.cancel(self)
+	self:close()
+end
+
 function DialogBox.input(self, action, value, change, ...)
 	self.ruu:input(action, value, change, ...)
 	if action == Ruu.CANCEL and change == 1 then
-		self:close()
+		self:cancel()
 	end
 	return true
 end

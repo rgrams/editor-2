@@ -35,7 +35,7 @@ end
 function MultiChoiceBox.addButtons(self, buttonBox)
 	self.cancelBtn = Button("Cancel", nil, "center")
 	self.cancelBtn:pivot("E"):setPos(-15, 0)
-	self.ruu:Button(self.cancelBtn, self.cancelBtnPressed):args(self)
+	self.ruu:Button(self.cancelBtn, self.cancel):args(self)
 
 	self.okBtn = Button("OK", nil, "center")
 	self.okBtn:pivot("W"):setPos(15, 0)
@@ -56,6 +56,11 @@ end
 function MultiChoiceBox.close(self)
 	MultiChoiceBox.super.close(self)
 	self.callback(self.choice)
+end
+
+function MultiChoiceBox.cancel(self)
+	self.choice = nil
+	self:close()
 end
 
 local function getChoiceIndex(self, choice)
@@ -82,11 +87,6 @@ function MultiChoiceBox.choiceSelected(self, choice)
 end
 
 function MultiChoiceBox.okBtnPressed(self)
-	self:close()
-end
-
-function MultiChoiceBox.cancelBtnPressed(self)
-	self.choice = nil
 	self:close()
 end
 
