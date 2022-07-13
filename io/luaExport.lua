@@ -35,6 +35,9 @@ M.defaultOptions = {
 	omitUnmodifiedBuiltins = true
 }
 
+local String = require "objects.properties.String"
+local split = require "lib.string-split"
+
 local function getPropExportValue(prop, filepath)
 	local val = prop:copyValue()
 	local propType = prop.typeName
@@ -46,6 +49,8 @@ local function getPropExportValue(prop, filepath)
 		if val[1] ~= "" then
 			val[1] = fileUtil.getRelativePath(filepath, val[1])
 		end
+	elseif (prop.name == "categories" or prop.name == "mask") and prop:is(String) then
+		val = split(val, ", ")
 	end
 	return val
 end
