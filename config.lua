@@ -5,6 +5,17 @@ M.projectFileExtension = ".project"
 
 M.userConfigFilename = "user-config.lua"
 
+M.winWidth = 800
+M.winHeight = 600
+M.windowSettings = {
+	vsync = 0,
+	resizable = true,
+	display = 1,
+}
+M.isWindowMaximized = false
+M.winDecorationOX = 0 -- Edit your user config with these
+M.winDecorationOY = 0 -- if your window is offset on restart.
+
 M.lastOpenFolder = nil
 M.lastSaveFolder = nil
 M.lastExportFolder = nil

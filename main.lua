@@ -27,6 +27,12 @@ do -- Load user config.
 	end
 end
 
+do -- Initialize window
+	love.window.setMode(config.winWidth, config.winHeight, config.windowSettings)
+	if config.isWindowMaximized then  love.window.maximize()  end
+	love.window.setTitle("Editor")
+end
+
 local modkeys = require "modkeys"
 _G.Input = require "input"
 
@@ -119,10 +125,21 @@ function love.draw()
 	end
 end
 
+local function saveWindowPosInConfig()
+	local win = config.windowSettings
+	win.x, win.y, win.display = love.window.getPosition()
+	win.x = win.x - config.winDecorationOX
+	win.y = win.y - config.winDecorationOY
+end
+
 function love.resize(w, h)
 	screenRect.w, screenRect.h = w, h
 	window:allocate(screenRect)
 	_G.shouldRedraw = true
+	if not love.window.isMaximized() then
+		config.winWidth, config.winHeight = w, h
+		saveWindowPosInConfig()
+	end
 end
 
 function love.keypressed(key, scancode, isRepeat)
@@ -166,6 +183,13 @@ function love.quit()
 	local file, errMsg = io.open(filepath, "w")
 	if file then
 		local userConfig = {}
+		userConfig.winWidth = config.winWidth
+		userConfig.winHeight = config.winHeight
+		saveWindowPosInConfig() -- No callback for window -move-, so grab it now.
+		userConfig.windowSettings = config.windowSettings
+		userConfig.isWindowMaximized = love.window.isMaximized()
+		userConfig.winDecorationOX = config.winDecorationOX
+		userConfig.winDecorationOY = config.winDecorationOY
 		userConfig.lastOpenFolder = config.lastOpenFolder
 		userConfig.lastSaveFolder = config.lastSaveFolder
 		userConfig.lastExportFolder = config.lastExportFolder
