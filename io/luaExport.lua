@@ -36,10 +36,12 @@ M.defaultOptions = {
 }
 
 local String = require "objects.properties.String"
+local Vec2 = require "objects.properties.Vec2"
 local split = require "lib.string-split"
 
-local function getPropExportValue(prop, filepath)
+local function writePropExportValue(prop, filepath)
 	local val = prop:copyValue()
+	local name = prop.name
 	local propType = prop.typeName
 	if propType == "file" or propType == "image" or propType == "script" then
 		if val ~= "" then
@@ -49,10 +51,17 @@ local function getPropExportValue(prop, filepath)
 		if val[1] ~= "" then
 			val[1] = fileUtil.getRelativePath(filepath, val[1])
 		end
-	elseif (prop.name == "categories" or prop.name == "mask") and prop:is(String) then
+	elseif (name == "categories" or name == "mask") and prop:is(String) then
 		val = split(val, ", ")
+	elseif (name == "pos" or name == "scale" or name == "skew") and prop:is(Vec2) then
+		local key1, key2
+		if name == "pos" then  key1, key2 = "x", "y"
+		elseif name == "scale" then  key1, key2 = "sx", "sy"
+		elseif name == "skew" then  key1, key2 = "kx", "ky"  end
+		write(key1.." = "..val.x..", "..key2.." = "..val.y..",\n")
+		return
 	end
-	return val
+	write(name.." = "..objToStr(val)..",\n")
 end
 
 local function writePropertyData(child, omitUnmod, filepath)
@@ -60,9 +69,7 @@ local function writePropertyData(child, omitUnmod, filepath)
 		if omitUnmod and prop.isNonRemovable and prop:isAtDefault() then
 			-- skip
 		else
-			local name = prop.name
-			local value = getPropExportValue(prop, filepath)
-			write(name.." = "..objToStr(value)..",\n")
+			writePropExportValue(prop, filepath)
 		end
 	end
 end
