@@ -3,13 +3,12 @@ local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
 local File = BaseClass:extend()
 File.className = "File"
 
+local config = require "config"
 local InputField = require "ui.widgets.InputField"
 local Button = require "ui.widgets.Button"
 local fileDialog = require "lib.native-file-dialog.dialog"
 local FilepathFieldTheme = require "ui.widgets.themes.FilepathFieldTheme"
 local fileUtil = require "lib.file-util"
-
-local lastOpenFolder
 
 File.labelWidth = File.width/3
 local dialogBtnWidth = 24
@@ -45,9 +44,9 @@ function File.onConfirm(self, wgt)
 end
 
 function File.buttonPressed(self)
-	local path = fileDialog.open(lastOpenFolder)
+	local path = fileDialog.open(config.lastFilePropFolder)
 	if path then
-		lastOpenFolder = fileUtil.splitFilepath(path)
+		config.lastFilePropFolder = fileUtil.splitFilepath(path)
 		self.fieldWgt:setText(path)
 		self:onConfirm(self.fieldWgt)
 	end

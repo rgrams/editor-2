@@ -20,7 +20,7 @@ function Script.isValid(self, filepath)
 	if filepath == "" then
 		return true, nil
 	elseif filepath then
-		script = scriptCache[filepath] or fileUtil.loadScriptFromAbsolutePath(filepath)
+		script = scriptCache[filepath] or fileUtil.loadLuaFromAbsolutePath(filepath)
 		if script then
 			scriptCache[filepath] = script
 			return true, script

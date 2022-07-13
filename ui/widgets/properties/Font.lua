@@ -3,14 +3,13 @@ local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
 local Font = BaseClass:extend()
 Font.className = "Font"
 
+local config = require "config"
 local InputField = require "ui.widgets.InputField"
 local Button = require "ui.widgets.Button"
 local fileDialog = require "lib.native-file-dialog.dialog"
 local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 local FilepathFieldTheme = require "ui.widgets.themes.FilepathFieldTheme"
 local fileUtil = require "lib.file-util"
-
-local lastOpenFolder
 
 Font.labelWidth = Font.width/3
 local dialogBtnWidth = 24
@@ -59,9 +58,9 @@ function Font.onConfirm(self, wgt, field)
 end
 
 function Font.buttonPressed(self)
-	local path = fileDialog.open(lastOpenFolder)
+	local path = fileDialog.open(config.lastFontPropFolder)
 	if path then
-		lastOpenFolder = fileUtil.splitFilepath(path)
+		config.lastFontPropFolder = fileUtil.splitFilepath(path)
 		self.pathWgt:setText(path)
 		self:onConfirm(self.pathWgt, "path")
 	end

@@ -52,13 +52,12 @@ function M.splitFilepath(path)
 	end
 end
 
-function M.loadScriptFromAbsolutePath(path)
+function M.loadLuaFromAbsolutePath(path)
 	local isSuccess, result = pcall(dofile, path)
 	if isSuccess then
 		return result
 	else
-		print(result)
-		return false
+		return false, result
 	end
 end
 

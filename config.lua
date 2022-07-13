@@ -3,6 +3,14 @@ local M = {}
 
 M.projectFileExtension = ".project"
 
+M.userConfigFilename = "user-config.lua"
+
+M.lastOpenFolder = nil
+M.lastSaveFolder = nil
+M.lastExportFolder = nil
+M.lastFontPropFolder = nil
+M.lastFilePropFolder = nil
+
 M.zoomRate = 0.1
 
 M.translateSnapIncrement = 8

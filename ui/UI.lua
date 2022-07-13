@@ -2,6 +2,7 @@
 local UI = gui.Column:extend()
 UI.className = "UI"
 
+local config = require "config"
 local Ruu = require "ui.ruu.ruu"
 local Toolbar = require "ui.Toolbar"
 local TabBar = require "ui.TabBar"
@@ -11,13 +12,8 @@ local ResizeHandle = require "ui.widgets.ResizeHandle"
 local scenes = require "scenes"
 local fileDialog = require "lib.native-file-dialog.dialog"
 local fileUtil = require "lib.file-util"
-local objectFn = require "commands.functions.object-functions"
 local signals = require "signals"
 local updateSceneTitleScript = require "ui.updateSceneTitle_script"
-
-local lastOpenFolder
-local lastSaveFolder
-local lastExportFolder
 
 Ruu.isHoverAction["pan camera"] = true
 Ruu.isHoverAction["right click"] = true
@@ -131,24 +127,24 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 	elseif action == "save" and change == 1 then
 		if scenes.active then
 			local filepath = scenes.active.filepath
-			if not filepath then  filepath = fileDialog.save(lastSaveFolder)  end
+			if not filepath then  filepath = fileDialog.save(config.lastSaveFolder)  end
 			if not filepath then  return  end
-			lastSaveFolder = fileUtil.splitFilepath(filepath)
+			config.lastSaveFolder = fileUtil.splitFilepath(filepath)
 			self:saveScene(scenes.active, filepath)
 		end
 	elseif action == "save as" and change == 1 then
 		if scenes.active then
-			local filepath = fileDialog.save(lastSaveFolder)
+			local filepath = fileDialog.save(config.lastSaveFolder)
 			if not filepath then  return  end
-			lastSaveFolder = fileUtil.splitFilepath(filepath)
+			config.lastSaveFolder = fileUtil.splitFilepath(filepath)
 			self:saveScene(scenes.active, filepath)
 		end
 	elseif action == "open" and change == 1 then
-		local filepath = fileDialog.open(lastOpenFolder)
+		local filepath = fileDialog.open(config.lastOpenFolder)
 		if not filepath then  return  end
 
 		local folder = fileUtil.splitFilepath(filepath)
-		lastOpenFolder = folder
+		config.lastOpenFolder = folder
 
 		self:openScene(filepath)
 	elseif action == "export" and change == 1 then
@@ -194,9 +190,9 @@ function UI.exportScene(self, scene, exporterName, isExportAs)
 	local exporter = _G.exporterList:get(exporterName)
 
 	local filepath = not isExportAs and scene.lastExportFilepath
-	if not filepath then  filepath = fileDialog.save(lastExportFolder or lastSaveFolder)  end
+	if not filepath then  filepath = fileDialog.save(config.lastExportFolder or config.lastSaveFolder)  end
 	if not filepath then  return  end
-	lastExportFolder = fileUtil.splitFilepath(filepath)
+	config.lastExportFolder = fileUtil.splitFilepath(filepath)
 	scene.lastExportFilepath = filepath
 	scene.lastUsedExporter = exporterName
 
