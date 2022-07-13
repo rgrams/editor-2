@@ -122,17 +122,22 @@ function M.export(scene, filepath, options)
 	write("return {\n")
 	addIndent()
 
+	-- Write scene properties.
+	write("isSceneFile = true,\n")
+	if #scene.properties > 0 then
+		write("properties = {\n")
+		addIndent()
+		local omitUnmod = false
+		writePropertyData(scene, omitUnmod, relFilepathFolder)
+		removeIndent()
+		write("},\n")
+	end
+
 	write("objects = {\n")
 	addIndent()
 	writeChildrenData(scene.children, options, relFilepathFolder)
 	removeIndent()
 	write("},\n")
-
-	-- TODO: write scene properties.
-	-- data.isSceneFile = true
-	-- if #scene.properties > 0 then
-		-- data.properties = copyPropertyData(scene, options.omitUnmodifiedBuiltins, filepath)
-	-- end
 
 	removeIndent()
 	write("}\n")
