@@ -36,6 +36,7 @@ M.defaultOptions = {
 	omitUnmodifiedBuiltins = true
 }
 
+local Float = require "objects.properties.Property"
 local String = require "objects.properties.String"
 local Vec2 = require "objects.properties.Vec2"
 local split = require "lib.string-split"
@@ -61,6 +62,8 @@ local function writePropExportValue(prop, filepath)
 		elseif name == "skew" then  key1, key2 = "kx", "ky"  end
 		write(key1.." = "..val.x..", "..key2.." = "..val.y..",\n")
 		return
+	elseif name == "angle" and prop:is(Float) then
+		val = math.rad(val)
 	end
 	write(name.." = "..objToStr(val)..",\n")
 end
