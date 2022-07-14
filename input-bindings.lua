@@ -56,4 +56,5 @@ return {
 	{ "button", "2", "polygon tool" },
 	{ "button", "ctrl e", "export" },
 	{ "button", "ctrl shift e", "export as" },
+	{ "button", "f5", "run game" },
 }
