@@ -2,6 +2,7 @@ local M = {}
 
 local objToStr = require "philtre.lib.object-to-string"
 local fileUtil = require "lib.file-util"
+local config = require "config"
 
 _G.exporterList:add(M, "lua export for runtime")
 
