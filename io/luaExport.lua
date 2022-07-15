@@ -54,6 +54,7 @@ local function writePropExportValue(prop, filepath)
 			val[1] = fileUtil.getRelativePath(filepath, val[1])
 		end
 	elseif (name == "categories" or name == "mask") and prop:is(String) then
+		if val == "" then  return  end
 		val = split(val, ", ")
 	elseif (name == "pos" or name == "scale" or name == "skew") and prop:is(Vec2) then
 		local key1, key2
