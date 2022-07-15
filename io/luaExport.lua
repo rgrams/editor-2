@@ -70,12 +70,25 @@ local function writePropExportValue(prop, filepath)
 end
 
 local function writePropertyData(child, omitUnmod, filepath)
+	local nonBuiltinProps
 	for _,prop in ipairs(child.properties) do
-		if omitUnmod and prop.isNonRemovable and prop:isAtDefault() then
-			-- skip
+		if prop.isNonRemovable then
+			if not (omitUnmod and prop:isAtDefault()) then
+				writePropExportValue(prop, filepath)
+			end
 		else
+			nonBuiltinProps = nonBuiltinProps or {}
+			table.insert(nonBuiltinProps, prop)
+		end
+	end
+	if nonBuiltinProps then
+		write("properties = {\n")
+		addIndent()
+		for _,prop in ipairs(nonBuiltinProps) do
 			writePropExportValue(prop, filepath)
 		end
+		removeIndent()
+		write("},\n")
 	end
 end
 
@@ -142,12 +155,8 @@ function M.export(scene, filepath, options)
 	-- Write scene properties.
 	write("isSceneFile = true,\n")
 	if #scene.properties > 0 then
-		write("properties = {\n")
-		addIndent()
 		local omitUnmod = false
 		writePropertyData(scene, omitUnmod, relFilepathFolder)
-		removeIndent()
-		write("},\n")
 	end
 
 	write("objects = {\n")
