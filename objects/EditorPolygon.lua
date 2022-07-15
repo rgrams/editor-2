@@ -158,7 +158,9 @@ function EditorPolygon.draw(self)
 	if isLoop and vertCount >= 3 then
 		love.graphics.polygon("line", verts)
 	elseif vertCount >= 2 then
+		if self.isHovered then  love.graphics.setLineWidth(2.25)  end
 		love.graphics.line(verts)
+		love.graphics.setLineWidth(1)
 	elseif vertCount == 1 then
 		love.graphics.circle("fill", verts[1], verts[2], 1, 8)
 	end
