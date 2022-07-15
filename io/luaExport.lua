@@ -32,6 +32,18 @@ local function write(str)
 	_file:write(_curIndent .. str)
 end
 
+local function openBlock(key)
+	if key then  write(key .. " = {\n")
+	else         write("{\n")  end
+	addIndent()
+end
+
+local function closeBlock(omitComma)
+	removeIndent()
+	if omitComma then  write("}\n")
+	else               write("},\n")  end
+end
+
 M.defaultOptions = {
 	omitUnmodifiedBuiltins = true
 }
@@ -82,13 +94,11 @@ local function writePropertyData(child, omitUnmod, filepath)
 		end
 	end
 	if nonBuiltinProps then
-		write("properties = {\n")
-		addIndent()
+		openBlock("properties")
 		for _,prop in ipairs(nonBuiltinProps) do
 			writePropExportValue(prop, filepath)
 		end
-		removeIndent()
-		write("},\n")
+		closeBlock()
 	end
 end
 
@@ -98,23 +108,19 @@ local function writeChildrenData(children, options, filepath)
 	for i=1,children.maxn or #children do
 		local child = children[i]
 		if child then
-			write("{\n")
-			addIndent()
+			openBlock()
 
 			local Class = getmetatable(child)
 			write("class = \""..Class.displayName.."\",\n")
 			writePropertyData(child, omitUnmod, filepath)
 
 			if child.children and child.children.maxn > 0 then
-				write("children = {\n")
-				addIndent()
+				openBlock("children")
 				writeChildrenData(child.children, options, filepath)
-				removeIndent()
-				write("}\n")
+				closeBlock(true)
 			end
 
-			removeIndent()
-			write("},\n")
+			closeBlock()
 		end
 	end
 	return output
@@ -152,21 +158,18 @@ function M.export(scene, filepath, options)
 	write("return {\n")
 	addIndent()
 
-	-- Write scene properties.
 	write("isSceneFile = true,\n")
+
 	if #scene.properties > 0 then
 		local omitUnmod = false
 		writePropertyData(scene, omitUnmod, relFilepathFolder)
 	end
 
-	write("objects = {\n")
-	addIndent()
+	openBlock("objects")
 	writeChildrenData(scene.children, options, relFilepathFolder)
-	removeIndent()
-	write("},\n")
+	closeBlock()
 
-	removeIndent()
-	write("}\n")
+	closeBlock(true)
 	file:close()
 end
 
