@@ -95,7 +95,7 @@ function M.export(scene, filepath, options)
 	data.isSceneFile = true
 	data.lastUsedExporter = scene.lastUsedExporter
 	if scene.lastExportFilepath then
-		data.lastExportFilepath = fileUtil.getRelativePath(filepath, scene.lastExportFilepath)
+		data.lastExportFilepath = fileUtil.getRelativePath(relFilepathFolder, scene.lastExportFilepath)
 	end
 	if #scene.properties > 0 then
 		data.properties = copyPropertyData(scene, options.omitUnmodifiedBuiltins, relFilepathFolder)
@@ -196,11 +196,6 @@ function M.import(filepath, options)
 	local _, filename = fileUtil.splitFilepath(filepath)
 	local scene = scenes.create(filename, filepath)
 
-	scene.lastUsedExporter = data.lastUsedExporter
-	if data.lastExportFilepath then
-		scene.lastExportFilepath = fileUtil.resolveRelativePath(filepath, data.lastExportFilepath)
-	end
-
 	local relFilepathFolder = filepath
 
 	local useProjectPaths
@@ -223,6 +218,11 @@ function M.import(filepath, options)
 		else
 			relFilepathFolder = projectFolder
 		end
+	end
+
+	scene.lastUsedExporter = data.lastUsedExporter
+	if data.lastExportFilepath then
+		scene.lastExportFilepath = fileUtil.resolveRelativePath(relFilepathFolder, data.lastExportFilepath)
 	end
 
 	if data.properties then
