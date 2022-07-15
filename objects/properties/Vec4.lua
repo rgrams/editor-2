@@ -48,7 +48,7 @@ end
 
 function Vec4.copyValue(self)
 	local val = self.value
-	return { val[1], val[2], val[2], val[4] }
+	return { val[1], val[2], val[3], val[4] }
 end
 
 local _printStr = "(Prop[%s]: '%s', (%.2f, %.2f, %.2f, %.2f))"
