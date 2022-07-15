@@ -424,6 +424,17 @@ function PolygonTool.ruuInput(wgt, depth, action, value, change, rawChange, isRe
 		if not self.isDragging then
 			updateHover(self, x, y)
 		end
+	elseif action == "click" and change == 1 and presses >= 2 then
+		local activePoly, enclosure = getActivePolygon()
+		if activePoly then
+			local self = wgt.object
+			if self.hoverSegIdx then
+				local lx, ly = self.intersectX, self.intersectY
+				local vi = self.hoverSegIdx + 1
+				scenes.active.history:perform("insertVertex", self, enclosure, vi, lx, ly)
+				updateHover(self, x, y)
+			end
+		end
 	elseif action == "cancel" and change == 1 then
 		local scene = scenes.active
 		if scene and next(scene.isVertSelected) then
