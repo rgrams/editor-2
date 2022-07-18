@@ -62,6 +62,7 @@ function AddPropDialog.set(self, callback, callbackArgs)
 		{ text = "file", fn = self.setType, args = {self, "file" } },
 		{ text = "script", fn = self.setType, args = {self, "script" } },
 		{ text = "font", fn = self.setType, args = {self, "font" } },
+		{ text = "object", fn = self.setType, args = {self, "object" } },
 	}
 end
 
