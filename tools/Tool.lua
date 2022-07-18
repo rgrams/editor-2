@@ -29,6 +29,8 @@ Tool.snapToAxisKey = "shift"
 Tool.bigNudgeKey = "shift"
 Tool.smallNudgeKey = "ctrl"
 Tool.dragInWorldSpace = true
+Tool.proportionalKey = "shift"
+Tool.symmetricalKey = "alt"
 
 local dirKey = { left = {-1,0}, right = {1,0}, up = {0,-1}, down = {0,1} }
 
@@ -369,52 +371,90 @@ function Tool.drag(wgt, dx, dy, dragType)
 			self.dragScaleStartOffsets = getDragPropertyList(enclosures, "scale", inWorldSpace)
 		end
 
-		-- AABB is in world space.
-		local AABB = self.originalDragAABB
-		local lt, top, rt, bot = AABB.lt, AABB.top, AABB.rt, AABB.bot
-		local w, h = rt - lt, bot - top
-
 		-- Figure out transform origin and new AABB.
 		local isSnapped = modkeys.isPressed(self.snapKey)
 		local snapIncr = isSnapped and config.translateSnapIncrement or config.roundAllPropsTo
 
+		-- AABB is in world space.
+		local origAABB = self.originalDragAABB
+		local lt, top = origAABB.lt, origAABB.top
+		local w, h = origAABB.w, origAABB.h
+
+		local isProportional = modkeys.isPressed(self.proportionalKey)
+		local isSymmetrical = modkeys.isPressed(self.symmetricalKey)
+
+		local xKey = { [-1] = "lt", [1] = "rt" }
+		local yKey = { [-1] = "top", [1] = "bot" }
+
 		local dir = handle.dir
-		local ox, oy
+		local pivotX, pivotY
 
-		if dir.x == -1 then
-			lt = lt + totalDX
-			lt = math.round(lt, snapIncr)
-			self.AABB.lt = lt -- Directly modify current AABB instead of re-summing it.
-			ox = rt
-		elseif dir.x == 0 then
-			ox = lt + w/2
-		elseif dir.x == 1 then
-			rt = rt + totalDX
-			rt = math.round(rt, snapIncr)
-			self.AABB.rt = rt
-			ox = lt
+		if dir.x ~= 0 then -- X axis
+			local key = xKey[dir.x]
+			local origVal = origAABB[key]
+			self.AABB[key] = math.round(origVal + totalDX, snapIncr)
+			local oppKey = xKey[-dir.x]
+			pivotX = origAABB[oppKey]
+			if isSymmetrical then
+				pivotX = lt + w/2
+				local delta = self.AABB[key] - origVal -- Want to be symmetrical, not snap independently.
+				self.AABB[oppKey] = origAABB[oppKey] - delta
+			else
+				self.AABB[oppKey] = origAABB[oppKey] -- Reset in case we were symmetrical before.
+			end
+		else
+			pivotX = lt + w/2
 		end
-		if dir.y == -1 then
-			top = top + totalDY
-			top = math.round(top, snapIncr)
-			self.AABB.top = top
-			oy = bot
-		elseif dir.y == 0 then
-			oy = top + h/2
-		elseif dir.y == 1 then
-			bot = bot + totalDY
-			bot = math.round(bot, snapIncr)
-			self.AABB.bot = bot
-			oy = top
+		if dir.y ~= 0 then -- Y axis
+			local key = yKey[dir.y]
+			local origVal = origAABB[key]
+			self.AABB[key] = math.round(origVal + totalDY, snapIncr)
+			local oppKey = yKey[-dir.y]
+			pivotY = origAABB[oppKey]
+			if isSymmetrical then
+				pivotY = top + h/2
+				local delta = self.AABB[key] - origVal
+				self.AABB[oppKey] = origAABB[oppKey] - delta
+			else
+				self.AABB[oppKey] = origAABB[oppKey]
+			end
+		else
+			pivotY = top + h/2
 		end
 
-		local newW, newH = rt - lt, bot - top
+		local newW, newH = self.AABB.rt - self.AABB.lt, self.AABB.bot - self.AABB.top
 		local sx, sy = newW / w, newH / h
+		if isProportional then
+			if dir.x == 0 then  sx = 0 -- Only use the controlled axis if it's a single-axis transform.
+			elseif dir.y == 0 then  sy = 0  end
+
+			local s = math.max(sx, sy)
+			sx, sy = s, s
+			newW, newH = origAABB.w*s, origAABB.h*s
+			local origCX, origCY = origAABB.lt + origAABB.w/2, origAABB.top + origAABB.h/2
+			if isSymmetrical then
+				self.AABB.lt, self.AABB.rt = origCX - newW/2, origCX + newW/2
+				self.AABB.top, self.AABB.bot = origCY - newH/2, origCY + newH/2
+			else
+				if dir.x ~= 0 then
+					local key, oppKey = xKey[dir.x], xKey[-dir.x]
+					self.AABB[key] = origAABB[oppKey] + newW*dir.x
+				else
+					self.AABB.lt, self.AABB.rt = origCX - newW/2, origCX + newW/2
+				end
+				if dir.y ~= 0 then
+					local key, oppKey = yKey[dir.y], yKey[-dir.y]
+					self.AABB[key] = origAABB[oppKey] + newH*dir.y
+				else
+					self.AABB.top, self.AABB.bot = origCY - newH/2, origCY + newH/2
+				end
+			end
+		end
 
 		local argsList = {}
 		for i,start in ipairs(self.dragPosStartOffsets) do
-			local x = ox + (start.x - ox)*sx
-			local y = oy + (start.y - oy)*sy
+			local x = pivotX + (start.x - pivotX)*sx
+			local y = pivotY + (start.y - pivotY)*sy
 			if inWorldSpace then
 				local obj = start.enclosure[1]
 				x, y = obj:toLocalPos(x, y)
