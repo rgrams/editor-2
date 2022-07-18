@@ -5,6 +5,8 @@ EditorWorld.className = "EditorWorld"
 
 EditorWorld.displayName = "World"
 
+local id = require "lib.id"
+
 _G.objClassList:add(EditorWorld, EditorWorld.displayName)
 
 EditorWorld.hitWidth = 54
@@ -17,6 +19,7 @@ local Script = require "objects.properties.Script"
 
 function EditorWorld.initProperties(self)
 	-- Class, name, value, isDefault, isNonRemovable
+	self:addProperty(String, "id", id.new(), nil, true)
 	self:addProperty(String, "name", nil, nil, true)
 	self:addProperty(Float, "gravityX", 0, true, true)
 	self:addProperty(Float, "gravityY", 0, true, true)

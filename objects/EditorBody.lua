@@ -4,6 +4,8 @@ local EditorBody = EditorObject:extend()
 EditorBody.className = "EditorBody"
 EditorBody.displayName = "Body"
 
+local id = require "lib.id"
+
 _G.objClassList:add(EditorBody, EditorBody.displayName)
 
 local Float = require "objects.properties.Property"
@@ -13,6 +15,7 @@ local String = require "objects.properties.String"
 local BodyType = require "objects.properties.Enum_BodyType"
 
 function EditorBody.initProperties(self)
+	self:addProperty(String,   "id",  id.new(), nil, true)
 	self:addProperty(String,   "name",     nil, nil, true)
 	self:addProperty(Vec2,     "pos",      nil, nil, true)
 	self:addProperty(Float,    "angle",    nil, nil, true)

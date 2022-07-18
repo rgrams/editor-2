@@ -3,6 +3,7 @@ local EditorObject = Object:extend()
 EditorObject.className = "EditorObject"
 
 local config = require "config"
+local id = require "lib.id"
 
 EditorObject.displayName = "Object"
 EditorObject.hitWidth = 32
@@ -26,6 +27,7 @@ function EditorObject.set(self)
 end
 
 function EditorObject.initProperties(self)
+	self:addProperty(String, "id",    id.new(),         nil,  true)
 	self:addProperty(String, "name",  nil,              nil,  true)
 	self:addProperty(Vec2,   "pos",   nil,              nil,  true)
 	self:addProperty(Float,  "angle", nil,              nil,  true)

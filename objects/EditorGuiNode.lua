@@ -10,6 +10,8 @@ EditorGuiNode.displayName = "GUI Node"
 EditorGuiNode.hitWidth = 100
 EditorGuiNode.hitHeight = 100
 
+local id = require "lib.id"
+
 _G.objClassList:add(EditorGuiNode, EditorGuiNode.displayName)
 
 local Bool = require "objects.properties.Bool"
@@ -36,16 +38,17 @@ function EditorGuiNode.init(self)
 end
 
 function EditorGuiNode.initProperties(self)
-	self:addProperty(String,     "name",   nil, nil, true)
-	self:addProperty(Vec2,       "pos",    nil, nil, true)
-	self:addProperty(Float,      "angle",  nil, nil, true)
-	self:addProperty(Vec2,       "size",   { x = self.hitWidth, y = self.hitHeight }, true)
-	self:addProperty(Vec2,       "skew",   nil, nil, true)
-	self:addProperty(Cardinal,   "pivot",  nil, nil, true)
-	self:addProperty(Cardinal,   "anchor", nil, nil, true)
-	self:addProperty(ResizeMode, "modeX",  nil, nil, true)
-	self:addProperty(ResizeMode, "modeY",  nil, nil, true)
-	self:addProperty(Vec2,       "pad",    nil, nil, true)
+	self:addProperty(String,     "id", id.new(), nil, true)
+	self:addProperty(String,     "name",    nil, nil, true)
+	self:addProperty(Vec2,       "pos",     nil, nil, true)
+	self:addProperty(Float,      "angle",   nil, nil, true)
+	self:addProperty(Vec2,       "size",    { x = self.hitWidth, y = self.hitHeight }, true)
+	self:addProperty(Vec2,       "skew",    nil, nil, true)
+	self:addProperty(Cardinal,   "pivot",   nil, nil, true)
+	self:addProperty(Cardinal,   "anchor",  nil, nil, true)
+	self:addProperty(ResizeMode, "modeX",   nil, nil, true)
+	self:addProperty(ResizeMode, "modeY",   nil, nil, true)
+	self:addProperty(Vec2,       "pad",     nil, nil, true)
 end
 
 function EditorGuiNode.allocate(self, ...)

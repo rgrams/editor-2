@@ -5,6 +5,7 @@ EditorCircle.className = "EditorCircle"
 EditorCircle.displayName = "Circle"
 
 local config = require "config"
+local id = require "lib.id"
 
 _G.objClassList:add(EditorCircle, EditorCircle.displayName)
 
@@ -14,6 +15,7 @@ EditorCircle.hitHeight = EditorCircle.radius*2
 EditorCircle.segments = 24
 
 local Float = require "objects.properties.Property"
+local String = require "objects.properties.String"
 local Vec2 = require "objects.properties.Vec2"
 
 function EditorCircle.set(self)
@@ -23,6 +25,7 @@ function EditorCircle.set(self)
 end
 
 function EditorCircle.initProperties(self)
+	self:addProperty(String, "id", id.new(), nil, true)
 	self:addProperty(Vec2, "pos", nil, nil, true)
 	self:addProperty(Float, "radius", self.radius, true, true)
 end

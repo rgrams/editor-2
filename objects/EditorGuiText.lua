@@ -6,6 +6,8 @@ EditorGuiText.className = "EditorGuiText"
 EditorGuiText.displayName = "GUI Text"
 EditorGuiText.hitHeight = 20
 
+local id = require "lib.id"
+
 _G.objClassList:add(EditorGuiText, EditorGuiText.displayName)
 
 local Bool = require "objects.properties.Bool"
@@ -31,6 +33,7 @@ function EditorGuiText.set(self)
 end
 
 function EditorGuiText.initProperties(self)
+	self:addProperty(String,     "id",    id.new(), nil, true)
 	self:addProperty(String,     "name",       nil, nil, true)
 	self:addProperty(Vec2,       "pos",        nil, nil, true)
 	self:addProperty(Float,      "angle",      nil, nil, true)
