@@ -182,6 +182,17 @@ function EditorObject.getModifiedProperties(self)
 	return properties
 end
 
+function EditorObject.applyModifiedProperties(self, properties)
+	for i,propData in ipairs(properties) do
+		local name, value, PropertyClass = unpack(propData)
+		if not self:hasProperty(name) then
+			self:addProperty(PropertyClass, name, value)
+		else
+			self:setProperty(name, value)
+		end
+	end
+end
+
 function EditorObject.getLocalPos(self)
 	return self.pos.x, self.pos.y
 end
