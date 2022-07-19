@@ -10,6 +10,9 @@ File.defaultValue = ""
 _G.propClassList:add(File, File.typeName)
 
 function File.isValid(self, value)
+	if value == "" then
+		return true, value
+	end
 	local file, errMsg = io.open(value, "r")
 	if file then
 		file:close()
