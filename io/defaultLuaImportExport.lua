@@ -265,7 +265,7 @@ function M.import(filepath, options, parentEnc)
 
 	objectFn.addObjects(caller, scene, addArgsList)
 
-	return scene
+	return scene, addArgsList
 end
 
 return M
