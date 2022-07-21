@@ -44,9 +44,4 @@ function Script._setValidValue(self, filepath, script)
 	self.script = script
 end
 
-function Script.isAtDefault(self)
-	local curVal = self:getValue()
-	return curVal ~= self.defaultValue
-end
-
 return Script

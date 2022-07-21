@@ -48,8 +48,8 @@ function Font.copyValue(self)
 	return { self.value[1], self.value[2] }
 end
 
-function Font.isAtDefault(self)
-	local cur, def = self.value, self.defaultValue
+function Font.isAtDefault(self, overrideDefault)
+	local cur, def = self.value, overrideDefault or self.defaultValue
 	return cur[1] == def[1] and cur[2] == def[2]
 end
 

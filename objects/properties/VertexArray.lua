@@ -9,8 +9,8 @@ VertexArray.defaultValue = {}
 
 _G.propClassList:add(VertexArray, VertexArray.typeName)
 
-function VertexArray.isAtDefault(self)
-	local cur, default = self.value, self.defaultValue
+function VertexArray.isAtDefault(self, overrideDefault)
+	local cur, default = self.value, overrideDefault or self.defaultValue
 	if #cur ~= #default then
 		return false
 	else

@@ -19,8 +19,9 @@ function Vec2.getDefaultValue(self)
 	return value
 end
 
-function Vec2.isAtDefault(self)
-	return self.value.x == self.defaultValue.x and self.value.y == self.defaultValue.y
+function Vec2.isAtDefault(self, overrideDefault)
+	local cur, def = self.value, overrideDefault or self.defaultValue
+	return cur.x == def.x and cur.y == def.y
 end
 
 function Vec2.isValid(self, value)

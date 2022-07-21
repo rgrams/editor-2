@@ -24,9 +24,9 @@ function Property.getDefaultValue(self)
 	return self.defaultValue
 end
 
-function Property.isAtDefault(self)
+function Property.isAtDefault(self, overrideDefault)
 	local curVal = self:getValue()
-	return curVal == self.defaultValue
+	return curVal == (overrideDefault or self.defaultValue)
 end
 
 function Property.isValid(self, value)

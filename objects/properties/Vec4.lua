@@ -13,8 +13,8 @@ Vec4.defaultValue = { 1, 1, 1, 1 }
 
 _G.propClassList:add(Vec4, Vec4.typeName)
 
-function Vec4.isAtDefault(self)
-	local cur, def = self.value, self.defaultValue
+function Vec4.isAtDefault(self, overrideDefault)
+	local cur, def = self.value, overrideDefault or self.defaultValue
 	return cur[1] == def[1] and cur[2] == def[2] and cur[3] == def[3] and cur[4] == def[4]
 end
 
