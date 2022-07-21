@@ -8,6 +8,7 @@ local objectFn = require "commands.functions.object-functions"
 local classList = _G.objClassList
 local propClassList = _G.propClassList
 local config = require "config"
+local ChildScene = require "objects.ChildScene"
 
 M.defaultOptions = {
 	omitUnmodifiedBuiltins = true
@@ -31,7 +32,7 @@ end
 local function copyPropertyData(child, omitUnmod, filepath)
 	local properties = {}
 	for _,prop in ipairs(child.properties) do
-		if omitUnmod and prop.isNonRemovable and prop:isAtDefault() then
+		if omitUnmod and prop.isNonRemovable and prop:isAtDefault(prop.sceneDefault) then
 			-- skip
 		else
 			local pData = {
@@ -55,9 +56,29 @@ local function copyChildrenData(children, options, filepath)
 			local data = {}
 			local Class = getmetatable(child)
 			data.class = Class.displayName
-			data.properties = copyPropertyData(child, omitUnmod, filepath)
-			if child.children then
-				data.children = copyChildrenData(child.children, options, filepath)
+			if Class == ChildScene then
+				local childProperties = {}
+				for id,enclosure in pairs(child.sceneObjectIDMap) do
+					local obj = enclosure[1]
+					local props = copyPropertyData(obj, omitUnmod, filepath)
+					if #props > 0 then
+						childProperties[id] = props
+					end
+				end
+				-- TODO: Get deleted objects.
+				--   Check each object in the ID map to see if it still exists.
+				-- TODO: Get added objects.
+				--   Loop recursively through all objects and store the ones that aren't in the ID map.
+				local mods = {
+					rootProperties = copyPropertyData(child, omitUnmod, filepath),
+					childProperties = childProperties
+				}
+				data.properties = mods
+			else
+				data.properties = copyPropertyData(child, omitUnmod, filepath)
+				if child.children then
+					data.children = copyChildrenData(child.children, options, filepath)
+				end
 			end
 			table.insert(output, data)
 		end
@@ -124,9 +145,12 @@ local function getPropImportValue(val, name, Class, filepath)
 	return val
 end
 
-local function makeAddPropArgs(obj, filepath)
+-- Convert from data: { type=, name=, value= }
+-- To : { name, value, Class }
+-- And convert filepaths to global.
+local function makeAddPropArgs(propDataList, filepath)
 	local properties = {}
-	for i,prop in ipairs(obj.properties) do
+	for i,prop in ipairs(propDataList) do
 		local PropertyClass = propClassList:get(prop.type)
 		local name, value = prop.name, prop.value
 		local propArgs = {
@@ -139,15 +163,29 @@ local function makeAddPropArgs(obj, filepath)
 	return properties
 end
 
-local function makeAddObjArgs(caller, scene, obj, parentEnclosure, filepath)
-	local Class = classList:get(obj.class)
+local function makeAddObjArgs(caller, scene, objData, parentEnclosure, filepath)
+	local Class = classList:get(objData.class)
 	local enclosure = {}
-	local properties = makeAddPropArgs(obj, filepath)
+	local properties
+	if Class == ChildScene then
+		local modsData = objData.properties
+		local mods = {}
+		if modsData.rootProperties then
+			mods.rootProperties = makeAddPropArgs(modsData.rootProperties, filepath)
+		end
+		mods.childProperties = {}
+		for id,propData in pairs(modsData.childProperties) do
+			mods.childProperties[id] = makeAddPropArgs(propData, filepath)
+		end
+		properties = mods
+	else
+		properties = makeAddPropArgs(objData.properties, filepath)
+	end
 	local isSelected = false
 	local children
-	if obj.children then
+	if objData.children then -- ChildScene won't have children saved as such.
 		children = {}
-		for i,child in ipairs(obj.children) do
+		for i,child in ipairs(objData.children) do
 			table.insert(children, makeAddObjArgs(caller, scene, child, enclosure, filepath))
 		end
 	end
@@ -233,7 +271,7 @@ function M.import(filepath, options, parentEnc)
 	end
 
 	if data.properties then
-		addScenePropsList = makeAddPropArgs(data, relFilepathFolder)
+		addScenePropsList = makeAddPropArgs(data.properties, relFilepathFolder)
 		if addScenePropsList then
 			local enclosure = parentEnc or scene.enclosure
 			local obj = enclosure[1]
@@ -249,12 +287,12 @@ function M.import(filepath, options, parentEnc)
 	end
 
 	-- Just need to add the objects at the base level, any children will be added along with.
-	for i,obj in ipairs(data) do
-		if not obj.class then
+	for i,objData in ipairs(data) do
+		if not objData.class then
 			editor.messageBox("Error parsing objects: No object class property found.", "Import Failed: Invalid object")
 			return
 		end
-		local isSuccess, result = pcall(makeAddObjArgs, caller, scene, obj, parentEnc, relFilepathFolder)
+		local isSuccess, result = pcall(makeAddObjArgs, caller, scene, objData, parentEnc, relFilepathFolder)
 		if not isSuccess then
 			editor.messageBox("Error creating command args for creating scene objects: "..tostring(result), "Import Failed: Invalid object")
 			return
