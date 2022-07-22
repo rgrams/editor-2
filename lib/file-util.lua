@@ -52,6 +52,10 @@ function M.splitFilepath(path)
 	end
 end
 
+function M.toRequirePath(filepath)
+	return filepath:gsub("[\\/]", "."):gsub("%.lua", "")
+end
+
 function M.loadLuaFromAbsolutePath(path)
 	local isSuccess, result = pcall(dofile, path)
 	if isSuccess then

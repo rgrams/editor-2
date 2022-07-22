@@ -81,6 +81,10 @@ local function writePropExportValue(prop, filepath)
 	if propType == "file" or propType == "image" or propType == "script" then
 		if val ~= "" then
 			val = fileUtil.getRelativePath(filepath, val)
+			local _, _, ext = fileUtil.splitFilepath(val)
+			if ext == ".lua" then
+				val = fileUtil.toRequirePath(val)
+			end
 		end
 	elseif propType == "font" then
 		if val[1] ~= "" then
