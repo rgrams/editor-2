@@ -78,7 +78,25 @@ local function writePropExportValue(prop, filepath)
 	local val = prop:copyValue()
 	local name = prop.name
 	local propType = prop.typeName
-	if propType == "file" or propType == "image" or propType == "script" then
+	if name == "scene" and propType == "file" then
+		if val ~= "" then
+			local origVal = val
+			val = fileUtil.getRelativePath(filepath, val)
+			local _, _, ext = fileUtil.splitFilepath(val)
+			if ext == ".lua" then
+				val = fileUtil.toRequirePath(val)
+
+				-- If the child-scene has a last-export-path, export that as well.
+				-- WARNING: Assumes all filepaths are project-relative.
+				local sceneModule = fileUtil.loadLuaFromAbsolutePath(origVal)
+				if sceneModule and sceneModule.lastExportFilepath then
+					local exPath = sceneModule.lastExportFilepath
+					exPath = fileUtil.toRequirePath(exPath)
+					write("exportedScene = "..objToStr(exPath)..",\n")
+				end
+			end
+		end
+	elseif propType == "file" or propType == "image" or propType == "script" then
 		if val ~= "" then
 			val = fileUtil.getRelativePath(filepath, val)
 			local _, _, ext = fileUtil.splitFilepath(val)
