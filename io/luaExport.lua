@@ -3,6 +3,7 @@ local M = {}
 local objToStr = require "philtre.lib.object-to-string"
 local fileUtil = require "lib.file-util"
 local config = require "config"
+local ChildScene = require "objects.ChildScene"
 
 _G.exporterList:add(M, "lua export for runtime")
 
@@ -101,11 +102,11 @@ local function writePropExportValue(prop, filepath)
 	write(name.." = "..objToStr(val)..",\n")
 end
 
-local function writePropertyData(child, omitUnmod, filepath)
+local function writePropertyData(child, omitUnmod, filepath, isSceneObj)
 	local nonBuiltinProps
 	for _,prop in ipairs(child.properties) do
 		if prop.isNonRemovable then
-			if not (omitUnmod and prop:isAtDefault()) then
+			if not (omitUnmod and prop:isAtDefault(isSceneObj and prop.sceneDefault)) then
 				writePropExportValue(prop, filepath)
 			end
 		else
@@ -122,6 +123,14 @@ local function writePropertyData(child, omitUnmod, filepath)
 	end
 end
 
+local function hasSceneModifications(obj, omitUnmod)
+	for _,prop in ipairs(obj.properties) do
+		if not (omitUnmod and prop.isNonRemovable and prop:isAtDefault(prop.sceneDefault)) then
+			return true
+		end
+	end
+end
+
 local function writeChildrenData(children, options, filepath)
 	local output = {}
 	local omitUnmod = options.omitUnmodifiedBuiltins
@@ -134,10 +143,23 @@ local function writeChildrenData(children, options, filepath)
 			write("class = \""..Class.displayName.."\",\n")
 			writePropertyData(child, omitUnmod, filepath)
 
-			if child.children and child.children.maxn > 0 then
-				openBlock("children")
-				writeChildrenData(child.children, options, filepath)
-				closeBlock(true)
+			if Class == ChildScene then
+				openBlock("sceneObjProperties")
+				for id,enclosure in pairs(child.sceneObjectIDMap) do
+					local obj = enclosure[1]
+					if hasSceneModifications(obj, omitUnmod) then
+						openBlock(id)
+						writePropertyData(obj, omitUnmod, filepath, true)
+						closeBlock()
+					end
+				end
+				closeBlock()
+			else
+				if child.children and child.children.maxn > 0 then
+					openBlock("children")
+					writeChildrenData(child.children, options, filepath)
+					closeBlock(true)
+				end
 			end
 
 			closeBlock()
