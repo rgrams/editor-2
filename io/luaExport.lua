@@ -8,6 +8,15 @@ _G.exporterList:add(M, "lua export for runtime")
 
 local indent = "\t"
 
+local isLuaKeyword = {
+	["and"] = true, ["break"] = true, ["do"] = true, ["else"] = true,
+	["elseif"] = true, ["end"] = true, ["false"] = true, ["for"] = true,
+	["function"] = true, ["goto"] = true, ["if"] = true, ["in"] = true,
+	["local"] = true, ["nil"] = true, ["not"] = true, ["or"] = true,
+	["repeat"] = true, ["return"] = true, ["then"] = true,
+	["true"] = true, ["until"] = true, ["while"] = true
+}
+
 -- Temp variables for each export.
 local _file
 local _curIndentLvl = 0
@@ -32,8 +41,19 @@ local function write(str)
 	_file:write(_curIndent .. str)
 end
 
+local function validKeyStr(k)
+	if isLuaKeyword[k] then  return '["' .. k .. '"]'  end
+	local t = type(k)
+	if t == "number" then  return "[" .. k .. "]"
+	elseif t == "string" then
+		if string.match(k, "^[%a_][%w_]*") then  return k
+		else  return '["' .. k .. '"]'  end
+	end
+	return k
+end
+
 local function openBlock(key)
-	if key then  write(key .. " = {\n")
+	if key then  write(validKeyStr(key) .. " = {\n")
 	else         write("{\n")  end
 	addIndent()
 end
