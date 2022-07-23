@@ -18,7 +18,6 @@ local String = require "objects.properties.String"
 local Script = require "objects.properties.Script"
 
 function EditorWorld.initProperties(self)
-	-- Class, name, value, isDefault, isNonRemovable
 	self:addProperty(String, "id", id.new(), nil, true)
 	self:addProperty(String, "name", nil, nil, true)
 	self:addProperty(Float, "gravityX", 0, true, true)

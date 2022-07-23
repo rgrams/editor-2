@@ -44,9 +44,9 @@ function EditorObject.wasRemoved(self, fromParent)
 	self:wasModified(fromParent)
 end
 
-function EditorObject.addProperty(self, Class, name, value, isDefault, isNonRemovable)
+function EditorObject.addProperty(self, Class, name, value, isDefault, isClassBuiltin)
 	assert(Class, "EditorObject.addProperty - No class given for property: '"..tostring(name).."', value: '"..tostring(value).."'.")
-	local property = Class(self, name, isNonRemovable)
+	local property = Class(self, name, isClassBuiltin)
 	name = property.name
 	if self.propertyMap[name] then  return  end
 	if value ~= nil then

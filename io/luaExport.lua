@@ -127,11 +127,11 @@ end
 local function writePropertyData(child, omitUnmod, filepath, isSceneObj)
 	local nonBuiltinProps
 	for _,prop in ipairs(child.properties) do
-		if prop.isNonRemovable then
+		if prop.isClassBuiltin then
 			if not (omitUnmod and prop:isAtDefault(isSceneObj and prop.sceneDefault)) then
 				writePropExportValue(prop, filepath)
 			end
-		else
+		elseif not (isSceneObj and prop.isNonRemovable and prop:isAtDefault(prop.sceneDefault)) then
 			nonBuiltinProps = nonBuiltinProps or {}
 			table.insert(nonBuiltinProps, prop)
 		end
