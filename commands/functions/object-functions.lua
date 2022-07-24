@@ -1,6 +1,9 @@
 
 local M = {}
 
+local id = require "lib.id"
+local StringProp = require "objects.properties.String"
+
 function M.add(caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children)
 	local object = Class()
 	enclosure[1] = object
@@ -137,19 +140,29 @@ function M.addObjects(caller, scene, argsList)
 	return caller, scene, enclosures, oneWasSelected
 end
 
+local function setNewIDProp(props)
+	for i,prop in ipairs(props) do
+		if prop[1] == "id" and prop[3] == StringProp then
+			prop[2] = id.new()
+			return props
+		end
+	end
+	return props
+end
+
 -- Copy to new tables and insert new enclosures and new scene-tree.
 function M.copyPasteDataFor(caller, scene, parentEnclosure, childArgList)
 	local newArgList = {}
 	for i,args in ipairs(childArgList) do
 		local newEnclosure = {}
 		local newArgs = {}
-		newArgs[1] = caller          -- [1] caller
-		newArgs[2] = scene           -- [2] scene
-		newArgs[3] = args[3]         -- [3] Class
-		newArgs[4] = newEnclosure    -- [4] enclosure
-		newArgs[5] = args[5]         -- [5] properties
-		newArgs[6] = false           -- [6] isSelected
-		newArgs[7] = parentEnclosure -- [7] parentEnclosure
+		newArgs[1] = caller                -- [1] caller
+		newArgs[2] = scene                 -- [2] scene
+		newArgs[3] = args[3]               -- [3] Class
+		newArgs[4] = newEnclosure          -- [4] enclosure
+		newArgs[5] = setNewIDProp(args[5]) -- [5] properties
+		newArgs[6] = false                 -- [6] isSelected
+		newArgs[7] = parentEnclosure       -- [7] parentEnclosure
 		local children = args[8]
 		if children then
 			newArgs[8] = M.copyPasteDataFor(caller, scene, newEnclosure, children)
