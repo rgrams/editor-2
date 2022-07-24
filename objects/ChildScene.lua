@@ -9,6 +9,7 @@ ChildScene.hitHeight = 64
 
 local signals = require "signals"
 local objectFn = require "commands.functions.object-functions"
+local classList = _G.objClassList
 
 _G.objClassList:add(ChildScene, ChildScene.displayName)
 
@@ -149,6 +150,18 @@ function ChildScene.applySceneModifications(self, mods)
 				else
 					obj:setProperty(name, value)
 				end
+			end
+		end
+	end
+	if mods.addedObjects then
+		local selfID = self:getProperty("id")
+		for id,addedObjects in pairs(mods.addedObjects) do
+			local parentEnc = self.sceneObjectIDMap[id]
+			if not parentEnc and id == selfID then  parentEnc = self.enclosure  end
+			if parentEnc then
+				-- Real parent enclosure didn't exist on import, so we need to set it here.
+				for i,addArg in ipairs(addedObjects) do  addArg[7] = parentEnc  end
+				objectFn.addObjects(self, self.tree, addedObjects)
 			end
 		end
 	end

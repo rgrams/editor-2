@@ -46,40 +46,71 @@ local function copyPropertyData(child, omitUnmod, filepath)
 	return properties
 end
 
-local function copyChildrenData(children, options, filepath)
-	local output = {}
+local function getSceneAddedObjects(children, idMap, list, parentID)
+	for i=1,children.maxn or #children do
+		local obj = children[i]
+		if obj then
+			if not idMap[obj:getProperty("id")] then
+				list = list or {}
+				table.insert(list, { obj=obj, parentID=parentID })
+			elseif obj.children then -- Only want base objects added, not all their descendants.
+				getSceneAddedObjects(obj.children, idMap, list, obj:getProperty("id"))
+			end
+		end
+	end
+	return list
+end
+
+local copyChildrenData
+
+local function copyChildData(child, options, filepath)
 	local omitUnmod = options.omitUnmodifiedBuiltins
+	local data = {}
+	local Class = getmetatable(child)
+	data.class = Class.displayName
+	if Class == ChildScene then
+		local childProperties = {}
+		for id,enclosure in pairs(child.sceneObjectIDMap) do
+			local obj = enclosure[1]
+			local props = copyPropertyData(obj, omitUnmod, filepath)
+			if #props > 0 then
+				childProperties[id] = props
+			end
+		end
+		-- TODO: Get deleted objects.
+		--   Check each object in the ID map to see if it still exists.
+		-- Get added objects.
+		local addedObjects = {}
+		if child.children then
+			local parentID = child:getProperty("id")
+			local addedObjList = getSceneAddedObjects(child.children, child.sceneObjectIDMap, {}, parentID)
+			for i,v in ipairs(addedObjList) do
+				addedObjects[v.parentID] = addedObjects[v.parentID] or {}
+				local childData = copyChildData(v.obj, options, filepath)
+				table.insert(addedObjects[v.parentID], childData)
+			end
+		end
+		local mods = {
+			rootProperties = copyPropertyData(child, omitUnmod, filepath),
+			childProperties = childProperties,
+			addedObjects = addedObjects,
+		}
+		data.properties = mods
+	else
+		data.properties = copyPropertyData(child, omitUnmod, filepath)
+		if child.children then
+			data.children = copyChildrenData(child.children, options, filepath)
+		end
+	end
+	return data
+end
+
+function copyChildrenData(children, options, filepath)
+	local output = {}
 	for i=1,children.maxn or #children do
 		local child = children[i]
 		if child then
-			-- Copy object data:
-			local data = {}
-			local Class = getmetatable(child)
-			data.class = Class.displayName
-			if Class == ChildScene then
-				local childProperties = {}
-				for id,enclosure in pairs(child.sceneObjectIDMap) do
-					local obj = enclosure[1]
-					local props = copyPropertyData(obj, omitUnmod, filepath)
-					if #props > 0 then
-						childProperties[id] = props
-					end
-				end
-				-- TODO: Get deleted objects.
-				--   Check each object in the ID map to see if it still exists.
-				-- TODO: Get added objects.
-				--   Loop recursively through all objects and store the ones that aren't in the ID map.
-				local mods = {
-					rootProperties = copyPropertyData(child, omitUnmod, filepath),
-					childProperties = childProperties
-				}
-				data.properties = mods
-			else
-				data.properties = copyPropertyData(child, omitUnmod, filepath)
-				if child.children then
-					data.children = copyChildrenData(child.children, options, filepath)
-				end
-			end
+			local data = copyChildData(child, options, filepath)
 			table.insert(output, data)
 		end
 	end
@@ -176,6 +207,16 @@ local function makeAddObjArgs(caller, scene, objData, parentEnclosure, filepath)
 		mods.childProperties = {}
 		for id,propData in pairs(modsData.childProperties) do
 			mods.childProperties[id] = makeAddPropArgs(propData, filepath)
+		end
+		mods.addedObjects = {}
+		for id,addedObjs in pairs(modsData.addedObjects) do
+			mods.addedObjects[id] = {}
+			for i,addedObjData in ipairs(addedObjs) do
+				-- WARNING: Parent objects from the scene don't exist yet, so the
+				--   parent enclosure set here is bogus. Will need to be updated later.
+				local args = makeAddObjArgs(caller, scene, addedObjData, enclosure, filepath)
+				table.insert(mods.addedObjects[id], args)
+			end
 		end
 		properties = mods
 	else
