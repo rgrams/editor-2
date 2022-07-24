@@ -209,13 +209,15 @@ local function makeAddObjArgs(caller, scene, objData, parentEnclosure, filepath)
 			mods.childProperties[id] = makeAddPropArgs(propData, filepath)
 		end
 		mods.addedObjects = {}
-		for id,addedObjs in pairs(modsData.addedObjects) do
-			mods.addedObjects[id] = {}
-			for i,addedObjData in ipairs(addedObjs) do
-				-- WARNING: Parent objects from the scene don't exist yet, so the
-				--   parent enclosure set here is bogus. Will need to be updated later.
-				local args = makeAddObjArgs(caller, scene, addedObjData, enclosure, filepath)
-				table.insert(mods.addedObjects[id], args)
+		if modsData.addedObjects then
+			for id,addedObjs in pairs(modsData.addedObjects) do
+				mods.addedObjects[id] = {}
+				for i,addedObjData in ipairs(addedObjs) do
+					-- WARNING: Parent objects from the scene don't exist yet, so the
+					--   parent enclosure set here is bogus. Will need to be updated later.
+					local args = makeAddObjArgs(caller, scene, addedObjData, enclosure, filepath)
+					table.insert(mods.addedObjects[id], args)
+				end
 			end
 		end
 		properties = mods
