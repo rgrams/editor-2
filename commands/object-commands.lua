@@ -1,5 +1,4 @@
 
-local Obj = require "commands.functions.object-functions"
 local objectFn = require "commands.functions.object-functions"
 local signals = require "signals"
 
@@ -55,6 +54,46 @@ local function paste(caller, ...)
 		signals.send("selection changed", caller, scene)
 	end
 	return caller, scene, newEnclosures, oneWasSelected
+end
+
+local function getAllEnclosuresFromArgs(args, list)
+	list = list or {}
+	for i,argsList in ipairs(args) do
+		local enclosure, children = argsList[4], argsList[8]
+		table.insert(list, enclosure)
+		if children then
+			getAllEnclosuresFromArgs(children, list)
+		end
+	end
+	return list
+end
+
+local function duplicate(caller, scene, enclosuresToCopy)
+	local dupArgs = objectFn.copy(scene, enclosuresToCopy)
+	dupArgs = objectFn.copyPasteDataFor(caller, scene, nil, dupArgs)
+	for i,enclosure in ipairs(enclosuresToCopy) do
+		local args = dupArgs[i]
+		local origParent = enclosure[1].parent
+		args[7] = origParent.enclosure -- Set parent back to the original.
+	end
+	-- Want to select -all- new objects, not just the ancestors.
+	local newEnclosuresToSelect = getAllEnclosuresFromArgs(dupArgs)
+
+	local _, _, newEnclosuresForUndo = objectFn.addObjects(caller, scene, dupArgs)
+	local oldSelection = scene.selection:setTo(newEnclosuresToSelect)
+
+	signals.send("objects added", caller, scene)
+	signals.send("selection changed", caller, scene)
+
+	return caller, scene, newEnclosuresForUndo, oldSelection
+end
+
+local function unduplicate(caller, scene, enclosures, oldSelection)
+	objectFn.deleteObjects(caller, scene, enclosures)
+	scene.selection:setTo(oldSelection)
+	signals.send("objects added", caller, scene)
+	signals.send("selection changed", caller, scene)
+	-- Only used for undoing duplicate, so it doesn't need to return anything.
 end
 
 ---------  Property Commands  ----------
@@ -167,6 +206,7 @@ return {
 	setMultiPropertiesOnMultiple = { setMultiPropertiesOnMultiple, setMultiPropertiesOnMultiple },
 	offsetVec2PropertyOnMultiple = { offsetVec2PropertyOnMultiple, setMultiPropertiesOnMultiple },
 	paste = { paste, deleteObjects },
+	duplicate = { duplicate, unduplicate },
 	addProperty = { addProperty, removeProperty },
 	removeProperty = { removeProperty, addProperty },
 	addPropertyToMultiple = { addPropertyToMultiple, removePropertyFromMultiple },

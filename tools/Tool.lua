@@ -579,7 +579,22 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 	if scenes.active and not isKeyboard then
 		local self = wgt.object
 
-		if scenes.active.selection[1] and Input.isPressed("force drag modifier") then
+		local hasSelection = scenes.active.selection[1]
+
+		if Input.isPressed("duplicate drag modifier") and (self.hoverObj or hasSelection) then
+			local scene = scenes.active
+			local enclosures
+			if hasSelection then -- Duplicate selection.
+				enclosures = scene.selection:copyList()
+				objectFn.removeDescendantsFromList(enclosures)
+			else -- Duplicate hovered object.
+				enclosures = { self.hoverObj.enclosure }
+			end
+			scene.history:perform("duplicate", self, scene, enclosures)
+			updateHover(self)
+			startDrag(self, "translate selection")
+
+		elseif hasSelection and Input.isPressed("force drag modifier") then
 			local isRotate = modkeys.isPressed(self.rotateKey)
 			local dragType = isRotate and "rotate selection" or "translate selection"
 			startDrag(self, dragType)
