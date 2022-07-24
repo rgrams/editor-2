@@ -153,38 +153,73 @@ local function hasSceneModifications(obj, omitUnmod)
 	end
 end
 
-local function writeChildrenData(children, options, filepath)
-	local output = {}
+local function getSceneAddedObjects(children, idMap, map, parentID)
+	for i=1,children.maxn or #children do
+		local obj = children[i]
+		if obj then
+			if not idMap[obj:getProperty("id")] then
+				map = map or {}
+				map[parentID] = map[parentID] or {}
+				table.insert(map[parentID], obj)
+			elseif obj.children then -- Only want base objects added, not all their descendants.
+				getSceneAddedObjects(obj.children, idMap, map, obj:getProperty("id"))
+			end
+		end
+	end
+	return map
+end
+
+local writeChildrenData
+
+local function writeChildData(child, options, filepath)
+	openBlock()
+
 	local omitUnmod = options.omitUnmodifiedBuiltins
+	local Class = getmetatable(child)
+	write("class = \""..Class.displayName.."\",\n")
+	writePropertyData(child, omitUnmod, filepath)
+
+	if Class == ChildScene then
+		openBlock("sceneObjProperties")
+		for id,enclosure in pairs(child.sceneObjectIDMap) do
+			local obj = enclosure[1]
+			if hasSceneModifications(obj, omitUnmod) then
+				openBlock(id)
+				writePropertyData(obj, omitUnmod, filepath, true)
+				closeBlock()
+			end
+		end
+		closeBlock()
+		openBlock("sceneAddedObjects")
+		if child.children then
+			local parentID = child:getProperty("id")
+			local addedObjMap = getSceneAddedObjects(child.children, child.sceneObjectIDMap, {}, parentID)
+			for id,objList in pairs(addedObjMap) do
+				openBlock(id)
+				for _,obj in ipairs(objList) do
+					writeChildData(obj, options, filepath)
+				end
+				closeBlock()
+			end
+		end
+		closeBlock()
+	else
+		if child.children and child.children.maxn > 0 then
+			openBlock("children")
+			writeChildrenData(child.children, options, filepath)
+			closeBlock(true)
+		end
+	end
+
+	closeBlock()
+end
+
+function writeChildrenData(children, options, filepath)
+	local output = {}
 	for i=1,children.maxn or #children do
 		local child = children[i]
 		if child then
-			openBlock()
-
-			local Class = getmetatable(child)
-			write("class = \""..Class.displayName.."\",\n")
-			writePropertyData(child, omitUnmod, filepath)
-
-			if Class == ChildScene then
-				openBlock("sceneObjProperties")
-				for id,enclosure in pairs(child.sceneObjectIDMap) do
-					local obj = enclosure[1]
-					if hasSceneModifications(obj, omitUnmod) then
-						openBlock(id)
-						writePropertyData(obj, omitUnmod, filepath, true)
-						closeBlock()
-					end
-				end
-				closeBlock()
-			else
-				if child.children and child.children.maxn > 0 then
-					openBlock("children")
-					writeChildrenData(child.children, options, filepath)
-					closeBlock(true)
-				end
-			end
-
-			closeBlock()
+			writeChildData(child, options, filepath)
 		end
 	end
 	return output
