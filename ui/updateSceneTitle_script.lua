@@ -8,6 +8,7 @@ local dirtyingSignals = {
 	"objects added",
 	"objects deleted",
 	"selected objects modified",
+	"export path modified",
 }
 
 local activeSceneChanged

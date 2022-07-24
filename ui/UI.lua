@@ -215,7 +215,10 @@ function UI.exportScene(self, scene, exporterName, isExportAs)
 	if not filepath then  filepath = fileDialog.save(config.lastExportFolder or config.lastSaveFolder)  end
 	if not filepath then  return  end
 	config.lastExportFolder = fileUtil.splitFilepath(filepath)
-	scene.lastExportFilepath = filepath
+	if scene.lastExportFilepath ~= filepath then
+		scene.lastExportFilepath = filepath
+		signals.send("export path modified", self, scene, filepath)
+	end
 	scene.lastUsedExporter = exporterName
 
 	exporter.export(scene, filepath)
