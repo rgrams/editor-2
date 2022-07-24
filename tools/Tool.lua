@@ -497,7 +497,7 @@ local function hitCheckChildren(children, x, y, minDist, closestObj)
 		local child = children[i]
 		if child then
 			local hitDist = child:touchesPoint(x, y)
-			if hitDist and hitDist < minDist then
+			if hitDist and hitDist <= minDist then
 				minDist, closestObj = hitDist, child
 			end
 			if child.children then
