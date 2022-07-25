@@ -22,7 +22,7 @@ end
 
 function Font.isValid(self, filepath, size)
 	filepath = filepath or self.value[1]
-	size = size or self.value[2] -- UI Widget does the size == number validation.
+	size = tonumber(size) or self.value[2] -- UI Widget does the size == number validation.
 	local font
 	if filepath ~= "" then
 		font = new.custom("font", fontLoader, filepath, size)
