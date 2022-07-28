@@ -1,38 +1,38 @@
 
 local M = {}
 
-function M.setVertexPos(caller, enclosure, i, x, y)
+function M.setVertexPos(enclosure, i, x, y)
 	local obj = enclosure[1]
 	local oldX, oldY = obj:getVertPos(i)
 	obj:setVertPos(i, x, y)
-	return caller, enclosure, i, oldX, oldY
+	return enclosure, i, oldX, oldY
 end
 
-function M.insertVertex(caller, enclosure, i, x, y)
+function M.insertVertex(enclosure, i, x, y)
 	local obj = enclosure[1]
 	obj:insertVert(i, x, y)
-	return caller, enclosure, i
+	return enclosure, i
 end
 
-function M.deleteVertex(caller, enclosure, i)
+function M.deleteVertex(enclosure, i)
 	local obj = enclosure[1]
 	local oldX, oldY = obj:deleteVert(i)
-	return caller, enclosure, i, oldX, oldY
+	return enclosure, i, oldX, oldY
 end
 
-function M.setMultiVertexPos(caller, argsList)
+function M.setMultiVertexPos(argsList)
 	local undoArgsList = {}
 	for i,args in ipairs(argsList) do
 		table.insert(undoArgsList, { M.setVertexPos(unpack(args)) })
 	end
-	return caller, undoArgsList
+	return undoArgsList
 end
 
 local function byIndexSorter(a, b)
 	return a[1] < b[1]
 end
 
-function M.insertMultiVertex(caller, enclosure, points)
+function M.insertMultiVertex(enclosure, points)
 	table.sort(points, byIndexSorter) -- Yes, this can "destructively" modify the input table.
 	local obj = enclosure[1]
 	local newIndices = {}
@@ -40,7 +40,7 @@ function M.insertMultiVertex(caller, enclosure, points)
 		table.insert(newIndices, point[1])
 		obj:insertVert(unpack(point)) -- point = { index, x, y }
 	end
-	return caller, enclosure, newIndices
+	return enclosure, newIndices
 end
 
 local function removeHolesInList(list, oldLength)
@@ -57,7 +57,7 @@ local function removeHolesInList(list, oldLength)
 	end
 end
 
-function M.deleteMultiVertex(caller, enclosure, indices)
+function M.deleteMultiVertex(enclosure, indices)
 	local obj = enclosure[1]
 	local verts = obj:getProperty("vertices")
 	local oldCount = #verts
@@ -70,7 +70,7 @@ function M.deleteMultiVertex(caller, enclosure, indices)
 	end
 	removeHolesInList(verts, oldCount)
 	obj:setProperty("vertices", verts)
-	return caller, enclosure, oldPoints
+	return enclosure, oldPoints
 end
 
 return M

@@ -27,7 +27,7 @@ local function removeOldSceneRootObjects(self)
 	local scene = self.tree
 	local enclosures = self.sceneRootEnclosures
 	if #enclosures > 0 then
-		local _, _, _, oneWasSelected = objectFn.deleteObjects(self, scene, enclosures)
+		local scn, undoArgs, oneWasSelected = objectFn.deleteObjects(scene, enclosures)
 		for i=#enclosures,1,-1 do
 			enclosures[i] = nil
 		end
@@ -89,8 +89,8 @@ local function loadScene(self, scenePath)
 			local enclosures = self.sceneRootEnclosures
 			local objects = {}
 			for i,args in ipairs(addObjectArgs) do
-				enclosures[i] = args[4] -- args = { caller, scene, Class, enclosure, ... }
-				objects[i] = args[4][1]
+				enclosures[i] = args[3] -- args = { scene, Class, enclosure, ... }
+				objects[i] = args[3][1]
 			end
 			setPropertiesDefaultAndBuiltin(self, objects)
 			getSceneObjectIDs(objects, self.sceneObjectIDMap)
@@ -160,8 +160,8 @@ function ChildScene.applySceneModifications(self, mods)
 			if not parentEnc and id == selfID then  parentEnc = self.enclosure  end
 			if parentEnc then
 				-- Real parent enclosure didn't exist on import, so we need to set it here.
-				for i,addArg in ipairs(addedObjects) do  addArg[7] = parentEnc  end
-				objectFn.addObjects(self, self.tree, addedObjects)
+				for i,addArg in ipairs(addedObjects) do  addArg[6] = parentEnc  end
+				objectFn.addObjects(self.tree, addedObjects)
 			end
 		end
 	end

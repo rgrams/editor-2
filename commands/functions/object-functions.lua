@@ -4,7 +4,7 @@ local M = {}
 local id = require "lib.id"
 local StringProp = require "objects.properties.String"
 
-function M.add(caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children)
+function M.add(scene, Class, enclosure, properties, isSelected, parentEnclosure, children)
 	local object = Class()
 	enclosure[1] = object
 	object.enclosure = enclosure
@@ -19,7 +19,7 @@ function M.add(caller, scene, Class, enclosure, properties, isSelected, parentEn
 
 	if children then
 		for i,childData in ipairs(children) do
-			local _, scn, enc, wasSelected = M.add(unpack(childData))
+			local scn, enc, wasSelected = M.add(unpack(childData))
 			oneWasSelected = oneWasSelected or wasSelected
 		end
 	end
@@ -28,10 +28,10 @@ function M.add(caller, scene, Class, enclosure, properties, isSelected, parentEn
 		scene.selection:add(enclosure)
 	end
 
-	return caller, scene, enclosure, oneWasSelected
+	return scene, enclosure, oneWasSelected
 end
 
-local function deleteChildren(caller, scene, children, isSimulation)
+local function deleteChildren(scene, children, isSimulation)
 	if not children then  return false  end
 
 	local childCount = children.maxn or #children
@@ -43,8 +43,8 @@ local function deleteChildren(caller, scene, children, isSimulation)
 	for i=1,childCount do
 		local object = children[i]
 		if object then
-			local args = { M.delete(caller, scene, object.enclosure, false, isSimulation) }
-			oneWasSelected = oneWasSelected or args[9]
+			local args = { M.delete(scene, object.enclosure, false, isSimulation) }
+			oneWasSelected = oneWasSelected or args[8]
 			table.insert(undoArgs, args)
 		end
 	end
@@ -74,7 +74,7 @@ function M.removeDescendantsFromList(enclosures)
 	end
 end
 
-function M.delete(caller, scene, enclosure, _oneWasSelected, isSimulation)
+function M.delete(scene, enclosure, _oneWasSelected, isSimulation)
 	local object = enclosure[1]
 	local Class = getmetatable(object)
 	local properties = object:getModifiedProperties() or false
@@ -87,57 +87,57 @@ function M.delete(caller, scene, enclosure, _oneWasSelected, isSimulation)
 		print("obj.delete - object has no parent", object)
 	end
 	local parentEnclosure = object.parent.enclosure or false
-	local children, childWasSelected = deleteChildren(caller, scene, object.children, isSimulation)
+	local children, childWasSelected = deleteChildren(scene, object.children, isSimulation)
 	oneWasSelected = oneWasSelected or childWasSelected
 	if not isSimulation then
 		local parent = object.parent
 		object.tree:remove(object)
 		object:call("wasRemoved", parent)
 	end
-	return caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children, oneWasSelected
+	return scene, Class, enclosure, properties, isSelected, parentEnclosure, children, oneWasSelected
 end
 
-function M.deleteObjects(caller, scene, enclosures)
+function M.deleteObjects(scene, enclosures)
 	local undoArgs = {}
 	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
-		local args = { M.delete(caller, scene, enclosure) }
+		local args = { M.delete(scene, enclosure) }
 		table.insert(undoArgs, args)
-		oneWasSelected = oneWasSelected or args[9]
+		oneWasSelected = oneWasSelected or args[8]
 	end
-	return caller, scene, undoArgs, oneWasSelected
+	return scene, undoArgs, oneWasSelected
 end
 
 function M.copy(scene, enclosures)
 	local isSimulation = true
 	local clipboardData = {}
 	for i,enclosure in ipairs(enclosures) do
-		local args = { M.delete(false, scene, enclosure, false, isSimulation) }
+		local args = { M.delete(scene, enclosure, false, isSimulation) }
 		table.insert(clipboardData, args)
 	end
 	return clipboardData
 end
 
-function M.addToMultiple(caller, scene, parentEnclosures, Class, properties, isSelected, children)
+function M.addToMultiple(scene, parentEnclosures, Class, properties, isSelected, children)
 	local newEnclosures = {}
 	local oneWasSelected = isSelected
 	for i,parentEnclosure in ipairs(parentEnclosures) do
-		local _, scn, enc, wasSelected = M.add(caller, scene, Class, {}, properties, isSelected, parentEnclosure, children)
+		local scn, enc, wasSelected = M.add(scene, Class, {}, properties, isSelected, parentEnclosure, children)
 		oneWasSelected = oneWasSelected or wasSelected
 		table.insert(newEnclosures, enc)
 	end
-	return caller, scene, newEnclosures, oneWasSelected
+	return scene, newEnclosures, oneWasSelected
 end
 
-function M.addObjects(caller, scene, argsList)
+function M.addObjects(scene, argsList)
 	local enclosures = {}
 	local oneWasSelected = false
 	for i,args in ipairs(argsList) do
-		local _, scn, enc, wasSelected = M.add(unpack(args))
+		local scn, enc, wasSelected = M.add(unpack(args))
 		oneWasSelected = oneWasSelected or wasSelected
 		table.insert(enclosures, enc)
 	end
-	return caller, scene, enclosures, oneWasSelected
+	return scene, enclosures, oneWasSelected
 end
 
 local function setNewIDProp(props)
@@ -151,21 +151,20 @@ local function setNewIDProp(props)
 end
 
 -- Copy to new tables and insert new enclosures and new scene-tree.
-function M.copyPasteDataFor(caller, scene, parentEnclosure, childArgList)
+function M.copyPasteDataFor(scene, parentEnclosure, childArgList)
 	local newArgList = {}
 	for i,args in ipairs(childArgList) do
 		local newEnclosure = {}
 		local newArgs = {}
-		newArgs[1] = caller                -- [1] caller
-		newArgs[2] = scene                 -- [2] scene
-		newArgs[3] = args[3]               -- [3] Class
-		newArgs[4] = newEnclosure          -- [4] enclosure
-		newArgs[5] = setNewIDProp(args[5]) -- [5] properties
-		newArgs[6] = false                 -- [6] isSelected
-		newArgs[7] = parentEnclosure       -- [7] parentEnclosure
-		local children = args[8]
+		newArgs[1] = scene                 -- [1] scene
+		newArgs[2] = args[2]               -- [2] Class
+		newArgs[3] = newEnclosure          -- [3] enclosure
+		newArgs[4] = setNewIDProp(args[4]) -- [4] properties
+		newArgs[5] = false                 -- [5] isSelected
+		newArgs[6] = parentEnclosure       -- [6] parentEnclosure
+		local children = args[7]
 		if children then
-			newArgs[8] = M.copyPasteDataFor(caller, scene, newEnclosure, children)
+			newArgs[7] = M.copyPasteDataFor(scene, newEnclosure, children)
 		end
 		newArgList[i] = newArgs
 	end
@@ -173,26 +172,26 @@ function M.copyPasteDataFor(caller, scene, parentEnclosure, childArgList)
 end
 
 -- WARNING: Clipboard argsList needs to be copied before it gets put into the history.
-function M.paste(caller, scene, parentEnclosures, copiedArgsList)
+function M.paste(scene, parentEnclosures, copiedArgsList)
 	local newEnclosures
 	local oneWasSelected = false
 	if not parentEnclosures then -- Add to scene root.
-		local _, scn, newEncs, wasSelected = M.addObjects(caller, scene, copiedArgsList)
+		local scn, newEncs, wasSelected = M.addObjects(scene, copiedArgsList)
 		oneWasSelected = oneWasSelected or wasSelected
 		newEnclosures = newEncs
 	else
 		newEnclosures = {}
 		for i,parentEnclosure in ipairs(parentEnclosures) do
-			local argsList = i == 1 and copiedArgsList or M.copyPasteDataFor(caller, scene, parentEnclosure, copiedArgsList)
-			M.copyPasteDataFor(caller, scene, parentEnclosure, argsList)
-			local _, scn, newEncs, wasSelected = M.addObjects(caller, scene, argsList)
+			local argsList = i == 1 and copiedArgsList or M.copyPasteDataFor(scene, parentEnclosure, copiedArgsList)
+			M.copyPasteDataFor(scene, parentEnclosure, argsList)
+			local scn, newEncs, wasSelected = M.addObjects(scene, argsList)
 			oneWasSelected = oneWasSelected or wasSelected
 			for _,enclosure in ipairs(newEncs) do
 				table.insert(newEnclosures, enclosure)
 			end
 		end
 	end
-	return caller, scene, newEnclosures, oneWasSelected
+	return scene, newEnclosures, oneWasSelected
 end
 
 return M

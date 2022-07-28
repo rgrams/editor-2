@@ -178,7 +178,7 @@ local function getDragPropertyList(enclosures, property, inWorldSpace, out)
 	return out
 end
 
-local function getPosDragArgList(caller, startOffsets, dx, dy, inWorldSpace, rx, ry)
+local function getPosDragArgList(startOffsets, dx, dy, inWorldSpace, rx, ry)
 	local argList = {}
 	local shouldRound = rx and ry
 	for i,start in ipairs(startOffsets) do
@@ -191,20 +191,20 @@ local function getPosDragArgList(caller, startOffsets, dx, dy, inWorldSpace, rx,
 		if shouldRound then
 			x, y = math.round(x, rx), math.round(y, ry)
 		end
-		local args = { caller, start.enclosure, "pos", { x = x, y = y } }
+		local args = { start.enclosure, "pos", { x = x, y = y } }
 		argList[i] = args
 	end
 	return argList
 end
 
-local function getRotDragArgList(caller, startOffsets, da, roundIncr)
+local function getRotDragArgList(startOffsets, da, roundIncr)
 	local argList = {}
 	for i,start in ipairs(startOffsets) do
 		local angle = start.angle + da
 		if roundIncr then
 			angle = math.round(angle, roundIncr)
 		end
-		local args = { caller, start.enclosure, "angle", angle }
+		local args = { start.enclosure, "angle", angle }
 		argList[i] = args
 	end
 	return argList
@@ -288,11 +288,11 @@ function Tool.drag(wgt, dx, dy, dragType)
 			self.startedDragCommand = true
 			local enclosures = getEnclosuresForDrag(scenes.active, inWorldSpace)
 			self.dragStartOffsets = getDragPropertyList(enclosures, "pos", inWorldSpace)
-			local argList = getPosDragArgList(self, self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
+			local argList = getPosDragArgList(self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
 			scene.history:perform("setMultiPropertiesOnMultiple", self, argList)
 		else
 			-- TODO: Make sure the last command in the history is still ours.
-			local argList = getPosDragArgList(self, self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
+			local argList = getPosDragArgList(self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
 			local doCmd = propCmd.setMultiPropertiesOnMultiple[1]
 			doCmd(self, argList)
 			scene.history:update(self, argList)
@@ -312,11 +312,11 @@ function Tool.drag(wgt, dx, dy, dragType)
 			self.startedDragCommand = true
 			local enclosures = getEnclosuresForDrag(scenes.active)
 			self.dragStartOffsets = getDragPropertyList(enclosures, "angle")
-			local argList = getRotDragArgList(self, self.dragStartOffsets, angle, roundIncr)
+			local argList = getRotDragArgList(self.dragStartOffsets, angle, roundIncr)
 			scene.history:perform("setMultiPropertiesOnMultiple", self, argList)
 		else
 			-- TODO: Make sure the last command in the history is still ours.
-			local argList = getRotDragArgList(self, self.dragStartOffsets, angle, roundIncr)
+			local argList = getRotDragArgList(self.dragStartOffsets, angle, roundIncr)
 			local doCmd = propCmd.setMultiPropertiesOnMultiple[1]
 			doCmd(self, argList)
 			scene.history:update(self, argList)
@@ -459,7 +459,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 				local obj = start.enclosure[1]
 				x, y = obj:toLocalPos(x, y)
 			end
-			local args = { self, start.enclosure, "pos", { x = x, y = y } }
+			local args = { start.enclosure, "pos", { x = x, y = y } }
 			table.insert(argsList, args)
 		end
 		for i,start in ipairs(self.dragScaleStartOffsets) do
@@ -472,7 +472,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 				value = start.s * math.min(sx, sy)
 			end
 			local propName = sizeProp.name
-			local args = { self, start.enclosure, propName, value }
+			local args = { start.enclosure, propName, value }
 			table.insert(argsList, args)
 		end
 
@@ -562,7 +562,7 @@ function Tool.addAt(self, Class, wx, wy)
 			local lx, ly = parentObj:toLocal(wx, wy)
 			local properties = { { "pos", { x = lx, y = ly }, Vec2Property } }
 			local args = {
-				self, scene, Class, {}, properties, isSelected, parentEnclosure
+				scene, Class, {}, properties, isSelected, parentEnclosure
 			}
 			argsList[i] = args
 		end
@@ -782,7 +782,7 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 				if pos then
 					local x, y = obj:getWorldPos()
 					x, y = obj:toLocalPos(x + dx, y + dy)
-					local args = { self, enclosure, "pos", { x = x, y = y } }
+					local args = { enclosure, "pos", { x = x, y = y } }
 					table.insert(argsList, args)
 				end
 			end

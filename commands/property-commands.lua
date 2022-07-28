@@ -3,7 +3,7 @@ local propFn = require "commands.functions.property-functions"
 local signals = require "signals"
 
 local function setProperty(caller, ...)
-	local _, enclosure, name, oldValue, oneWasSelected = propFn.setProperty(caller, ...)
+	local enclosure, name, oldValue, oneWasSelected = propFn.setProperty(...)
 	if oneWasSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
@@ -12,9 +12,9 @@ local function setProperty(caller, ...)
 end
 
 local function setSamePropertyOnMultiple(caller, ...)
-	local _, undoArgList, oneWasSelected = propFn.setSamePropertyOnMultiple(caller, ...)
+	local undoArgList, oneWasSelected = propFn.setSamePropertyOnMultiple(...)
 	if oneWasSelected then
-		local enclosure = undoArgList[1][2]
+		local enclosure = undoArgList[1][1]
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
 	end
@@ -22,9 +22,9 @@ local function setSamePropertyOnMultiple(caller, ...)
 end
 
 local function setMultiPropertiesOnMultiple(caller, ...)
-	local _, undoArgList, oneWasSelected = propFn.setMultiPropertiesOnMultiple(caller, ...)
+	local undoArgList, oneWasSelected = propFn.setMultiPropertiesOnMultiple(...)
 	if oneWasSelected then
-		local enclosure = undoArgList[1][2]
+		local enclosure = undoArgList[1][1]
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
 	end
@@ -32,9 +32,9 @@ local function setMultiPropertiesOnMultiple(caller, ...)
 end
 
 local function offsetVec2PropertyOnMultiple(caller, ...)
-	local _, undoArgList, oneWasSelected = propFn.offsetVec2PropertyOnMultiple(caller, ...)
+	local undoArgList, oneWasSelected = propFn.offsetVec2PropertyOnMultiple(...)
 	if oneWasSelected then
-		local enclosure = undoArgList[1][2]
+		local enclosure = undoArgList[1][1]
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
 	end
@@ -42,7 +42,7 @@ local function offsetVec2PropertyOnMultiple(caller, ...)
 end
 
 local function addProperty(caller, ...)
-	local _, enclosure, name, oneWasSelected = propFn.addProperty(caller, ...)
+	local enclosure, name, oneWasSelected = propFn.addProperty(...)
 	if oneWasSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
@@ -51,7 +51,7 @@ local function addProperty(caller, ...)
 end
 
 local function removeProperty(caller, ...)
-	local _, enclosure, Class, name, value, oneWasSelected = propFn.removeProperty(caller, ...)
+	local enclosure, Class, name, value, oneWasSelected = propFn.removeProperty(...)
 	if oneWasSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
@@ -60,9 +60,9 @@ local function removeProperty(caller, ...)
 end
 
 local function addSamePropertyToMultiple(caller, ...)
-	local _, undoArgList, oneWasSelected = propFn.addSamePropertyToMultiple(caller, ...)
+	local undoArgList, oneWasSelected = propFn.addSamePropertyToMultiple(...)
 	if oneWasSelected then
-		local enclosure = undoArgList[1][2]
+		local enclosure = undoArgList[1][1]
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
 	end
@@ -70,9 +70,9 @@ local function addSamePropertyToMultiple(caller, ...)
 end
 
 local function addPropertyToMultiple(caller, ...)
-	local _, undoArgList, oneWasSelected = propFn.addPropertyToMultiple(caller, ...)
+	local undoArgList, oneWasSelected = propFn.addPropertyToMultiple(...)
 	if oneWasSelected then
-		local enclosure = undoArgList[1][2]
+		local enclosure = undoArgList[1][1]
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
 	end
@@ -80,9 +80,9 @@ local function addPropertyToMultiple(caller, ...)
 end
 
 local function removeSamePropertyFromMultiple(caller, ...)
-	local _, undoArgList, oneWasSelected = propFn.removeSamePropertyFromMultiple(caller, ...)
+	local undoArgList, oneWasSelected = propFn.removeSamePropertyFromMultiple(...)
 	if oneWasSelected then
-		local enclosure = undoArgList[1][2]
+		local enclosure = undoArgList[1][1]
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
 	end
@@ -90,9 +90,9 @@ local function removeSamePropertyFromMultiple(caller, ...)
 end
 
 local function removePropertyFromMultiple(caller, ...)
-	local _, undoArgList, oneWasSelected = propFn.removePropertyFromMultiple(caller, ...)
+	local _, undoArgList, oneWasSelected = propFn.removePropertyFromMultiple(...)
 	if oneWasSelected then
-		local enclosure = undoArgList[1][2]
+		local enclosure = undoArgList[1][1]
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
 	end

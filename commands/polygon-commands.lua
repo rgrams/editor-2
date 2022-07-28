@@ -3,7 +3,7 @@ local signals = require "signals"
 local polyFn = require "commands.functions.polygon-functions"
 
 local function setVertexPos(caller, enclosure, i, x, y)
-	local _, _, _, oldX, oldY = polyFn.setVertexPos(caller, enclosure, i, x, y)
+	local enc, _i, oldX, oldY = polyFn.setVertexPos(enclosure, i, x, y)
 	if enclosure[1].isSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
@@ -12,7 +12,7 @@ local function setVertexPos(caller, enclosure, i, x, y)
 end
 
 local function insertVertex(caller, enclosure, i, x, y)
-	polyFn.insertVertex(caller, enclosure, i, x, y)
+	polyFn.insertVertex(enclosure, i, x, y)
 	if enclosure[1].isSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
@@ -28,7 +28,7 @@ local function addVertex(caller, enclosure, x, y)
 end
 
 local function deleteVertex(caller, enclosure, i)
-	local _, _, _, oldX, oldY = polyFn.deleteVertex(caller, enclosure, i)
+	local enc, _i, oldX, oldY = polyFn.deleteVertex(enclosure, i)
 	if enclosure[1].isSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
@@ -41,7 +41,7 @@ local function setMultiVertexPos(caller, argsList)
 	for i,args in ipairs(argsList) do
 		table.insert(undoArgsList, { setVertexPos(unpack(args)) })
 	end
-	local enclosure = argsList[1][2]
+	local enclosure = argsList[1][1]
 	if enclosure[1].isSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
@@ -50,7 +50,7 @@ local function setMultiVertexPos(caller, argsList)
 end
 
 local function insertMultiVertex(caller, enclosure, points)
-	local _, _, newIndices = polyFn.insertMultiVertex(caller, enclosure, points)
+	local enc, newIndices = polyFn.insertMultiVertex(enclosure, points)
 	if enclosure[1].isSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
@@ -59,7 +59,7 @@ local function insertMultiVertex(caller, enclosure, points)
 end
 
 local function deleteMultiVertex(caller, enclosure, indices)
-	local _, _, oldPoints = polyFn.deleteMultiVertex(caller, enclosure, indices)
+	local enc, oldPoints = polyFn.deleteMultiVertex(enclosure, indices)
 	if enclosure[1].isSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)

@@ -119,7 +119,7 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 		if _G.scene_clipboard then
 			local parentEnclosures = selection:copyList() or false
 			local firstParent = parentEnclosures and parentEnclosures[1] or false
-			local argsList = objectFn.copyPasteDataFor(wgt.object, scene, firstParent, _G.scene_clipboard)
+			local argsList = objectFn.copyPasteDataFor(scene, firstParent, _G.scene_clipboard)
 			-- Do NOT want to put the mutable clipboard table into the command history.
 			scene.history:perform("paste", wgt.object, scene, parentEnclosures, argsList)
 			return true

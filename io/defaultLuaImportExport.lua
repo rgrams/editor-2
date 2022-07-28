@@ -195,7 +195,7 @@ local function makeAddPropArgs(propDataList, filepath)
 	return properties
 end
 
-local function makeAddObjArgs(caller, scene, objData, parentEnclosure, filepath)
+local function makeAddObjArgs(scene, objData, parentEnclosure, filepath)
 	local Class = classList:get(objData.class)
 	local enclosure = {}
 	local properties
@@ -216,7 +216,7 @@ local function makeAddObjArgs(caller, scene, objData, parentEnclosure, filepath)
 				for i,addedObjData in ipairs(addedObjs) do
 					-- WARNING: Parent objects from the scene don't exist yet, so the
 					--   parent enclosure set here is bogus. Will need to be updated later.
-					local args = makeAddObjArgs(caller, scene, addedObjData, enclosure, filepath)
+					local args = makeAddObjArgs(scene, addedObjData, enclosure, filepath)
 					table.insert(mods.addedObjects[id], args)
 				end
 			end
@@ -230,10 +230,10 @@ local function makeAddObjArgs(caller, scene, objData, parentEnclosure, filepath)
 	if objData.children then -- ChildScene won't have children saved as such.
 		children = {}
 		for i,child in ipairs(objData.children) do
-			table.insert(children, makeAddObjArgs(caller, scene, child, enclosure, filepath))
+			table.insert(children, makeAddObjArgs(scene, child, enclosure, filepath))
 		end
 	end
-	return { caller, scene, Class, enclosure, properties, isSelected, parentEnclosure, children }
+	return { scene, Class, enclosure, properties, isSelected, parentEnclosure, children }
 end
 
 function M.import(filepath, options, parentEnc)
@@ -276,7 +276,6 @@ function M.import(filepath, options, parentEnc)
 
 	local addArgsList = {}
 	local addScenePropsList
-	local caller = false
 
 	local _, filename = fileUtil.splitFilepath(filepath)
 	local scene
@@ -324,7 +323,7 @@ function M.import(filepath, options, parentEnc)
 				if obj:hasProperty(name) then
 					obj:setProperty(name, value)
 				else
-					propFn.addProperty(caller, enclosure, Class, name, value)
+					propFn.addProperty(enclosure, Class, name, value)
 				end
 			end
 		end
@@ -336,7 +335,7 @@ function M.import(filepath, options, parentEnc)
 			editor.messageBox("Error parsing objects: No object class property found.", "Import Failed: Invalid object")
 			return
 		end
-		local isSuccess, result = pcall(makeAddObjArgs, caller, scene, objData, parentEnc, relFilepathFolder)
+		local isSuccess, result = pcall(makeAddObjArgs, scene, objData, parentEnc, relFilepathFolder)
 		if not isSuccess then
 			editor.messageBox("Error creating command args for creating scene objects: "..tostring(result), "Import Failed: Invalid object")
 			return
@@ -345,7 +344,7 @@ function M.import(filepath, options, parentEnc)
 		end
 	end
 
-	objectFn.addObjects(caller, scene, addArgsList)
+	objectFn.addObjects(scene, addArgsList)
 
 	return scene, addArgsList
 end

@@ -13,7 +13,7 @@ local function addShapeDrawingScript(caller, enclosures)
 	scriptPath = scriptPath .. "/objects/scripts/drawn-shape.lua"
 	local propName = "drawScript"
 	for i,enclosure in ipairs(enclosures) do
-		local _, _, _, wasSelected = propFn.addProperty(caller, enclosure, Script, propName, scriptPath)
+		local enc, name, wasSelected = propFn.addProperty(enclosure, Script, propName, scriptPath)
 		oneWasSelected = oneWasSelected or wasSelected
 	end
 	if oneWasSelected then

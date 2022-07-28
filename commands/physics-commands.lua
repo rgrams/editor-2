@@ -12,20 +12,20 @@ local function addPhysicsShapeProperties(caller, enclosures)
 	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
 		local args
-		args = { propFn.addProperty(caller, enclosure, Bool, "sensor", false) }
+		args = { propFn.addProperty(enclosure, Bool, "sensor", false) }
 		table.insert(undoArgList, args)
-		args = { propFn.addProperty(caller, enclosure, Float, "friction", 0.2) }
+		args = { propFn.addProperty(enclosure, Float, "friction", 0.2) }
 		table.insert(undoArgList, args)
-		args = { propFn.addProperty(caller, enclosure, Float, "density", 1) }
+		args = { propFn.addProperty(enclosure, Float, "density", 1) }
 		table.insert(undoArgList, args)
-		args = { propFn.addProperty(caller, enclosure, Float, "restitution", 0) }
+		args = { propFn.addProperty(enclosure, Float, "restitution", 0) }
 		table.insert(undoArgList, args)
-		args = { propFn.addProperty(caller, enclosure, String, "categories", "") }
+		args = { propFn.addProperty(enclosure, String, "categories", "") }
 		table.insert(undoArgList, args)
-		args = { propFn.addProperty(caller, enclosure, String, "mask", "") }
+		args = { propFn.addProperty(enclosure, String, "mask", "") }
 		table.insert(undoArgList, args)
 
-		oneWasSelected = oneWasSelected or args[4]
+		oneWasSelected = oneWasSelected or args[3]
 	end
 	if oneWasSelected then
 		local scene = enclosures[1][1].tree
@@ -39,20 +39,20 @@ local function removePhysicsShapeProperties(caller, enclosures)
 	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
 		local args
-		args = { propFn.removeProperty(caller, enclosure, "sensor") }
+		args = { propFn.removeProperty(enclosure, "sensor") }
 		table.insert(undoArgList, args)
-		args = { propFn.removeProperty(caller, enclosure, "friction") }
+		args = { propFn.removeProperty(enclosure, "friction") }
 		table.insert(undoArgList, args)
-		args = { propFn.removeProperty(caller, enclosure, "density") }
+		args = { propFn.removeProperty(enclosure, "density") }
 		table.insert(undoArgList, args)
-		args = { propFn.removeProperty(caller, enclosure, "restitution") }
+		args = { propFn.removeProperty(enclosure, "restitution") }
 		table.insert(undoArgList, args)
-		args = { propFn.removeProperty(caller, enclosure, "categories") }
+		args = { propFn.removeProperty(enclosure, "categories") }
 		table.insert(undoArgList, args)
-		args = { propFn.removeProperty(caller, enclosure, "mask") }
+		args = { propFn.removeProperty(enclosure, "mask") }
 		table.insert(undoArgList, args)
 
-		oneWasSelected = oneWasSelected or args[6]
+		oneWasSelected = oneWasSelected or args[5]
 	end
 	if oneWasSelected then
 		local scene = enclosures[1][1].tree
