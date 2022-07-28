@@ -1,7 +1,7 @@
 
 local signals = require "signals"
-local objectFn = require "commands.functions.object-functions"
-local objectCmd = require "commands.object-commands"
+local propFn = require "commands.functions.property-functions"
+local propCmd = require "commands.property-commands"
 
 -- removeSamePropertyFromMultiple(caller, enclosures, name)
 
@@ -13,7 +13,7 @@ local function addShapeDrawingScript(caller, enclosures)
 	scriptPath = scriptPath .. "/objects/scripts/drawn-shape.lua"
 	local propName = "drawScript"
 	for i,enclosure in ipairs(enclosures) do
-		local _, _, _, wasSelected = objectFn.addProperty(caller, enclosure, Script, propName, scriptPath)
+		local _, _, _, wasSelected = propFn.addProperty(caller, enclosure, Script, propName, scriptPath)
 		oneWasSelected = oneWasSelected or wasSelected
 	end
 	if oneWasSelected then
@@ -24,5 +24,5 @@ local function addShapeDrawingScript(caller, enclosures)
 end
 
 return {
-	addShapeDrawingScript = { addShapeDrawingScript, objectCmd.removeSamePropertyFromMultiple[1] }
+	addShapeDrawingScript = { addShapeDrawingScript, propCmd.removeSamePropertyFromMultiple[1] }
 }

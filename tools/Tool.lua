@@ -9,7 +9,7 @@ local EditorObject = require "objects.EditorObject"
 local Vec2Property = require "objects.properties.Vec2"
 local VertexArray = require "objects.properties.VertexArray"
 local objectFn = require "commands.functions.object-functions"
-local objectCmd = require "commands.object-commands"
+local propCmd = require "commands.property-commands"
 local selectCmd = require "commands.selection-commands"
 local modkeys = require "modkeys"
 local list = require "lib.list"
@@ -293,7 +293,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 		else
 			-- TODO: Make sure the last command in the history is still ours.
 			local argList = getPosDragArgList(self, self.dragStartOffsets, totalDX, totalDY, inWorldSpace, roundX, roundY)
-			local doCmd = objectCmd.setMultiPropertiesOnMultiple[1]
+			local doCmd = propCmd.setMultiPropertiesOnMultiple[1]
 			doCmd(self, argList)
 			scene.history:update(self, argList)
 		end
@@ -317,7 +317,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 		else
 			-- TODO: Make sure the last command in the history is still ours.
 			local argList = getRotDragArgList(self, self.dragStartOffsets, angle, roundIncr)
-			local doCmd = objectCmd.setMultiPropertiesOnMultiple[1]
+			local doCmd = propCmd.setMultiPropertiesOnMultiple[1]
 			doCmd(self, argList)
 			scene.history:update(self, argList)
 		end
@@ -483,7 +483,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 		else
 			-- Update set property command args.
 			-- TODO: Make sure the last command in the history is still ours.
-			local doCmd = objectCmd.setMultiPropertiesOnMultiple[1]
+			local doCmd = propCmd.setMultiPropertiesOnMultiple[1]
 			doCmd(self, argsList)
 			scene.history:update(self, argsList)
 		end

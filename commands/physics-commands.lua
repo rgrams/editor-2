@@ -1,6 +1,6 @@
 
-local objectFn = require "commands.functions.object-functions"
-local objectCmd = require "commands.object-commands"
+local propFn = require "commands.functions.property-functions"
+local propCmd = require "commands.property-commands"
 local signals = require "signals"
 
 local Float = require "objects.properties.Property"
@@ -12,17 +12,17 @@ local function addPhysicsShapeProperties(caller, enclosures)
 	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
 		local args
-		args = { objectFn.addProperty(caller, enclosure, Bool, "sensor", false) }
+		args = { propFn.addProperty(caller, enclosure, Bool, "sensor", false) }
 		table.insert(undoArgList, args)
-		args = { objectFn.addProperty(caller, enclosure, Float, "friction", 0.2) }
+		args = { propFn.addProperty(caller, enclosure, Float, "friction", 0.2) }
 		table.insert(undoArgList, args)
-		args = { objectFn.addProperty(caller, enclosure, Float, "density", 1) }
+		args = { propFn.addProperty(caller, enclosure, Float, "density", 1) }
 		table.insert(undoArgList, args)
-		args = { objectFn.addProperty(caller, enclosure, Float, "restitution", 0) }
+		args = { propFn.addProperty(caller, enclosure, Float, "restitution", 0) }
 		table.insert(undoArgList, args)
-		args = { objectFn.addProperty(caller, enclosure, String, "categories", "") }
+		args = { propFn.addProperty(caller, enclosure, String, "categories", "") }
 		table.insert(undoArgList, args)
-		args = { objectFn.addProperty(caller, enclosure, String, "mask", "") }
+		args = { propFn.addProperty(caller, enclosure, String, "mask", "") }
 		table.insert(undoArgList, args)
 
 		oneWasSelected = oneWasSelected or args[4]
@@ -39,17 +39,17 @@ local function removePhysicsShapeProperties(caller, enclosures)
 	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
 		local args
-		args = { objectFn.removeProperty(caller, enclosure, "sensor") }
+		args = { propFn.removeProperty(caller, enclosure, "sensor") }
 		table.insert(undoArgList, args)
-		args = { objectFn.removeProperty(caller, enclosure, "friction") }
+		args = { propFn.removeProperty(caller, enclosure, "friction") }
 		table.insert(undoArgList, args)
-		args = { objectFn.removeProperty(caller, enclosure, "density") }
+		args = { propFn.removeProperty(caller, enclosure, "density") }
 		table.insert(undoArgList, args)
-		args = { objectFn.removeProperty(caller, enclosure, "restitution") }
+		args = { propFn.removeProperty(caller, enclosure, "restitution") }
 		table.insert(undoArgList, args)
-		args = { objectFn.removeProperty(caller, enclosure, "categories") }
+		args = { propFn.removeProperty(caller, enclosure, "categories") }
 		table.insert(undoArgList, args)
-		args = { objectFn.removeProperty(caller, enclosure, "mask") }
+		args = { propFn.removeProperty(caller, enclosure, "mask") }
 		table.insert(undoArgList, args)
 
 		oneWasSelected = oneWasSelected or args[6]
@@ -61,8 +61,8 @@ local function removePhysicsShapeProperties(caller, enclosures)
 	return caller, undoArgList, oneWasSelected
 end
 
-local removePropertyFromMultiple = objectCmd.removePropertyFromMultiple[1]
-local addPropertyToMultiple = objectCmd.addPropertyToMultiple[1]
+local removePropertyFromMultiple = propCmd.removePropertyFromMultiple[1]
+local addPropertyToMultiple = propCmd.addPropertyToMultiple[1]
 
 return {
 	addPhysicsShapeProperties = { addPhysicsShapeProperties, removePropertyFromMultiple },

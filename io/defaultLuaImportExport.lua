@@ -5,6 +5,7 @@ local objToStr = require "philtre.lib.object-to-string"
 local fileUtil = require "lib.file-util"
 local scenes = require "scenes"
 local objectFn = require "commands.functions.object-functions"
+local propFn = require "commands.functions.property-functions"
 local classList = _G.objClassList
 local propClassList = _G.propClassList
 local config = require "config"
@@ -323,7 +324,7 @@ function M.import(filepath, options, parentEnc)
 				if obj:hasProperty(name) then
 					obj:setProperty(name, value)
 				else
-					objectFn.addProperty(caller, enclosure, Class, name, value)
+					propFn.addProperty(caller, enclosure, Class, name, value)
 				end
 			end
 		end
