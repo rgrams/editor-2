@@ -56,30 +56,25 @@ local function paste(caller, ...)
 	return caller, scene, newEnclosures, oneWasSelected
 end
 
-local function getAllEnclosuresFromArgs(args, list)
+local function getAllEnclosuresFromArgs(addObjDatas, list)
 	list = list or {}
-	for i,argsList in ipairs(args) do
-		local enclosure, children = argsList[3], argsList[7]
-		table.insert(list, enclosure)
-		if children then
-			getAllEnclosuresFromArgs(children, list)
+	for i,addData in ipairs(addObjDatas) do
+		table.insert(list, addData.enclosure)
+		if addData.children then
+			getAllEnclosuresFromArgs(addData.children, list)
 		end
 	end
 	return list
 end
 
 local function duplicate(caller, scene, enclosuresToCopy)
-	local dupArgs = objectFn.copy(scene, enclosuresToCopy)
-	dupArgs = objectFn.copyPasteDataFor(scene, nil, dupArgs)
-	for i,enclosure in ipairs(enclosuresToCopy) do
-		local args = dupArgs[i]
-		local origParent = enclosure[1].parent
-		args[6] = origParent.enclosure -- Set parent back to the original.
-	end
+	local dupAddDatas = objectFn.copy(scene, enclosuresToCopy)
+	local keepOrigParents = true
+	dupAddDatas = objectFn.copyPasteDataFor(scene, nil, dupAddDatas, keepOrigParents)
 	-- Want to select -all- new objects, not just the ancestors.
-	local newEnclosuresToSelect = getAllEnclosuresFromArgs(dupArgs)
+	local newEnclosuresToSelect = getAllEnclosuresFromArgs(dupAddDatas)
 
-	local scn, newEnclosuresForUndo = objectFn.addObjects(scene, dupArgs)
+	local scn, newEnclosuresForUndo = objectFn.addObjects(scene, dupAddDatas)
 	local oldSelection = scene.selection:setTo(newEnclosuresToSelect)
 
 	signals.send("objects added", caller, scene)

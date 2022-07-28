@@ -16,6 +16,7 @@ local list = require "lib.list"
 local Dropdown = require "ui.widgets.Dropdown"
 local classList = _G.objClassList
 local Handle = require "tools.ToolHandle"
+local AddObjData = require "commands.data.AddObjData"
 
 Tool.boxSelectAddChord = "shift "
 Tool.boxSelectToggleChord = "ctrl "
@@ -556,17 +557,14 @@ function Tool.addAt(self, Class, wx, wy)
 	local scene = scenes.active
 	local isSelected = false -- Lets you quickly create multiple objects without parenting exponentially.
 	if scene.selection[1] then
-		local argsList = {}
+		local addObjDatas = {}
 		for i,parentEnclosure in ipairs(scene.selection) do
 			local parentObj = parentEnclosure[1]
 			local lx, ly = parentObj:toLocal(wx, wy)
 			local properties = { { "pos", { x = lx, y = ly }, Vec2Property } }
-			local args = {
-				scene, Class, {}, properties, isSelected, parentEnclosure
-			}
-			argsList[i] = args
+			addObjDatas[i] = AddObjData(scene, Class, {}, properties, isSelected, parentEnclosure)
 		end
-		scene.history:perform("addObjects", self, scene, argsList)
+		scene.history:perform("addObjects", self, scene, addObjDatas)
 	else
 		local properties = { { "pos", { x = wx, y = wy }, Vec2Property } }
 		scene.history:perform("addObject", self, scene, Class, {}, properties, isSelected, false)

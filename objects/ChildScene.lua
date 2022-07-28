@@ -42,8 +42,8 @@ end
 
 local function addSceneObjects(self, scenePath)
 	local importer = require "io.defaultLuaImportExport"
-	local _, addObjectArgs = importer.import(scenePath, nil, self.enclosure)
-	return addObjectArgs
+	local _, addObjDatas = importer.import(scenePath, nil, self.enclosure)
+	return addObjDatas
 end
 
 local function setPropertiesDefaultAndBuiltin(self, objects)
@@ -85,12 +85,12 @@ local function loadScene(self, scenePath)
 		removeOldSceneRootObjects(self)
 		self.oldScenePath = scenePath
 		if scenePath ~= "" then
-			local addObjectArgs = addSceneObjects(self, scenePath)
+			local addObjDatas = addSceneObjects(self, scenePath)
 			local enclosures = self.sceneRootEnclosures
 			local objects = {}
-			for i,args in ipairs(addObjectArgs) do
-				enclosures[i] = args[3] -- args = { scene, Class, enclosure, ... }
-				objects[i] = args[3][1]
+			for i,addObjData in ipairs(addObjDatas) do
+				enclosures[i] = addObjData.enclosure
+				objects[i] = addObjData.enclosure[1]
 			end
 			setPropertiesDefaultAndBuiltin(self, objects)
 			getSceneObjectIDs(objects, self.sceneObjectIDMap)
@@ -159,8 +159,6 @@ function ChildScene.applySceneModifications(self, mods)
 			local parentEnc = self.sceneObjectIDMap[id]
 			if not parentEnc and id == selfID then  parentEnc = self.enclosure  end
 			if parentEnc then
-				-- Real parent enclosure didn't exist on import, so we need to set it here.
-				for i,addArg in ipairs(addedObjects) do  addArg[6] = parentEnc  end
 				objectFn.addObjects(self.tree, addedObjects)
 			end
 		end
