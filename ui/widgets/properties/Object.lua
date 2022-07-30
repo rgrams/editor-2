@@ -3,6 +3,7 @@ local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
 local Object = BaseClass:extend()
 Object.className = "Object"
 
+local PropData = require "commands.data.PropData"
 local Button = require "ui.widgets.Button"
 local ObjectSelectorTool = require "tools.ObjectSelectorTool"
 
@@ -37,7 +38,7 @@ function Object.objectSelected(self, obj)
 		local cmd = "setSamePropertyOnMultiple"
 		local enclosures = self.selection:copyList()
 		local caller = self.tree:get("/Window/UI/PropertyPanel")
-		scene.history:perform(cmd, caller, enclosures, self.propertyName, value)
+		scene.history:perform(cmd, caller, enclosures, PropData(self.propertyName, value))
 	end
 end
 

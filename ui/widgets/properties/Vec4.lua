@@ -3,6 +3,7 @@ local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
 local Vec4 = BaseClass:extend()
 Vec4.className = "Vec4"
 
+local PropData = require "commands.data.PropData"
 local InputField = require "ui.widgets.InputField"
 local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 
@@ -66,7 +67,7 @@ function Vec4.onConfirm(self, wgt, key)
 		local setVal = {}
 		setVal[key] = value
 		local caller = self.tree:get("/Window/UI/PropertyPanel")
-		scene.history:perform(cmd, caller, enclosures, self.propertyName, setVal)
+		scene.history:perform(cmd, caller, enclosures, PropData(self.propertyName, setVal))
 	end
 end
 

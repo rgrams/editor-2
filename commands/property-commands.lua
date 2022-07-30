@@ -3,12 +3,12 @@ local propFn = require "commands.functions.property-functions"
 local signals = require "signals"
 
 local function setProperty(caller, ...)
-	local enclosure, name, oldValue, oneWasSelected = propFn.setProperty(...)
+	local enclosure, oldPdata, oneWasSelected = propFn.setProperty(...)
 	if oneWasSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
 	end
-	return caller, enclosure, name, oldValue, oneWasSelected
+	return caller, enclosure, oldPdata, oneWasSelected
 end
 
 local function setSamePropertyOnMultiple(caller, ...)
@@ -51,12 +51,12 @@ local function addProperty(caller, ...)
 end
 
 local function removeProperty(caller, ...)
-	local enclosure, Class, name, value, oneWasSelected = propFn.removeProperty(...)
+	local enclosure, pData, oneWasSelected = propFn.removeProperty(...)
 	if oneWasSelected then
 		local scene = enclosure[1].tree
 		signals.send("selected objects modified", caller, scene)
 	end
-	return caller, enclosure, Class, name, value, oneWasSelected
+	return caller, enclosure, pData, oneWasSelected
 end
 
 local function addSamePropertyToMultiple(caller, ...)
@@ -90,7 +90,7 @@ local function removeSamePropertyFromMultiple(caller, ...)
 end
 
 local function removePropertyFromMultiple(caller, ...)
-	local _, undoArgList, oneWasSelected = propFn.removePropertyFromMultiple(...)
+	local undoArgList, oneWasSelected = propFn.removePropertyFromMultiple(...)
 	if oneWasSelected then
 		local enclosure = undoArgList[1][1]
 		local scene = enclosure[1].tree

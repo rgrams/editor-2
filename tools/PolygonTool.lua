@@ -9,6 +9,7 @@ local signals = require "signals"
 local polygonCmd = require "commands.polygon-commands"
 local list = require "lib.list"
 local pointHitsLine = require "lib.pointHitsLine"
+local PropData = require "commands.data.PropData"
 
 PolygonTool.snapKey = "ctrl"
 PolygonTool.snapToAxisKey = "shift"
@@ -329,7 +330,8 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 				local vertCount = #verts/2
 
 				if not isLoop and vertCount >= 3 and (self.hoverIdx == 1 or self.hoverIdx == vertCount) then
-					scene.history:perform("setProperty", self, enclosure, "isLoop", true) -- Close the loop.
+					local propData = PropData("isLoop", true) -- Close the loop.
+					scene.history:perform("setProperty", self, enclosure, propData)
 				elseif self.hoverSegIdx then
 					local lx, ly = self.intersectX, self.intersectY
 					local vi = self.hoverSegIdx + 1

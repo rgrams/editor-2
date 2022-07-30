@@ -11,6 +11,7 @@ local propClassList = _G.propClassList
 local config = require "config"
 local ChildScene = require "objects.ChildScene"
 local AddObjData = require "commands.data.AddObjData"
+local PropData = require "commands.data.PropData"
 
 M.defaultOptions = {
 	omitUnmodifiedBuiltins = true
@@ -178,22 +179,18 @@ local function getPropImportValue(val, name, Class, filepath)
 	return val
 end
 
--- Convert from data: { type=, name=, value= }
--- To : { name, value, Class }
+-- Convert from import data: { type=, name=, value= }
+-- To : PropData { name, value, Class }
 -- And convert filepaths to global.
-local function makeAddPropArgs(propDataList, filepath)
-	local properties = {}
-	for i,prop in ipairs(propDataList) do
-		local PropertyClass = propClassList:get(prop.type)
-		local name, value = prop.name, prop.value
-		local propArgs = {
-			name,
-			getPropImportValue(value, name, PropertyClass, filepath),
-			PropertyClass
-		}
-		table.insert(properties, propArgs)
+local function makeAddPropDatas(importedProperties, filepath)
+	local propDatas = {}
+	for i,prop in ipairs(importedProperties) do
+		local Class = propClassList:get(prop.type)
+		local name = prop.name
+		local value = getPropImportValue(prop.value, name, Class, filepath)
+		table.insert(propDatas, PropData(name, value, Class))
 	end
-	return properties
+	return propDatas
 end
 
 local function makeAddObjData(scene, objData, parentEnclosure, filepath)
@@ -204,11 +201,11 @@ local function makeAddObjData(scene, objData, parentEnclosure, filepath)
 		local modsData = objData.properties
 		local mods = {}
 		if modsData.rootProperties then
-			mods.rootProperties = makeAddPropArgs(modsData.rootProperties, filepath)
+			mods.rootProperties = makeAddPropDatas(modsData.rootProperties, filepath)
 		end
 		mods.childProperties = {}
 		for id,propData in pairs(modsData.childProperties) do
-			mods.childProperties[id] = makeAddPropArgs(propData, filepath)
+			mods.childProperties[id] = makeAddPropDatas(propData, filepath)
 		end
 		mods.addedObjects = {}
 		if modsData.addedObjects then
@@ -224,7 +221,7 @@ local function makeAddObjData(scene, objData, parentEnclosure, filepath)
 		end
 		properties = mods
 	else
-		properties = makeAddPropArgs(objData.properties, filepath)
+		properties = makeAddPropDatas(objData.properties, filepath)
 	end
 	local isSelected = false
 	local children
@@ -276,7 +273,6 @@ function M.import(filepath, options, parentEnc)
 	end
 
 	local addObjDatas = {}
-	local addScenePropsList
 
 	local _, filename = fileUtil.splitFilepath(filepath)
 	local scene
@@ -315,16 +311,15 @@ function M.import(filepath, options, parentEnc)
 	end
 
 	if data.properties then
-		addScenePropsList = makeAddPropArgs(data.properties, relFilepathFolder)
-		if addScenePropsList then
+		local scenePropDatas = makeAddPropDatas(data.properties, relFilepathFolder)
+		if scenePropDatas then
 			local enclosure = parentEnc or scene.enclosure
 			local obj = enclosure[1]
-			for i,prop in ipairs(addScenePropsList) do
-				local name, value, Class = unpack(prop)
-				if obj:hasProperty(name) then
-					obj:setProperty(name, value)
+			for i,propData in ipairs(scenePropDatas) do
+				if obj:hasProperty(propData.name) then
+					obj:setProperty(propData)
 				else
-					propFn.addProperty(enclosure, Class, name, value)
+					propFn.addProperty(enclosure, propData)
 				end
 			end
 		end

@@ -46,8 +46,8 @@ function Vec4._setValidValue(self, x, y, z, w)
 	val[1], val[2], val[3], val[4] = x, y, z, w
 end
 
-function Vec4.copyValue(self)
-	local val = self.value
+function Vec4.copyValue(self, value)
+	local val = value or self.value
 	return { val[1], val[2], val[3], val[4] }
 end
 

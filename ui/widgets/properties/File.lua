@@ -3,6 +3,7 @@ local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
 local File = BaseClass:extend()
 File.className = "File"
 
+local PropData = require "commands.data.PropData"
 local config = require "config"
 local InputField = require "ui.widgets.InputField"
 local Button = require "ui.widgets.Button"
@@ -39,7 +40,7 @@ function File.onConfirm(self, wgt)
 		local cmd = "setSamePropertyOnMultiple"
 		local enclosures = self.selection:copyList()
 		local caller = self.tree:get("/Window/UI/PropertyPanel")
-		scene.history:perform(cmd, caller, enclosures, self.propertyName, value)
+		scene.history:perform(cmd, caller, enclosures, PropData(self.propertyName, value))
 	end
 end
 

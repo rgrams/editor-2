@@ -2,15 +2,16 @@
 local EditorObject = require "objects.EditorObject"
 local EditorPolygon = EditorObject:extend()
 EditorPolygon.className = "EditorPolygon"
-
-local config = require "config"
-
 EditorPolygon.displayName = "Polygon"
+
 local minHitWidth, minHitHeight = 16, 16
 EditorPolygon.hitWidth = minHitWidth
 EditorPolygon.hitHeight = minHitHeight
 
 _G.objClassList:add(EditorPolygon, EditorPolygon.displayName)
+
+local config = require "config"
+local PropData = require "commands.data.PropData"
 
 local Bool = require "objects.properties.Bool"
 local VertexArray = require "objects.properties.VertexArray"
@@ -23,8 +24,8 @@ end
 
 function EditorPolygon.initProperties(self)
 	EditorPolygon.super.initProperties(self)
-	self:addProperty(Bool, "isLoop", false, true, true)
-	self:addProperty(VertexArray, "vertices", nil, nil, true)
+	self:addProperty(PropData("isLoop", false, Bool, false, true))
+	self:addProperty(PropData("vertices", nil, VertexArray, nil, true))
 end
 
 function EditorPolygon.propertyWasSet(self, name, value, property)
@@ -44,7 +45,7 @@ function EditorPolygon.setVertPos(self, i, x, y)
 	local ix = i*2 - 1
 	local verts = self:getProperty("vertices")
 	verts[ix], verts[ix+1] = x, y
-	self:setProperty("vertices", verts)
+	self:setProperty(PropData("vertices", verts))
 end
 
 function EditorPolygon.insertVert(self, i, x, y)
@@ -52,7 +53,7 @@ function EditorPolygon.insertVert(self, i, x, y)
 	local verts = self:getProperty("vertices")
 	table.insert(verts, ix, y)
 	table.insert(verts, ix, x)
-	self:setProperty("vertices", verts)
+	self:setProperty(PropData("vertices", verts))
 end
 
 function EditorPolygon.deleteVert(self, i)
@@ -60,7 +61,7 @@ function EditorPolygon.deleteVert(self, i)
 	local verts = self:getProperty("vertices")
 	local oldX = table.remove(verts, ix)
 	local oldY = table.remove(verts, ix)
-	self:setProperty("vertices", verts)
+	self:setProperty(PropData("vertices", verts))
 	return oldX, oldY
 end
 

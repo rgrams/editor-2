@@ -5,14 +5,14 @@ local EditorGuiNode = gui.Node:extend()
 EditorGuiNode:implements(EditorObject, "skip")
 
 EditorGuiNode.className = "EditorGuiNode"
-
 EditorGuiNode.displayName = "GUI Node"
 EditorGuiNode.hitWidth = 100
 EditorGuiNode.hitHeight = 100
 
-local id = require "lib.id"
-
 _G.objClassList:add(EditorGuiNode, EditorGuiNode.displayName)
+
+local id = require "lib.id"
+local PropData = require "commands.data.PropData"
 
 local Bool = require "objects.properties.Bool"
 local Vec2 = require "objects.properties.Vec2"
@@ -38,17 +38,18 @@ function EditorGuiNode.init(self)
 end
 
 function EditorGuiNode.initProperties(self)
-	self:addProperty(String,     "id", id.new(), nil, true)
-	self:addProperty(String,     "name",    nil, nil, true)
-	self:addProperty(Vec2,       "pos",     nil, nil, true)
-	self:addProperty(Float,      "angle",   nil, nil, true)
-	self:addProperty(Vec2,       "size",    { x = self.hitWidth, y = self.hitHeight }, true, true)
-	self:addProperty(Vec2,       "skew",    nil, nil, true)
-	self:addProperty(Cardinal,   "pivot",   nil, nil, true)
-	self:addProperty(Cardinal,   "anchor",  nil, nil, true)
-	self:addProperty(ResizeMode, "modeX",   nil, nil, true)
-	self:addProperty(ResizeMode, "modeY",   nil, nil, true)
-	self:addProperty(Vec2,       "pad",     nil, nil, true)
+	local size = { x = self.hitWidth, y = self.hitHeight }
+	self:addProperty(PropData("id", id.new(),  String, nil, true))
+	self:addProperty(PropData("name",    nil,  String, nil, true))
+	self:addProperty(PropData("pos",     nil,  Vec2, nil, true))
+	self:addProperty(PropData("angle",   nil,  Float, nil, true))
+	self:addProperty(PropData("size",    size, Vec2, size, true))
+	self:addProperty(PropData("skew",    nil,  Vec2, nil, true))
+	self:addProperty(PropData("pivot",   nil,  Cardinal, nil, true))
+	self:addProperty(PropData("anchor",  nil,  Cardinal, nil, true))
+	self:addProperty(PropData("modeX",   nil,  ResizeMode, nil, true))
+	self:addProperty(PropData("modeY",   nil,  ResizeMode, nil, true))
+	self:addProperty(PropData("pad",     nil,  Vec2, nil, true))
 end
 
 function EditorGuiNode.allocate(self, ...)

@@ -3,6 +3,7 @@ local M = {}
 
 local id = require "lib.id"
 local AddObjData = require "commands.data.AddObjData"
+local PropData = require "commands.data.PropData"
 local StringProp = require "objects.properties.String"
 
 function M.add(scene, Class, enclosure, properties, isSelected, parentEnclosure, children)
@@ -141,14 +142,23 @@ function M.addObjects(scene, addObjDatas)
 	return scene, enclosures, oneWasSelected
 end
 
-local function setNewIDProp(props)
-	for i,prop in ipairs(props) do
-		if prop[1] == "id" and prop[3] == StringProp then
-			prop[2] = id.new()
-			return props
+local function setNewIDProp(propDatas)
+	for i,propData in ipairs(propDatas) do
+		if propData.name == "id" and propData.Class == StringProp then
+			local t = {
+				name = propData.name,
+				value = id.new(),
+				Class = propData.Class,
+				defaultVal = propData.defaultVal,
+				isClassBuiltin = propData.isClassBuiltin,
+				isNonRemovable = propData.isNonRemovable,
+			}
+			local newPropData = PropData(t)
+			propDatas[i] = newPropData
+			return propDatas
 		end
 	end
-	return props
+	return propDatas
 end
 
 -- Copy to new tables and insert new enclosures and new scene-tree.

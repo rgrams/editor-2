@@ -17,6 +17,7 @@ local Dropdown = require "ui.widgets.Dropdown"
 local classList = _G.objClassList
 local Handle = require "tools.ToolHandle"
 local AddObjData = require "commands.data.AddObjData"
+local PropData = require "commands.data.PropData"
 
 Tool.boxSelectAddChord = "shift "
 Tool.boxSelectToggleChord = "ctrl "
@@ -192,8 +193,8 @@ local function getPosDragArgList(startOffsets, dx, dy, inWorldSpace, rx, ry)
 		if shouldRound then
 			x, y = math.round(x, rx), math.round(y, ry)
 		end
-		local args = { start.enclosure, "pos", { x = x, y = y } }
-		argList[i] = args
+		local setPropArgs = { start.enclosure, PropData("pos", { x = x, y = y }) }
+		argList[i] = setPropArgs
 	end
 	return argList
 end
@@ -205,8 +206,8 @@ local function getRotDragArgList(startOffsets, da, roundIncr)
 		if roundIncr then
 			angle = math.round(angle, roundIncr)
 		end
-		local args = { start.enclosure, "angle", angle }
-		argList[i] = args
+		local setPropArgs = { start.enclosure, PropData("angle", angle) }
+		argList[i] = setPropArgs
 	end
 	return argList
 end
@@ -460,8 +461,8 @@ function Tool.drag(wgt, dx, dy, dragType)
 				local obj = start.enclosure[1]
 				x, y = obj:toLocalPos(x, y)
 			end
-			local args = { start.enclosure, "pos", { x = x, y = y } }
-			table.insert(argsList, args)
+			local setPropArgs = { start.enclosure, PropData("pos", { x = x, y = y }) }
+			table.insert(argsList, setPropArgs)
 		end
 		for i,start in ipairs(self.dragScaleStartOffsets) do
 			local obj = start.enclosure[1]
@@ -473,8 +474,8 @@ function Tool.drag(wgt, dx, dy, dragType)
 				value = start.s * math.min(sx, sy)
 			end
 			local propName = sizeProp.name
-			local args = { start.enclosure, propName, value }
-			table.insert(argsList, args)
+			local setPropArgs = { start.enclosure, PropData(propName, value) }
+			table.insert(argsList, setPropArgs)
 		end
 
 		if not self.startedDragCommand then
@@ -561,12 +562,12 @@ function Tool.addAt(self, Class, wx, wy)
 		for i,parentEnclosure in ipairs(scene.selection) do
 			local parentObj = parentEnclosure[1]
 			local lx, ly = parentObj:toLocal(wx, wy)
-			local properties = { { "pos", { x = lx, y = ly }, Vec2Property } }
+			local properties = { PropData("pos", { x = lx, y = ly }, Vec2Property) }
 			addObjDatas[i] = AddObjData(scene, Class, {}, properties, isSelected, parentEnclosure)
 		end
 		scene.history:perform("addObjects", self, scene, addObjDatas)
 	else
-		local properties = { { "pos", { x = wx, y = wy }, Vec2Property } }
+		local properties = { PropData("pos", { x = wx, y = wy }, Vec2Property) }
 		scene.history:perform("addObject", self, scene, Class, {}, properties, isSelected, false)
 	end
 	updateHover(self)
@@ -748,15 +749,16 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		local self, scene = wgt.object, scenes.active
 		if scene.selection[1] then
 			local enclosures = scene.selection:copyList()
-			local pos = { x = 0, y = 0 }
-			scene.history:perform("setSamePropertyOnMultiple", self, enclosures, "pos", pos)
+			local propData = PropData("pos", { x = 0, y = 0 })
+			scene.history:perform("setSamePropertyOnMultiple", self, enclosures, propData)
 			updateHover(self)
 		end
 	elseif action == "zero rotation" and change == 1 then
 		local self, scene = wgt.object, scenes.active
 		if scene.selection[1] then
 			local enclosures = scene.selection:copyList()
-			scene.history:perform("setSamePropertyOnMultiple", self, enclosures, "angle", 0)
+			local propData = PropData("angle", 0)
+			scene.history:perform("setSamePropertyOnMultiple", self, enclosures, propData)
 			updateHover(self)
 		end
 	elseif dirKey[action] and (change == 1 or isRepeat) then
@@ -780,8 +782,8 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 				if pos then
 					local x, y = obj:getWorldPos()
 					x, y = obj:toLocalPos(x + dx, y + dy)
-					local args = { enclosure, "pos", { x = x, y = y } }
-					table.insert(argsList, args)
+					local addPropArgs = { enclosure, PropData("pos", { x = x, y = y }) }
+					table.insert(argsList, addPropArgs)
 				end
 			end
 			scene.history:perform("setMultiPropertiesOnMultiple", self, argsList)

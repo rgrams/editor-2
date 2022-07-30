@@ -2,10 +2,11 @@
 local EditorObject = require "objects.EditorObject"
 local EditorSprite = EditorObject:extend()
 EditorSprite.className = "EditorSprite"
-
 EditorSprite.displayName = "Sprite"
 
 _G.objClassList:add(EditorSprite, EditorSprite.displayName)
+
+local PropData = require "commands.data.PropData"
 
 local Image = require "objects.properties.Image"
 local Color = require "objects.properties.Color"
@@ -19,9 +20,9 @@ end
 
 function EditorSprite.initProperties(self)
 	EditorSprite.super.initProperties(self)
-	self:addProperty(Image, "image", nil, nil, true)
-	self:addProperty(Color, "color", nil, nil, true)
-	self:addProperty(BlendMode, "blendMode", nil, nil, true)
+	self:addProperty(PropData("image", nil, Image, nil, true))
+	self:addProperty(PropData("color", nil, Color, nil, true))
+	self:addProperty(PropData("blendMode", nil, BlendMode, nil, true))
 end
 
 function EditorSprite.propertyWasSet(self, name, value, property)

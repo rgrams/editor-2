@@ -44,8 +44,9 @@ function Font._setValidValue(self, font, filepath, size)
 	self.value[2] = size
 end
 
-function Font.copyValue(self)
-	return { self.value[1], self.value[2] }
+function Font.copyValue(self, value)
+	value = value or self.value
+	return { value[1], value[2] }
 end
 
 function Font.isAtDefault(self, overrideDefault)

@@ -1,6 +1,8 @@
 
 local M = {}
 
+local PropData = require "commands.data.PropData"
+
 function M.setVertexPos(enclosure, i, x, y)
 	local obj = enclosure[1]
 	local oldX, oldY = obj:getVertPos(i)
@@ -69,7 +71,7 @@ function M.deleteMultiVertex(enclosure, indices)
 		table.insert(oldPoints, { index, oldX, oldY })
 	end
 	removeHolesInList(verts, oldCount)
-	obj:setProperty("vertices", verts)
+	obj:setProperty(PropData("vertices", verts))
 	return enclosure, oldPoints
 end
 

@@ -2,6 +2,7 @@
 local script = {}
 
 local config = require "config"
+local PropData = require "commands.data.PropData"
 local EditorObject = require "objects.EditorObject"
 local Circle = require "objects.EditorCircle"
 local Rectangle = require "objects.EditorRectangle"
@@ -132,28 +133,30 @@ end
 function script.editor_script_added(self, name, filepath, scr)
 	if scr ~= script then  return  end -- Don't care about other scripts being added.
 	self._oldDraw = self.draw
+	local color = { 1, 1, 1, 1 }
 	if self:is(Circle) then
-		self:addProperty(Float, "angle")
-		self:addProperty(Vec2, "scale", { x = 1, y = 1 }, true)
-		self:addProperty(Vec2, "skew")
-		self:addProperty(Float, "segments", 24, true)
-		self:addProperty(Float, "lineWidth", 1, true)
-		self:addProperty(Bool, "isFilled", true, true)
-		self:addProperty(Color, "color")
+		local scale = { x = 1, y = 1 }
+		self:addProperty(PropData("angle", nil, Float))
+		self:addProperty(PropData("scale", scale, Vec2, scale))
+		self:addProperty(PropData("skew", nil, Vec2))
+		self:addProperty(PropData("segments", 24, Float, 24))
+		self:addProperty(PropData("lineWidth", 1, Float, 1, true))
+		self:addProperty(PropData("isFilled", true, Bool, true))
+		self:addProperty(PropData("color", color, Color, color))
 		self.draw = circleDraw
 	elseif self:is(Rectangle) then
-		self:addProperty(Vec2, "skew")
-		self:addProperty(Float, "lineWidth", 1, true)
-		self:addProperty(Bool, "isFilled", true, true)
-		self:addProperty(Color, "color")
-		self:addProperty(Float, "roundX", 0)
-		self:addProperty(Float, "roundY", 0)
-		self:addProperty(Float, "roundSegments", 2, true)
+		self:addProperty(PropData("skew", nil, Vec2))
+		self:addProperty(PropData("lineWidth", 1, Float, 1))
+		self:addProperty(PropData("isFilled", true, Bool, true))
+		self:addProperty(PropData("color", color, Color, color))
+		self:addProperty(PropData("roundX", 0, Float))
+		self:addProperty(PropData("roundY", 0, Float))
+		self:addProperty(PropData("roundSegments", 2, Float, 2))
 		self.draw = rectangleDraw
 	elseif self:is(Polygon) then
-		self:addProperty(Float, "lineWidth", 1, true)
-		self:addProperty(Bool, "isFilled", true, true)
-		self:addProperty(Color, "color")
+		self:addProperty(PropData("lineWidth", 1, Float, 1))
+		self:addProperty(PropData("isFilled", true, Bool, true))
+		self:addProperty(PropData("color", color, Color, color))
 		self.draw = polygonDraw
 	end
 end

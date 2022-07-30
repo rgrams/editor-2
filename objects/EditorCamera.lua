@@ -2,16 +2,16 @@
 local EditorObject = require "objects.EditorObject"
 local EditorCamera = EditorObject:extend()
 EditorCamera.className = "EditorCamera"
-
 EditorCamera.displayName = "Camera"
 
 EditorCamera.hitWidth = 800
 EditorCamera.hitHeight = 600
 
+_G.objClassList:add(EditorCamera, EditorCamera.displayName)
+
 local config = require "config"
 local id = require "lib.id"
-
-_G.objClassList:add(EditorCamera, EditorCamera.displayName)
+local PropData = require "commands.data.PropData"
 
 local Float = require "objects.properties.Property"
 local Bool = require "objects.properties.Bool"
@@ -20,14 +20,14 @@ local String = require "objects.properties.String"
 local ScaleMode = require "objects.properties.Enum_CamScaleMode"
 
 function EditorCamera.initProperties(self)
-	self:addProperty(String, "id", id.new(), nil, true)
-	self:addProperty(String, "name", nil, nil, true)
-	self:addProperty(Vec2, "pos", nil, nil, true)
-	self:addProperty(Float, "angle", nil, nil, true)
-	self:addProperty(Vec2, "viewArea", { x=800, y=600}, nil, true)
-	self:addProperty(ScaleMode, "scaleMode", nil, nil, true)
-	self:addProperty(Bool, "fixedAspect", false, nil, true)
-	self:addProperty(Bool, "isActive", true, nil, true)
+	self:addProperty(PropData("id", id.new(), String, nil, true))
+	self:addProperty(PropData("name", nil, String, nil, true))
+	self:addProperty(PropData("pos", nil, Vec2, nil, true))
+	self:addProperty(PropData("angle", nil, Float, nil, true))
+	self:addProperty(PropData("viewArea", { x=800, y=600 }, Vec2, nil, true))
+	self:addProperty(PropData("scaleMode", nil, ScaleMode, nil, true))
+	self:addProperty(PropData("fixedAspect", false, Bool, nil, true))
+	self:addProperty(PropData("isActive", true, Bool, nil, true))
 end
 
 function EditorCamera.getSizePropertyObj(self)

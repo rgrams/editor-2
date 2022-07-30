@@ -3,6 +3,7 @@ local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
 local Vec2 = BaseClass:extend()
 Vec2.className = "Vec2"
 
+local PropData = require "commands.data.PropData"
 local InputField = require "ui.widgets.InputField"
 local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 
@@ -52,7 +53,7 @@ function Vec2.onConfirm(self, wgt, axis)
 		if axis == "x" then  x = value
 		else  y = value  end
 		local caller = self.tree:get("/Window/UI/PropertyPanel")
-		scene.history:perform(cmd, caller, enclosures, self.propertyName, { x = x, y = y })
+		scene.history:perform(cmd, caller, enclosures, PropData(self.propertyName, { x = x, y = y }))
 	end
 end
 

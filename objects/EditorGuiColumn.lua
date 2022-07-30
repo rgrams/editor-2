@@ -9,6 +9,8 @@ EditorGuiColumn.displayName = "GUI Column"
 
 _G.objClassList:add(EditorGuiColumn, EditorGuiColumn.displayName)
 
+local PropData = require "commands.data.PropData"
+
 local Float = require "objects.properties.Property"
 local Bool = require "objects.properties.Bool"
 
@@ -21,9 +23,9 @@ end
 
 function EditorGuiColumn.initProperties(self)
 	EditorGuiColumn.super.initProperties(self)
-	self:addProperty(Float, "spacing",     nil,   nil,  true)
-	self:addProperty(Bool,  "homogeneous", false, true, true)
-	self:addProperty(Float, "dir",         -1,    true, true)
+	self:addProperty(PropData("spacing",     nil,   Float, nil,  true))
+	self:addProperty(PropData("homogeneous", false, Bool, false, true))
+	self:addProperty(PropData("dir",         -1,    Float, -1, true))
 end
 
 function EditorGuiColumn.allocateChildren(self, forceUpdate)

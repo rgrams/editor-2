@@ -56,7 +56,10 @@ function Property.getValue(self)
 	return self.value
 end
 
-Property.copyValue = Property.getValue -- These will be separate for vector/table properties
+function Property.copyValue(self, value)
+	if value ~= nil then  return value
+	else  return self.value  end
+end
 
 local _printStr = "(Prop[%s]: '%s', %s)"
 

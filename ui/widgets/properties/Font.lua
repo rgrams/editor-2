@@ -3,6 +3,7 @@ local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
 local Font = BaseClass:extend()
 Font.className = "Font"
 
+local PropData = require "commands.data.PropData"
 local config = require "config"
 local InputField = require "ui.widgets.InputField"
 local Button = require "ui.widgets.Button"
@@ -53,7 +54,7 @@ function Font.onConfirm(self, wgt, field)
 			propValue[2] = value
 		end
 		local caller = self.tree:get("/Window/UI/PropertyPanel")
-		scene.history:perform(cmd, caller, enclosures, self.propertyName, propValue)
+		scene.history:perform(cmd, caller, enclosures, PropData(self.propertyName, propValue))
 	end
 end
 

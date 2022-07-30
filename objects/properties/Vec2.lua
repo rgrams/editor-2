@@ -48,8 +48,9 @@ function Vec2._setValidValue(self, x, y)
 	self.value.x, self.value.y = x, y
 end
 
-function Vec2.copyValue(self)
-	return { x = self.value.x, y = self.value.y }
+function Vec2.copyValue(self, value)
+	value = value or self.value
+	return { x = value.x, y = value.y }
 end
 
 local _printStr = "(Prop[%s]: '%s', (%.3f, %.3f))"

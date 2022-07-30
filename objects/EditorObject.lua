@@ -1,15 +1,16 @@
 
 local EditorObject = Object:extend()
 EditorObject.className = "EditorObject"
-
-local config = require "config"
-local id = require "lib.id"
-
 EditorObject.displayName = "Object"
+
 EditorObject.hitWidth = 32
 EditorObject.hitHeight = 32
 
 _G.objClassList:add(EditorObject, EditorObject.displayName)
+
+local config = require "config"
+local id = require "lib.id"
+local PropData = require "commands.data.PropData"
 
 local Float = require "objects.properties.Property"
 local Vec2 = require "objects.properties.Vec2"
@@ -27,12 +28,13 @@ function EditorObject.set(self)
 end
 
 function EditorObject.initProperties(self)
-	self:addProperty(String, "id",    id.new(),         nil,  true)
-	self:addProperty(String, "name",  nil,              nil,  true)
-	self:addProperty(Vec2,   "pos",   nil,              nil,  true)
-	self:addProperty(Float,  "angle", nil,              nil,  true)
-	self:addProperty(Vec2,   "scale", { x = 1, y = 1 }, true, true)
-	self:addProperty(Vec2,   "skew",  nil,              nil,  true)
+	local scale = { x = 1, y = 1 }
+	self:addProperty(PropData("id", id.new(), String, nil, true))
+	self:addProperty(PropData("name", nil, String, nil, true))
+	self:addProperty(PropData("pos", nil, Vec2, nil, true))
+	self:addProperty(PropData("angle", nil, Float, nil, true))
+	self:addProperty(PropData("scale", scale, Vec2, scale, true))
+	self:addProperty(PropData("skew", nil, Vec2, nil, true))
 end
 
 function EditorObject.init(self)
@@ -44,22 +46,27 @@ function EditorObject.wasRemoved(self, fromParent)
 	self:wasModified(fromParent)
 end
 
-function EditorObject.addProperty(self, Class, name, value, isDefault, isClassBuiltin)
-	assert(Class, "EditorObject.addProperty - No class given for property: '"..tostring(name).."', value: '"..tostring(value).."'.")
-	local property = Class(self, name, isClassBuiltin)
-	name = property.name
-	if self.propertyMap[name] then  return  end
-	if value ~= nil then
-		property:setValue(value)
-		if isDefault then
-			property.defaultValue = value
-		end
-	end
-	self.propertyMap[name] = property
-	table.insert(self.properties, property)
-	self:call("propertyWasAdded", name, value, property, Class)
+local function setPropValues(prop, pdata)
+	if pdata.value ~= nil then  prop:setValue(pdata.value)  end
+	if pdata.defaultVal ~= nil then  prop.defaultValue = prop:copyValue(pdata.defaultVal)  end
+	if pdata.isClassBuiltin ~= nil then  prop.isClassBuiltin = pdata.isClassBuiltin  end
+	if pdata.isNonRemovable ~= nil then  prop.isNonRemovable = pdata.isNonRemovable  end
+end
+
+function EditorObject.addProperty(self, pdata)
+	assert(pdata.Class, "EditorObject.addProperty - No class given for property: '"..tostring(pdata.name).."'.")
+	local name = pdata.name or pdata.Class.name
+	if self.propertyMap[name] then  return  end -- Abort if property already exists.
+
+	local prop = pdata.Class(self, name)
+	self.propertyMap[name] = prop
+	table.insert(self.properties, prop)
+
+	setPropValues(prop, pdata)
+
+	self:call("propertyWasAdded", name, prop.value, prop, pdata.Class)
 	self:wasModified()
-	return name, property.value
+	return name, prop.value
 end
 
 function EditorObject.removeProperty(self, name)
@@ -84,12 +91,29 @@ function EditorObject.wasModified(self, parent)
 	end
 end
 
-function EditorObject.setProperty(self, name, value)
-	local property = self:getPropertyObj(name)
-	if property then
-		property:setValue(value)
-		self:call("propertyWasSet", name, value, property)
-		self:wasModified()
+function EditorObject.setProperty(self, pdata)
+	local prop = self:getPropertyObj(pdata.name)
+	if prop then
+		if pdata.Class ~= nil then
+			assert(pdata.Class == getmetatable(prop), "EditorObject.setProperty - tried to alter property class of prop '"..pdata.name.."'.")
+		end
+
+		setPropValues(prop, pdata)
+
+		if pdata.newName then
+			local oldName, newName = pdata.name, pdata.newName
+			self.propertyMap[oldName] = nil
+			self:call("propertyWasRemoved", oldName, prop)
+			prop.name = newName
+			self.propertyMap[newName] = prop
+			self:call("propertyWasAdded", newName, prop.value, prop, getmetatable(prop))
+		end
+		if pdata.value then
+			self:call("propertyWasSet", pdata.name, prop.value, prop)
+		end
+		if pdata.value or pdata.newName then
+			self:wasModified()
+		end
 		return true
 	else
 		return false
@@ -162,33 +186,30 @@ function EditorObject.getProperty(self, name)
 end
 
 function EditorObject.getModifiedProperties(self)
-	local properties
+	local propDatas
 	for i,property in ipairs(self.properties) do
-		local name = property.name
-		local value
-		if property.isNonRemovable then
+		local propData
+		if property.isClassBuiltin then
 			if not property:isAtDefault() then
-				value = property:copyValue()
+				propData = PropData.fromProp(property)
 			end
 		else
-			value = property:copyValue()
+			propData = PropData.fromProp(property)
 		end
-		if value ~= nil then
-			properties = properties or {}
-			local Class = getmetatable(property)
-			table.insert(properties, { name, value, Class })
+		if propData then
+			propDatas = propDatas or {}
+			table.insert(propDatas, propData)
 		end
 	end
-	return properties
+	return propDatas
 end
 
-function EditorObject.applyModifiedProperties(self, properties)
-	for i,propData in ipairs(properties) do
-		local name, value, PropertyClass = unpack(propData)
-		if not self:hasProperty(name) then
-			self:addProperty(PropertyClass, name, value)
+function EditorObject.applyModifiedProperties(self, propDatas)
+	for i,propData in ipairs(propDatas) do
+		if not self:hasProperty(propData.name) then
+			self:addProperty(propData)
 		else
-			self:setProperty(name, value)
+			self:setProperty(propData)
 		end
 	end
 end

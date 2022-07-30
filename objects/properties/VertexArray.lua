@@ -45,8 +45,8 @@ function VertexArray._setValidValue(self, value)
 	end
 end
 
-function VertexArray.copyValue(self)
-	local val = self.value
+function VertexArray.copyValue(self, value)
+	local val = value or self.value
 	local copy = {}
 	for i=1,#val do  copy[i] = val[i]  end
 	return copy

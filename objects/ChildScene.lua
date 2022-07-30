@@ -7,19 +7,23 @@ ChildScene.displayName = "ChildScene"
 ChildScene.hitWidth = 64
 ChildScene.hitHeight = 64
 
+_G.objClassList:add(ChildScene, ChildScene.displayName)
+
 local signals = require "signals"
 local objectFn = require "commands.functions.object-functions"
-local classList = _G.objClassList
-
-_G.objClassList:add(ChildScene, ChildScene.displayName)
+local PropData = require "commands.data.PropData"
 
 local File = require "objects.properties.File"
 
-function ChildScene.initProperties(self)
+function ChildScene.set(self)
 	self.oldScenePath = ""
 	self.sceneRootEnclosures = {}
 	self.sceneObjectIDMap = {}
-	self:addProperty(File, "scene", "", false, true)
+	ChildScene.super.set(self)
+end
+
+function ChildScene.initProperties(self)
+	self:addProperty(PropData("scene", "", File, nil, true))
 	ChildScene.super.initProperties(self)
 end
 
@@ -139,16 +143,15 @@ end
 
 function ChildScene.applySceneModifications(self, mods)
 	-- Apply property mods to scene objects.
-	for id,modProps in pairs(mods.childProperties) do
+	for id,propDatas in pairs(mods.childProperties) do
 		local enclosure = self.sceneObjectIDMap[id]
 		if enclosure then -- Object may have been deleted in source scene.
 			local obj = enclosure[1]
-			for i,propData in ipairs(modProps) do
-				local name, value, PropertyClass = unpack(propData)
-				if not obj:hasProperty(name) then
-					obj:addProperty(PropertyClass, name, value)
+			for i,propData in ipairs(propDatas) do
+				if not obj:hasProperty(propData.name) then
+					obj:addProperty(propData)
 				else
-					obj:setProperty(name, value)
+					obj:setProperty(propData)
 				end
 			end
 		end

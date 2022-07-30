@@ -3,6 +3,7 @@ local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
 local Enum = BaseClass:extend()
 Enum.className = "Enum"
 
+local PropData = require "commands.data.PropData"
 local Button = require "ui.widgets.Button"
 local Dropdown = require "ui.widgets.Dropdown"
 
@@ -36,7 +37,7 @@ function Enum.setValue(self, value)
 		local cmd = "setSamePropertyOnMultiple"
 		local enclosures = self.selection:copyList()
 		local caller = self.tree:get("/Window/UI/PropertyPanel")
-		scene.history:perform(cmd, caller, enclosures, self.propertyName, value)
+		scene.history:perform(cmd, caller, enclosures, PropData(self.propertyName, value))
 	end
 end
 

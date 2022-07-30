@@ -1,23 +1,25 @@
 
 local M = {}
 
-function M.setProperty(enclosure, name, value)
+local PropData = require "commands.data.PropData"
+
+function M.setProperty(enclosure, pdata)
 	local object = enclosure[1]
-	local property = object:getPropertyObj(name)
-	local oldValue
+	local property = object:getPropertyObj(pdata.name)
 	if property then
-		oldValue = property:copyValue()
-		object:setProperty(name, value)
+		local oldPdata = PropData.fromProp(property)
+		object:setProperty(pdata)
+		return enclosure, oldPdata, object.isSelected
 	end
-	return enclosure, name, oldValue, object.isSelected
+	return enclosure
 end
 
-function M.setSamePropertyOnMultiple(enclosures, name, value)
+function M.setSamePropertyOnMultiple(enclosures, pdata)
 	local undoArgList = {}
 	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
-		local undoArgs = { M.setProperty(enclosure, name, value) }
-		oneWasSelected = oneWasSelected or undoArgs[4]
+		local undoArgs = { M.setProperty(enclosure, pdata) }
+		oneWasSelected = oneWasSelected or undoArgs[3]
 		table.insert(undoArgList, undoArgs)
 	end
 	return undoArgList, oneWasSelected
@@ -28,7 +30,7 @@ function M.setMultiPropertiesOnMultiple(argList)
 	local oneWasSelected = false
 	for i,args in ipairs(argList) do
 		local undoArgs = { M.setProperty(unpack(args)) }
-		oneWasSelected = oneWasSelected or undoArgs[4]
+		oneWasSelected = oneWasSelected or undoArgs[3]
 		table.insert(undoArgList, undoArgs)
 	end
 	return undoArgList, oneWasSelected
@@ -41,22 +43,25 @@ function M.offsetVec2PropertyOnMultiple(enclosures, name, dx, dy)
 	for _,enclosure in ipairs(enclosures) do
 		local object = enclosure[1]
 		local oldValue = object:getProperty(name)
-		local newValue = { x = oldValue.x + dx, y = oldValue.y + dy }
-		object:setProperty(name, newValue)
-		local undoArgs = { enclosure, name, oldValue }
+		local oldX, oldY = oldValue.x, oldValue.y
+		local oldPdata = PropData(name, { x = oldX, y = oldY })
+		local newPdata = PropData(name, { x = oldX + dx, y = oldY + dy })
+		object:setProperty(newPdata)
+		local undoSetPropertyArgs = { enclosure, oldPdata }
 		oneWasSelected = oneWasSelected or object.isSelected
-		table.insert(undoArgList, undoArgs)
+		table.insert(undoArgList, undoSetPropertyArgs)
 	end
 	return undoArgList, oneWasSelected
 end
 
-function M.addProperty(enclosure, Class, name, value)
-	assert(name, "object-functions.addProperty - `name` can not be nil.")
+function M.addProperty(enclosure, pdata)
+	local name = pdata.name
+	assert(name, "object-functions.addProperty - `propData.name` can not be nil.")
 	local obj = enclosure[1]
-	if not Class or obj:getPropertyObj(name) then -- If adding `nil` property or object already has the property.
+	if not pdata.Class or obj:getPropertyObj(name) then -- If adding `nil` property or object already has the property.
 		return enclosure, name, false
 	end
-	name = obj:addProperty(Class, name, value) -- `name` can be nil and the class default is used.
+	name = obj:addProperty(pdata)
 	return enclosure, name, obj.isSelected
 end
 
@@ -66,17 +71,16 @@ function M.removeProperty(enclosure, name)
 	if not property then
 		return enclosure
 	end
-	local value = property:getValue()
-	local Class = getmetatable(property)
+	local pdata = PropData.fromProp(property)
 	obj:removeProperty(name)
-	return enclosure, Class, name, value, obj.isSelected
+	return enclosure, pdata, obj.isSelected
 end
 
-function M.addSamePropertyToMultiple(enclosures, Class, name, value)
+function M.addSamePropertyToMultiple(enclosures, pdata)
 	local undoArgList = {}
 	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
-		local undoArgs = { M.addProperty(enclosure, Class, name, value) }
+		local undoArgs = { M.addProperty(enclosure, pdata) }
 		oneWasSelected = oneWasSelected or undoArgs[3]
 		undoArgList[i] = undoArgs
 	end
@@ -99,7 +103,7 @@ function M.removeSamePropertyFromMultiple(enclosures, name)
 	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
 		local undoArgs = { M.removeProperty(enclosure, name) }
-		oneWasSelected = oneWasSelected or undoArgs[5]
+		oneWasSelected = oneWasSelected or undoArgs[3]
 		undoArgList[i] = undoArgs
 	end
 	return undoArgList, oneWasSelected
@@ -110,7 +114,7 @@ function M.removePropertyFromMultiple(argList)
 	local oneWasSelected = false
 	for i,args in ipairs(argList) do
 		local undoArgs = { M.removeProperty(unpack(args)) }
-		oneWasSelected = oneWasSelected or undoArgs[5]
+		oneWasSelected = oneWasSelected or undoArgs[3]
 		undoArgList[i] = undoArgs
 	end
 	return undoArgList, oneWasSelected

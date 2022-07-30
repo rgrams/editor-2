@@ -4,10 +4,11 @@ local EditorCircle = EditorObject:extend()
 EditorCircle.className = "EditorCircle"
 EditorCircle.displayName = "Circle"
 
+_G.objClassList:add(EditorCircle, EditorCircle.displayName)
+
 local config = require "config"
 local id = require "lib.id"
-
-_G.objClassList:add(EditorCircle, EditorCircle.displayName)
+local PropData = require "commands.data.PropData"
 
 EditorCircle.radius = 16
 EditorCircle.hitWidth = EditorCircle.radius*2
@@ -25,9 +26,9 @@ function EditorCircle.set(self)
 end
 
 function EditorCircle.initProperties(self)
-	self:addProperty(String, "id", id.new(), nil, true)
-	self:addProperty(Vec2, "pos", nil, nil, true)
-	self:addProperty(Float, "radius", self.radius, true, true)
+	self:addProperty(PropData("id", id.new(), String, nil, true))
+	self:addProperty(PropData("pos", nil, Vec2, nil, true))
+	self:addProperty(PropData("radius", self.radius, Float, self.radius, true))
 end
 
 function EditorCircle.propertyWasSet(self, name, value, property)

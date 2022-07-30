@@ -1,31 +1,33 @@
 
 local propFn = require "commands.functions.property-functions"
 local propCmd = require "commands.property-commands"
+local PropData = require "commands.data.PropData"
 local signals = require "signals"
 
 local Float = require "objects.properties.Property"
 local Bool = require "objects.properties.Bool"
 local String = require "objects.properties.String"
 
+local propNames = { "sensor", "friction", "density", "restitution", "categories", "mask"}
+
+local addPropDatas = {
+	PropData("sensor", false, Bool),
+	PropData("friction", 0.2, Float),
+	PropData("density", 1, Float),
+	PropData("restitution", 0, Float),
+	PropData("categories", "", String),
+	PropData("mask", "", String),
+}
+
 local function addPhysicsShapeProperties(caller, enclosures)
 	local undoArgList = {}
 	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
-		local args
-		args = { propFn.addProperty(enclosure, Bool, "sensor", false) }
-		table.insert(undoArgList, args)
-		args = { propFn.addProperty(enclosure, Float, "friction", 0.2) }
-		table.insert(undoArgList, args)
-		args = { propFn.addProperty(enclosure, Float, "density", 1) }
-		table.insert(undoArgList, args)
-		args = { propFn.addProperty(enclosure, Float, "restitution", 0) }
-		table.insert(undoArgList, args)
-		args = { propFn.addProperty(enclosure, String, "categories", "") }
-		table.insert(undoArgList, args)
-		args = { propFn.addProperty(enclosure, String, "mask", "") }
-		table.insert(undoArgList, args)
-
-		oneWasSelected = oneWasSelected or args[3]
+		for _,propData in ipairs(addPropDatas) do
+			local args = { propFn.addProperty(enclosure, propData) }
+			table.insert(undoArgList, args)
+		end
+		oneWasSelected = oneWasSelected or enclosure[1].isSelected
 	end
 	if oneWasSelected then
 		local scene = enclosures[1][1].tree
@@ -38,21 +40,11 @@ local function removePhysicsShapeProperties(caller, enclosures)
 	local undoArgList = {}
 	local oneWasSelected = false
 	for i,enclosure in ipairs(enclosures) do
-		local args
-		args = { propFn.removeProperty(enclosure, "sensor") }
-		table.insert(undoArgList, args)
-		args = { propFn.removeProperty(enclosure, "friction") }
-		table.insert(undoArgList, args)
-		args = { propFn.removeProperty(enclosure, "density") }
-		table.insert(undoArgList, args)
-		args = { propFn.removeProperty(enclosure, "restitution") }
-		table.insert(undoArgList, args)
-		args = { propFn.removeProperty(enclosure, "categories") }
-		table.insert(undoArgList, args)
-		args = { propFn.removeProperty(enclosure, "mask") }
-		table.insert(undoArgList, args)
-
-		oneWasSelected = oneWasSelected or args[5]
+		for _,propName in ipairs(propNames) do
+			local args = { propFn.removeProperty(enclosure, propName) }
+			table.insert(undoArgList, args)
+		end
+		oneWasSelected = oneWasSelected or enclosure[1].isSelected
 	end
 	if oneWasSelected then
 		local scene = enclosures[1][1].tree

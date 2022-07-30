@@ -2,11 +2,11 @@
 local EditorGuiNode = require(GetRequireFolder(...) .. "EditorGuiNode")
 local EditorGuiSprite = EditorGuiNode:extend()
 EditorGuiSprite.className = "EditorGuiSprite"
-
 EditorGuiSprite.displayName = "GUI Sprite"
 
 _G.objClassList:add(EditorGuiSprite, EditorGuiSprite.displayName)
 
+local PropData = require "commands.data.PropData"
 local Image = require "objects.properties.Image"
 local Color = require "objects.properties.Color"
 
@@ -17,8 +17,8 @@ end
 
 function EditorGuiSprite.initProperties(self)
 	EditorGuiSprite.super.initProperties(self)
-	self:addProperty(Image, "image", nil, nil, true)
-	self:addProperty(Color, "color", nil, nil, true)
+	self:addProperty(PropData("image", nil, Image, nil, true))
+	self:addProperty(PropData("color", nil, Color, nil, true))
 end
 
 function EditorGuiSprite.updateInnerSize(self)

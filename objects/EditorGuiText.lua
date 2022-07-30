@@ -2,13 +2,14 @@
 local EditorGuiNode = require(GetRequireFolder(...) .. "EditorGuiNode")
 local EditorGuiText = EditorGuiNode:extend()
 EditorGuiText.className = "EditorGuiText"
-
 EditorGuiText.displayName = "GUI Text"
+
 EditorGuiText.hitHeight = 20
 
-local id = require "lib.id"
-
 _G.objClassList:add(EditorGuiText, EditorGuiText.displayName)
+
+local id = require "lib.id"
+local PropData = require "commands.data.PropData"
 
 local Bool = require "objects.properties.Bool"
 local Vec2 = require "objects.properties.Vec2"
@@ -33,20 +34,21 @@ function EditorGuiText.set(self)
 end
 
 function EditorGuiText.initProperties(self)
-	self:addProperty(String,     "id",    id.new(), nil, true)
-	self:addProperty(String,     "name",       nil, nil, true)
-	self:addProperty(Vec2,       "pos",        nil, nil, true)
-	self:addProperty(Float,      "angle",      nil, nil, true)
-	self:addProperty(Vec2,       "size",       { x = self.hitWidth, y = self.hitHeight }, true, true)
-	self:addProperty(Vec2,       "skew",       nil, nil, true)
-	self:addProperty(Cardinal,   "pivot",      nil, nil, true)
-	self:addProperty(Cardinal,   "anchor",     nil, nil, true)
-	self:addProperty(ResizeMode, "modeX",      nil, nil, true)
-	self:addProperty(Vec2,       "pad",        nil, nil, true)
-	self:addProperty(String,     "text",       nil, nil, true)
-	self:addProperty(Font,       "font",       nil, nil, true)
-	self:addProperty(TextAlign,  "align",      nil, nil, true)
-	self:addProperty(Bool,       "isWrapping", nil, nil, true)
+	local size = { x = self.hitWidth, y = self.hitHeight }
+	self:addProperty(PropData("id",    id.new(),  String, nil, true))
+	self:addProperty(PropData("name",       nil,  String, nil, true))
+	self:addProperty(PropData("pos",        nil,  Vec2, nil, true))
+	self:addProperty(PropData("angle",      nil,  Float, nil, true))
+	self:addProperty(PropData("size",       size, Vec2, size, true))
+	self:addProperty(PropData("skew",       nil,  Vec2, nil, true))
+	self:addProperty(PropData("pivot",      nil,  Cardinal, nil, true))
+	self:addProperty(PropData("anchor",     nil,  Cardinal, nil, true))
+	self:addProperty(PropData("modeX",      nil,  ResizeMode, nil, true))
+	self:addProperty(PropData("pad",        nil,  Vec2, nil, true))
+	self:addProperty(PropData("text",       nil,  String, nil, true))
+	self:addProperty(PropData("font",       nil,  Font, nil, true))
+	self:addProperty(PropData("align",      nil,  TextAlign, nil, true))
+	self:addProperty(PropData("isWrapping", nil,  Bool, nil, true))
 end
 
 function EditorGuiText.updateScale(self, alloc)

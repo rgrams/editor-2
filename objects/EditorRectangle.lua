@@ -4,10 +4,11 @@ local EditorRectangle = EditorObject:extend()
 EditorRectangle.className = "EditorRectangle"
 EditorRectangle.displayName = "Rectangle"
 
+_G.objClassList:add(EditorRectangle, EditorRectangle.displayName)
+
 local config = require "config"
 local id = require "lib.id"
-
-_G.objClassList:add(EditorRectangle, EditorRectangle.displayName)
+local PropData = require "commands.data.PropData"
 
 local Float = require "objects.properties.Property"
 local String = require "objects.properties.String"
@@ -20,10 +21,10 @@ function EditorRectangle.set(self)
 end
 
 function EditorRectangle.initProperties(self)
-	self:addProperty(String, "id", id.new(), nil, true)
-	self:addProperty(Vec2, "pos", nil, nil, true)
-	self:addProperty(Float, "angle", nil, nil, true)
-	self:addProperty(Vec2, "size", { x = self.hitWidth, y = self.hitHeight }, true, true)
+	self:addProperty(PropData("id", id.new(), String, nil, true))
+	self:addProperty(PropData("pos", nil, Vec2, nil, true))
+	self:addProperty(PropData("angle", nil, Float, nil, true))
+	self:addProperty(PropData("size", { x = self.hitWidth, y = self.hitHeight }, Vec2, nil, true))
 end
 
 function EditorRectangle.propertyWasSet(self, name, value, property)

@@ -2,11 +2,11 @@
 local EditorGuiNode = require(GetRequireFolder(...) .. "EditorGuiNode")
 local EditorGuiSlice = EditorGuiNode:extend()
 EditorGuiSlice.className = "EditorGuiSlice"
-
 EditorGuiSlice.displayName = "GUI Slice"
 
 _G.objClassList:add(EditorGuiSlice, EditorGuiSlice.displayName)
 
+local PropData = require "commands.data.PropData"
 local Image = require "objects.properties.Image"
 local Vec4 = require "objects.properties.Vec4"
 local Color = require "objects.properties.Color"
@@ -25,9 +25,9 @@ end
 
 function EditorGuiSlice.initProperties(self)
 	EditorGuiSlice.super.initProperties(self)
-	self:addProperty(Image, "image", nil, nil, true)
-	self:addProperty(Color, "color", nil, nil, true)
-	self:addProperty(Vec4, "margins", { 2, 2, 2, 2 }, true, true)
+	self:addProperty(PropData("image", nil, Image, nil, true))
+	self:addProperty(PropData("color", nil, Color, nil, true))
+	self:addProperty(PropData("margins", { 2, 2, 2, 2 }, Vec4, nil, true))
 	local margins = self:getPropertyObj("margins")
 	margins.wgtFieldLabels = { "lt", "tp", "rt", "bt" }
 end

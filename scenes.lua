@@ -9,7 +9,8 @@ local signals = require "signals"
 
 local layers = { "default" }
 local defaultLayer = "default"
-local commands = require("commands.all")
+local commands = require "commands.all"
+local PropData = require "commands.data.PropData"
 
 ----------  Define EditorScene class (so scene can have properties)  ----------
 local EditorObject = require "objects.EditorObject"
@@ -45,7 +46,7 @@ function M.create(name, filepath)
 	scene.name = name or "Untitled"
 	scene.properties = {}
 	local Bool = require("objects.properties.Bool")
-	scene:addProperty(Bool, "useProjectLocalPaths", false, true, true)
+	scene:addProperty(PropData("useProjectLocalPaths", false, Bool, false, true))
 	scene.camX, scene.camY, scene.camZoom = 0, 0, 1
 	return scene
 end

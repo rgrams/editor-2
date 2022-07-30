@@ -6,6 +6,7 @@ local scenes = require "scenes"
 local signals = require "signals"
 local PanelTheme = require "ui.widgets.themes.PanelTheme"
 local AddPropertyDialog = require "ui.AddPropertyDialog"
+local PropData = require "commands.data.PropData"
 
 local headerFont = { "assets/font/OpenSans-Semibold.ttf", 17 }
 local propClass = _G.propClassList
@@ -51,7 +52,8 @@ function PropertyPanel.addProperty(self, propType, propName)
 		enclosures = scenes.active.selfSelection
 	end
 	local Class = propClass:get(propType)
-	scenes.active.history:perform("addSamePropertyToMultiple", self, enclosures, Class, propName)
+	local propData = PropData(propName, nil, Class)
+	scenes.active.history:perform("addSamePropertyToMultiple", self, enclosures, propData)
 	self:updateProperties(selection) -- We'll ignore the signal from ourself, so manually update.
 end
 

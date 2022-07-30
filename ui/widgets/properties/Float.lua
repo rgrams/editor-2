@@ -3,6 +3,7 @@ local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
 local Float = BaseClass:extend()
 Float.className = "Float"
 
+local PropData = require "commands.data.PropData"
 local InputField = require "ui.widgets.InputField"
 local InputFieldTheme = require "ui.widgets.themes.InputFieldTheme"
 
@@ -31,7 +32,7 @@ function Float.onConfirm(self, wgt)
 		local cmd = "setSamePropertyOnMultiple"
 		local enclosures = self.selection:copyList()
 		local caller = self.tree:get("/Window/UI/PropertyPanel")
-		scene.history:perform(cmd, caller, enclosures, self.propertyName, value)
+		scene.history:perform(cmd, caller, enclosures, PropData(self.propertyName, value))
 	end
 end
 

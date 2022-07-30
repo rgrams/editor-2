@@ -3,6 +3,7 @@ local BaseClass = require(GetRequireFolder(...) .. "BaseClass")
 local Bool = BaseClass:extend()
 Bool.className = "Bool"
 
+local PropData = require "commands.data.PropData"
 local Checkbox = require "ui.widgets.Checkbox"
 local CheckboxTheme = require "ui.widgets.themes.CheckboxTheme"
 
@@ -26,7 +27,7 @@ function Bool.onToggle(self, wgt)
 		local cmd = "setSamePropertyOnMultiple"
 		local enclosures = self.selection:copyList()
 		local caller = self.tree:get("/Window/UI/PropertyPanel")
-		scene.history:perform(cmd, caller, enclosures, self.propertyName, value)
+		scene.history:perform(cmd, caller, enclosures, PropData(self.propertyName, value))
 	end
 end
 
