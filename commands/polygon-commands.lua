@@ -39,7 +39,7 @@ end
 local function setMultiVertexPos(caller, argsList)
 	local undoArgsList = {}
 	for i,args in ipairs(argsList) do
-		table.insert(undoArgsList, { setVertexPos(unpack(args)) })
+		table.insert(undoArgsList, { polyFn.setVertexPos(unpack(args)) })
 	end
 	local enclosure = argsList[1][1]
 	if enclosure[1].isSelected then

@@ -180,7 +180,7 @@ local function getPosDragArgList(self, enclosure, startOffsets, totalDX, totalDY
 		local wx, wy = startX + offset.x + totalDX, startY + offset.y + totalDY
 		wx, wy = math.round(wx, roundX), math.round(wy, roundY)
 		local lx, ly = self.hoverObj:toLocal(wx, wy)
-		table.insert(argList, { self, enclosure, offset.i, lx, ly })
+		table.insert(argList, { enclosure, offset.i, lx, ly })
 	end
 	return argList
 end
@@ -479,7 +479,7 @@ function PolygonTool.ruuInput(wgt, depth, action, value, change, rawChange, isRe
 				if scene.isVertSelected[vi] then
 					local vx, vy = verts[iy-1], verts[iy]
 					vx, vy = vx + dx, vy + dy
-					table.insert(argList, { self, enclosure, vi, vx, vy })
+					table.insert(argList, { enclosure, vi, vx, vy })
 				end
 			end
 			scene.history:perform("setMultiVertexPos", self, argList)
