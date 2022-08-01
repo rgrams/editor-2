@@ -133,24 +133,18 @@ end
 
 -- Returns folder, filename (or nil).
 function M.findProject(sceneFilepath, projectFileExtension)
-	print("Searching for Project...")
 	local mountPoint = "_searchFolder/"
 	local fromFolder = M.splitFilepath(sceneFilepath)
 	while true do
-		print("   mounting", fromFolder)
 		if not urfs.mount(fromFolder, mountPoint) then
 			print("      urfs.mount failed with folder: '"..tostring(fromFolder).."'.")
 			return
 		end
 		for i,path in ipairs(love.filesystem.getDirectoryItems(mountPoint)) do
 			local _, _, extension = M.splitFilepath(path)
-			-- print("      checking", path, "has extension", extension)
 			if extension == projectFileExtension then
-				print("      extension matches", extension)
 				local fullPath = mountPoint .. path
 				if love.filesystem.getInfo(fullPath).type == "file" then
-					print("         FOUND", fullPath, fromFolder)
-					print("         "..love.filesystem.getRealDirectory(fullPath)..path)
 					urfs.unmount(fromFolder, mountPoint)
 					return fromFolder, path
 				end
@@ -158,7 +152,6 @@ function M.findProject(sceneFilepath, projectFileExtension)
 		end
 		urfs.unmount(fromFolder, mountPoint)
 		if #fromFolder <= 1 then
-			print("Hit root again, aborting search.", fromFolder)
 			return
 		end
 		fromFolder = M.goUp(fromFolder)
