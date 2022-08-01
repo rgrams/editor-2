@@ -11,19 +11,27 @@ function M.add(scene, Class, enclosure, properties, isSelected, parentEnclosure,
 	enclosure[1] = object
 	object.enclosure = enclosure
 
+	local oneWasSelected = isSelected
+
+	if children then
+		object.children = object.children or {}
+		for _,addData in ipairs(children) do
+			assert(addData.parentEnclosure == enclosure, "object-functions.add() - Child's parent enclosure in AddObjData does not match our own")
+			local scn, enc, wasSelected = M.add(addData.unpack())
+			oneWasSelected = oneWasSelected or wasSelected
+		end
+	end
+
 	if properties then
 		object:applyModifiedProperties(properties)
 	end
 
-	scene:add(object, parentEnclosure and parentEnclosure[1])
-
-	local oneWasSelected = isSelected
-
-	if children then
-		for _,addData in ipairs(children) do
-			local scn, enc, wasSelected = M.add(addData.unpack())
-			oneWasSelected = oneWasSelected or wasSelected
-		end
+	local parentObj = parentEnclosure and parentEnclosure[1] or scene
+	if parentObj.path then
+		scene:add(object, parentObj)
+	else
+		parentObj.children = parentObj.children or {}
+		table.insert(parentObj.children, object)
 	end
 
 	if isSelected then
