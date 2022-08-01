@@ -5,6 +5,7 @@ local id = require "lib.id"
 local AddObjData = require "commands.data.AddObjData"
 local PropData = require "commands.data.PropData"
 local StringProp = require "objects.properties.String"
+local ChildScene = require "objects.ChildScene"
 
 function M.add(scene, Class, enclosure, properties, isSelected, parentEnclosure, children)
 	local object = Class()
@@ -150,12 +151,13 @@ function M.addObjects(scene, addObjDatas)
 	return scene, enclosures, oneWasSelected
 end
 
-local function setNewIDProp(propDatas)
+local function setNewIDProp(properties, newID)
+	local propDatas = properties.rootProperties or properties
 	for i,propData in ipairs(propDatas) do
 		if propData.name == "id" and propData.Class == StringProp then
 			local t = {
 				name = propData.name,
-				value = id.new(),
+				value = newID,
 				Class = propData.Class,
 				defaultVal = propData.defaultVal,
 				isClassBuiltin = propData.isClassBuiltin,
@@ -166,22 +168,34 @@ local function setNewIDProp(propDatas)
 			return propDatas
 		end
 	end
-	return propDatas
+	-- If no ID property found, add one.
+	table.insert(propDatas, PropData("id", newID, StringProp, nil, true))
+	return properties
 end
 
 -- Copy to new tables and insert new enclosures and new scene-tree.
-function M.copyPasteDataFor(scene, parentEnclosure, addObjDatas, keepOrigParents)
+function M.copyPasteDataFor(scene, parentEnclosure, addObjDatas, keepOrigParents, isInsideChildScene)
 	local newAddObjDatas = {}
 	local isSelected = false
 	for i,addData in ipairs(addObjDatas) do
 		local newEnclosure = {}
 		local children = addData.children
-		if children then  children = M.copyPasteDataFor(scene, newEnclosure, children)  end
+		if addData.Class == ChildScene then
+			isInsideChildScene = true
+		end
+		if children then
+			children = M.copyPasteDataFor(scene, newEnclosure, children, nil, isInsideChildScene)
+		end
+		local properties = addData.properties
+		if not (isInsideChildScene and properties.isChildSceneObj) then
+			local newID = id.new()
+			setNewIDProp(properties, newID)
+		end
 		local newAddData = AddObjData(
 			scene,
 			addData.Class,
 			newEnclosure,
-			setNewIDProp(addData.properties),
+			properties,
 			isSelected,
 			keepOrigParents and addData.parentEnclosure or parentEnclosure,
 			children
