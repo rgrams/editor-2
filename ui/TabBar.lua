@@ -8,6 +8,8 @@ local Tab = require "ui.widgets.Tab"
 local PanelTheme = require "ui.widgets.themes.PanelTheme"
 local TabTheme = require "ui.widgets.themes.TabTheme"
 local TabCloseButtonTheme = require "ui.widgets.themes.TabCloseButtonTheme"
+local tabFont = new.font(unpack(Tab.font))
+local maxTabTitleWidth = Tab.width - Tab.buttonWidth + 3
 
 local spacing = 2
 local width = 100
@@ -45,7 +47,7 @@ function TabBar.onActiveSceneChanged(self, sender, signal, scene)
 end
 
 function TabBar.addTab(self, text, scene)
-	local tab = Tab(text)
+	local tab = Tab(TabBar.getTrimmedText(text))
 	self.tree:add(tab, self)
 
 	local closeWgt = self.ruu:Button(tab.closeBtn, self.tabCloseBtnPressed, TabCloseButtonTheme)
@@ -77,6 +79,14 @@ function TabBar.removeTab(self, scene)
 			return
 		end
 	end
+end
+
+function TabBar.getTrimmedText(text)
+	local t = text:sub(1, 16)
+	while tabFont:getWidth(t) > maxTabTitleWidth do
+		t = t:sub(1, -2)
+	end
+	return t
 end
 
 function TabBar.setTabText(self, scene, text)

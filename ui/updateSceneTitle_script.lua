@@ -32,7 +32,8 @@ end
 
 local function updateTabText(self, scene)
 	local tabBar = self.tree:get("/Window/UI/MainRow/VPColumn/TabBar")
-	tabBar:setTabText(scene, scene.name .. (scene.isDirty and "*" or ""))
+	local title = tabBar.getTrimmedText(scene.name) .. (scene.isDirty and "*" or "")
+	tabBar:setTabText(scene, title)
 end
 
 local function updateWindowTitle(scene)
