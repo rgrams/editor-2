@@ -18,6 +18,9 @@ local classList = _G.objClassList
 local Handle = require "tools.ToolHandle"
 local AddObjData = require "commands.data.AddObjData"
 local PropData = require "commands.data.PropData"
+local fileDialog = require "lib.native-file-dialog.dialog"
+local fileUtil = require "lib.file-util"
+local ChildScene = require "objects.ChildScene"
 
 Tool.boxSelectAddChord = "shift "
 Tool.boxSelectToggleChord = "ctrl "
@@ -573,6 +576,32 @@ function Tool.addAt(self, Class, wx, wy)
 	updateHover(self)
 end
 
+local function addScene(self, filepath)
+	if not filepath then  filepath = fileDialog.open(config.lastOpenFolder)  end
+	if not filepath then  return  end
+
+	local folder = fileUtil.splitFilepath(filepath)
+	config.lastOpenFolder = folder
+
+	-- TODO: Add to all selected objects.
+	local scene = scenes.active
+	local rootEnc = {}
+	local importer = require "io.defaultLuaImportExport"
+	local _, addRootObjDatas, scenePropDatas = importer.import(filepath, nil, rootEnc, scene)
+	if not addRootObjDatas then  return  end
+	self.lastAddScene = filepath
+
+	local mx, my = love.mouse.getPosition()
+	local wx, wy = Camera.current:screenToWorld(mx, my)
+	local properties = {
+		rootProperties = { PropData("pos", { x = wx, y = wy }, Vec2Property) },
+		sceneFilepath = filepath,
+		sceneEnclosureIDMap = ChildScene.recursiveMapEncIDs(addRootObjDatas)
+	}
+	local addSceneData = AddObjData(scene, ChildScene, rootEnc, properties, false, false, addRootObjDatas) -- No nils in command args.
+	scene.history:perform("addObject", self, addSceneData.unpack())
+end
+
 function Tool.press(wgt, depth, mx, my, isKeyboard)
 	if depth ~= 1 then  return  end
 	if scenes.active and not isKeyboard then
@@ -734,13 +763,19 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 		local mx, my = love.mouse.getPosition()
 		local wx, wy = Camera.current:screenToWorld(mx, my)
 		for i,Class in ipairs(classList) do
-			local name = classList:getName(Class)
-			local item = { text = name, fn = fn, args = {self, Class, wx, wy} }
-			table.insert(items, item)
+			if Class ~= ChildScene then
+				local name = classList:getName(Class)
+				local item = { text = name, fn = fn, args = {self, Class, wx, wy} }
+				table.insert(items, item)
+			end
 		end
 		local dropdown = Dropdown(mx, my, items)
 		local guiRoot = self.tree:get("/Window")
 		self.tree:add(dropdown, guiRoot)
+	elseif action == "add scene" and change == 1 then
+		addScene(wgt.object)
+	elseif action == "add last scene" and change == 1 then
+		addScene(wgt.object, wgt.object.lastAddScene)
 	elseif action == "snap" then
 		if wgt.object.isDragging and (change == 1 or change == -1) then
 			wgt:drag(0, 0, wgt.object.lastDragType)

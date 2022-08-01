@@ -72,8 +72,9 @@ local function copyChildData(child, options, filepath)
 	local Class = getmetatable(child)
 	data.class = Class.displayName
 	if Class == ChildScene then
+		data.sceneFilepath = fileUtil.getRelativePath(filepath, child.sceneFilepath)
 		local childProperties = {}
-		for id,enclosure in pairs(child.sceneObjectIDMap) do
+		for id,enclosure in pairs(child.sceneEnclosureIDMap) do
 			local obj = enclosure[1]
 			local props = copyPropertyData(obj, omitUnmod, filepath)
 			if #props > 0 then
@@ -86,7 +87,7 @@ local function copyChildData(child, options, filepath)
 		local addedObjects = {}
 		if child.children then
 			local parentID = child:getProperty("id")
-			local addedObjList = getSceneAddedObjects(child.children, child.sceneObjectIDMap, {}, parentID)
+			local addedObjList = getSceneAddedObjects(child.children, child.sceneEnclosureIDMap, {}, parentID)
 			for i,v in ipairs(addedObjList) do
 				addedObjects[v.parentID] = addedObjects[v.parentID] or {}
 				local childData = copyChildData(v.obj, options, filepath)
@@ -121,8 +122,7 @@ function copyChildrenData(children, options, filepath)
 end
 
 function M.export(scene, filepath, options)
-	print("----  EXPORT  ----")
-	print("   "..filepath)
+	print("EXPORT: "..filepath)
 	local file, errMsg = io.open(filepath, "w")
 	if not file then
 		editor.messageBox(errMsg, "Export Failed: Could not access target file")
@@ -197,6 +197,7 @@ local function makeAddObjData(scene, objData, parentEnclosure, filepath)
 	local Class = classList:get(objData.class)
 	local enclosure = {}
 	local properties
+	local children
 	if Class == ChildScene then
 		local modsData = objData.properties
 		local mods = {}
@@ -204,18 +205,34 @@ local function makeAddObjData(scene, objData, parentEnclosure, filepath)
 			mods.rootProperties = makeAddPropDatas(modsData.rootProperties, filepath)
 		end
 		mods.childProperties = {}
-		for id,propData in pairs(modsData.childProperties) do
-			mods.childProperties[id] = makeAddPropDatas(propData, filepath)
+		if mods.childProperties then
+			for id,propData in pairs(modsData.childProperties) do
+				mods.childProperties[id] = makeAddPropDatas(propData, filepath)
+			end
 		end
-		mods.addedObjects = {}
-		if modsData.addedObjects then
-			for id,addedObjs in pairs(modsData.addedObjects) do
-				mods.addedObjects[id] = {}
-				for i,addedObjData in ipairs(addedObjs) do
-					-- WARNING: Parent objects from the scene don't exist yet, so the
-					--   parent enclosure set here is bogus. Will need to be updated later.
-					local args = makeAddObjData(scene, addedObjData, enclosure, filepath)
-					table.insert(mods.addedObjects[id], args)
+
+		local scenePath = fileUtil.resolveRelativePath(filepath, objData.sceneFilepath)
+		mods.sceneFilepath = scenePath
+		local _, addRootObjDatas, scenePropDatas = M.import(scenePath, nil, enclosure, scene)
+		children = addRootObjDatas
+		-- TODO: Need to add ChildScene's ID to the map.
+		local sceneEnclosureIDMap, objDataIDMap = ChildScene.recursiveMapEncIDs(addRootObjDatas)
+		mods.sceneEnclosureIDMap = sceneEnclosureIDMap
+
+		if objData.properties.addedObjects then
+			for parentID,addedObjs in pairs(modsData.addedObjects) do
+				local parentAddObjData = objDataIDMap[parentID]
+				if parentAddObjData then
+					if not parentAddObjData.children then
+						parentAddObjData.rawset("children", {})
+					end
+					local parentEnc = parentAddObjData.enclosure
+					for i,addedObjData in ipairs(addedObjs) do
+						local addObjData = makeAddObjData(scene, addedObjData, parentEnc, filepath)
+						table.insert(parentAddObjData.children, addObjData)
+					end
+				else
+					print("didn't find parent data for ID: "..parentID.." for added scene objects.")
 				end
 			end
 		end
@@ -224,7 +241,6 @@ local function makeAddObjData(scene, objData, parentEnclosure, filepath)
 		properties = makeAddPropDatas(objData.properties, filepath)
 	end
 	local isSelected = false
-	local children
 	if objData.children then -- ChildScene won't have children saved as such.
 		children = {}
 		for i,child in ipairs(objData.children) do
@@ -234,15 +250,10 @@ local function makeAddObjData(scene, objData, parentEnclosure, filepath)
 	return AddObjData(scene, Class, enclosure, properties, isSelected, parentEnclosure, children)
 end
 
-function M.import(filepath, options, parentEnc)
-	options = options or {}
-	print("----  IMPORT  ----")
-	print("   "..filepath)
-	if parentEnc then
-		assert(parentEnc[1].tree, "Import - Object in parent enclosure must be in a sceneTree already.")
-	end
+local function loadSceneFile(filepath)
 	local file, errMsg = io.open(filepath, "r")
 	if not file then
+		print(errMsg)
 		editor.messageBox(errMsg, "Import Failed: Error opening file")
 		return
 	end
@@ -252,12 +263,14 @@ function M.import(filepath, options, parentEnc)
 
 	local isSuccess, result = pcall(loadstring, str)
 	if not isSuccess then
+		print(result)
 		editor.messageBox("Error loading contents of file as lua code: "..tostring(result), "Import Failed: Error loading as lua")
 		return
 	end
 
 	local isSuccess, data = pcall(result)
 	if not isSuccess then
+		print(data)
 		editor.messageBox(tostring(data), "Import Failed: Error executing loaded lua code")
 		return
 	end
@@ -271,14 +284,20 @@ function M.import(filepath, options, parentEnc)
 		editor.messageBox("Lua module is not flagged as a scene file.", "Import Failed: Invalid scene file")
 		return
 	end
+	return data
+end
+
+function M.import(filepath, options, parentEnc, scene)
+	options = options or {}
+	print("IMPORT: "..filepath)
+	if parentEnc then  assert(scene, "Import - No scene given. Must also give a scene if a parent enclosure is given.")  end
+
+	local data = loadSceneFile(filepath)
+	if not data then  return  end
 
 	local addObjDatas = {}
-
 	local _, filename = fileUtil.splitFilepath(filepath)
-	local scene
-	if parentEnc then  scene = parentEnc[1].tree
-	else  scene = scenes.create(filename, filepath)  end
-
+	if not parentEnc then  scene = scenes.create(filename, filepath)  end
 	local relFilepathFolder = filepath
 
 	local useProjectPaths
@@ -310,10 +329,13 @@ function M.import(filepath, options, parentEnc)
 		end
 	end
 
+	local scenePropDatas
+
 	if data.properties then
-		local scenePropDatas = makeAddPropDatas(data.properties, relFilepathFolder)
-		if scenePropDatas then
-			local enclosure = parentEnc or scene.enclosure
+		scenePropDatas = makeAddPropDatas(data.properties, relFilepathFolder)
+		if scenePropDatas and not parentEnc then
+			-- Add scene properties to new scene.
+			local enclosure = scene.enclosure
 			local obj = enclosure[1]
 			for i,propData in ipairs(scenePropDatas) do
 				if obj:hasProperty(propData.name) then
@@ -334,6 +356,7 @@ function M.import(filepath, options, parentEnc)
 		local parentEnc = parentEnc or scene.enclosure
 		local isSuccess, result = pcall(makeAddObjData, scene, objData, parentEnc, relFilepathFolder)
 		if not isSuccess then
+			print(result)
 			editor.messageBox("Error creating command args for creating scene objects: "..tostring(result), "Import Failed: Invalid object")
 			return
 		else
@@ -341,9 +364,11 @@ function M.import(filepath, options, parentEnc)
 		end
 	end
 
-	objectFn.addObjects(scene, addObjDatas)
+	if not parentEnc then
+		objectFn.addObjects(scene, addObjDatas)
+	end
 
-	return scene, addObjDatas
+	return scene, addObjDatas, scenePropDatas
 end
 
 return M

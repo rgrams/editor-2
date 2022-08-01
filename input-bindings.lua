@@ -34,6 +34,8 @@ return {
 	{ "button", "ctrl a", "select all" },
 	{ "button", "a", "add modifier" },
 	{ "button", "shift a", "add" },
+	{ "button", "alt a", "add scene" },
+	{ "button", "alt shift a", "add last scene" },
 	{ "button", "ctrl z", "undo" },
 	{ "button", "ctrl shift z", "redo" },
 	{ "button", "ctrl x", "cut" },

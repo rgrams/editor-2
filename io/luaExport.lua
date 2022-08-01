@@ -181,7 +181,7 @@ local function writeChildData(child, options, filepath)
 
 	if Class == ChildScene then
 		openBlock("sceneObjProperties")
-		for id,enclosure in pairs(child.sceneObjectIDMap) do
+		for id,enclosure in pairs(child.sceneEnclosureIDMap) do
 			local obj = enclosure[1]
 			if hasSceneModifications(obj, omitUnmod) then
 				openBlock(id)
@@ -193,7 +193,7 @@ local function writeChildData(child, options, filepath)
 		openBlock("sceneAddedObjects")
 		if child.children then
 			local parentID = child:getProperty("id")
-			local addedObjMap = getSceneAddedObjects(child.children, child.sceneObjectIDMap, {}, parentID)
+			local addedObjMap = getSceneAddedObjects(child.children, child.sceneEnclosureIDMap, {}, parentID)
 			for id,objList in pairs(addedObjMap) do
 				openBlock(id)
 				for _,obj in ipairs(objList) do
@@ -226,8 +226,7 @@ function writeChildrenData(children, options, filepath)
 end
 
 function M.export(scene, filepath, options)
-	print("----  EXPORT - LUA  ----")
-	print("   "..filepath)
+	print("EXPORT - LUA: "..filepath)
 	local file, errMsg = io.open(filepath, "w")
 	if not file then
 		editor.messageBox(errMsg, "Export Failed: Could not access target file")

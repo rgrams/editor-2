@@ -9,45 +9,12 @@ ChildScene.hitHeight = 64
 
 _G.objClassList:add(ChildScene, ChildScene.displayName)
 
-local signals = require "signals"
-local objectFn = require "commands.functions.object-functions"
 local PropData = require "commands.data.PropData"
 
-local File = require "objects.properties.File"
-
-function ChildScene.set(self)
-	self.oldScenePath = ""
-	self.sceneRootEnclosures = {}
-	self.sceneObjectIDMap = {}
-	ChildScene.super.set(self)
-end
-
-function ChildScene.initProperties(self)
-	self:addProperty(PropData("scene", "", File, nil, true))
-	ChildScene.super.initProperties(self)
-end
-
-local function removeOldSceneRootObjects(self)
-	local scene = self.tree
-	local enclosures = self.sceneRootEnclosures
-	if #enclosures > 0 then
-		local scn, undoArgs, oneWasSelected = objectFn.deleteObjects(scene, enclosures)
-		for i=#enclosures,1,-1 do
-			enclosures[i] = nil
-		end
-		for k,v in pairs(self.sceneObjectIDMap) do
-			self.sceneObjectIDMap[k] = nil
-		end
-		if oneWasSelected then
-			signals.send("selection changed", self, scene)
-		end
-	end
-end
-
-local function addSceneObjects(self, scenePath)
-	local importer = require "io.defaultLuaImportExport"
-	local _, addObjDatas = importer.import(scenePath, nil, self.enclosure)
-	return addObjDatas
+function ChildScene.init(self)
+	ChildScene.super.init(self)
+	assert(self.sceneEnclosureIDMap, "ChildScene.init - no sceneEnclosureIDMap")
+	assert(self.sceneFilepath, "ChildScene.init - no sceneFilepath")
 end
 
 local function setPropertiesDefaultAndBuiltin(self, objects)
@@ -69,59 +36,27 @@ local function setPropertiesDefaultAndBuiltin(self, objects)
 	end
 end
 
-local function getSceneObjectIDs(objects, map)
+local function getIDFromPropDatas(propDatas)
+	for i,propData in ipairs(propDatas) do
+		if propData.name == "id" then
+			return propData.value
+		end
+	end
+end
+
+-- Used by Tool & Importer when adding child scenes.
+function ChildScene.recursiveMapEncIDs(addObjDatas, map, dataMap)
 	map = map or {}
-	for i=1,objects.maxn or #objects do
-		local obj = objects[i]
-		if obj then
-			local id = obj:getProperty("id")
-			map[id] = obj.enclosure
-			if obj.children then
-				getSceneObjectIDs(obj.children, map)
-			end
+	dataMap = dataMap or {}
+	for i,addObjData in ipairs(addObjDatas) do
+		local id = getIDFromPropDatas(addObjData.properties)
+		map[id] = addObjData.enclosure
+		dataMap[id] = addObjData
+		if addObjData.children then
+			ChildScene.recursiveMapEncIDs(addObjData.children, map, dataMap)
 		end
 	end
-	return map
-end
-
-local function loadScene(self, scenePath)
-	if scenePath ~= self.oldScenePath then
-		removeOldSceneRootObjects(self)
-		self.oldScenePath = scenePath
-		if scenePath ~= "" then
-			local addObjDatas = addSceneObjects(self, scenePath)
-			local enclosures = self.sceneRootEnclosures
-			local objects = {}
-			for i,addObjData in ipairs(addObjDatas) do
-				enclosures[i] = addObjData.enclosure
-				objects[i] = addObjData.enclosure[1]
-			end
-			setPropertiesDefaultAndBuiltin(self, objects)
-			getSceneObjectIDs(objects, self.sceneObjectIDMap)
-		end
-	end
-end
-
-function ChildScene.init(self)
-	ChildScene.super.init(self)
-	local scenePath = self:getProperty("scene")
-	if scenePath ~= "" then
-		if self.modData then
-			loadScene(self, scenePath)
-			self:applySceneModifications(self.modData)
-			self.modData = nil
-		end
-	end
-end
-
-function ChildScene.propertyWasSet(self, name, value, property)
-	if name == "scene" then
-		if self.tree then
-			loadScene(self, value)
-			return
-		end
-	end
-	ChildScene.super.propertyWasSet(self, name, value, property)
+	return map, dataMap
 end
 
 function ChildScene.applyModifiedProperties(self, mods)
@@ -129,40 +64,53 @@ function ChildScene.applyModifiedProperties(self, mods)
 		ChildScene.super.applyModifiedProperties(self, mods)
 		return
 	end
+
 	-- Got detailed properties from import.
+	self.sceneEnclosureIDMap = mods.sceneEnclosureIDMap
 	if mods.rootProperties then
 		ChildScene.super.applyModifiedProperties(self, mods.rootProperties)
 	end
-	if not self.tree then
-		-- Must delay applying mods to scene objects until after they're created (on init).
-		self.modData = mods
-	else
-		self:applySceneModifications(mods)
+	self.sceneFilepath = mods.sceneFilepath
+	self:applySceneModifications(mods)
+end
+
+function ChildScene.getModifiedProperties(self)
+	local propDatas
+	for i,property in ipairs(self.properties) do
+		local propData
+		if property.isClassBuiltin then
+			if not property:isAtDefault() then
+				propData = PropData.fromProp(property)
+			end
+		else
+			propData = PropData.fromProp(property)
+		end
+		if propData then
+			propDatas = propDatas or {}
+			table.insert(propDatas, propData)
+		end
 	end
+	return {
+		rootProperties = propDatas,
+		sceneEnclosureIDMap = self.sceneEnclosureIDMap,
+		sceneFilepath = self.sceneFilepath,
+	}
 end
 
 function ChildScene.applySceneModifications(self, mods)
 	-- Apply property mods to scene objects.
-	for id,propDatas in pairs(mods.childProperties) do
-		local enclosure = self.sceneObjectIDMap[id]
-		if enclosure then -- Object may have been deleted in source scene.
-			local obj = enclosure[1]
-			for i,propData in ipairs(propDatas) do
-				if not obj:hasProperty(propData.name) then
-					obj:addProperty(propData)
-				else
-					obj:setProperty(propData)
+	if mods.childProperties then
+		for id,propDatas in pairs(mods.childProperties) do
+			local enclosure = self.sceneEnclosureIDMap[id]
+			if enclosure then -- Object may have been deleted in source scene.
+				local obj = enclosure[1]
+				for i,propData in ipairs(propDatas) do
+					if not obj:hasProperty(propData.name) then
+						obj:addProperty(propData)
+					else
+						obj:setProperty(propData)
+					end
 				end
-			end
-		end
-	end
-	if mods.addedObjects then
-		local selfID = self:getProperty("id")
-		for id,addedObjects in pairs(mods.addedObjects) do
-			local parentEnc = self.sceneObjectIDMap[id]
-			if not parentEnc and id == selfID then  parentEnc = self.enclosure  end
-			if parentEnc then
-				objectFn.addObjects(self.tree, addedObjects)
 			end
 		end
 	end
