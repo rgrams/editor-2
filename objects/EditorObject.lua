@@ -325,6 +325,7 @@ function EditorObject.draw(self)
 end
 
 function EditorObject.updateAABB(self)
+	if not self.path then  return  end -- Will update on init anyway.
 	if self.parent then  self:updateTransform()  end
 	local hw, hh = self.hitWidth/2, self.hitHeight/2
 	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
