@@ -16,13 +16,13 @@ end
 
 local function newAddObjData(scene, Class, enclosure, properties, isSelected, parentEnclosure, children)
 	local t = {
-		scene = scene,
-		Class = Class,
-		enclosure = enclosure,
-		properties = properties,
-		isSelected = isSelected,
-		parentEnclosure = parentEnclosure,
-		children = children,
+		scene = scene or false,
+		Class = Class or false,
+		enclosure = enclosure or false,
+		properties = properties or false,
+		isSelected = isSelected or false,
+		parentEnclosure = parentEnclosure or false,
+		children = children or false,
 	}
 	local proxy = {
 		unpack = function()
