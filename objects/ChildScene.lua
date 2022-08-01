@@ -21,13 +21,11 @@ local function setPropertiesDefaultAndBuiltin(self, objects)
 	for i=1,objects.maxn or #objects do
 		local obj = objects[i]
 		if obj then
-			for _,property in ipairs(obj.properties) do
-				property.isNonRemovable = true
-				-- Can't just set the default value to the current one because those defaults
-				-- aren't saved anywhere.
-				-- If you delete the object in only saves modified properties, so if everything
-				-- is at default, nothing is saved and the information is destroyed.
-				property.sceneDefault = property:copyValue() -- Use alternate default for export.
+			if obj.isChildSceneObj then
+				for _,property in ipairs(obj.properties) do
+					property.isNonRemovable = true
+					property.defaultValue = property:copyValue() -- Use alternate default for export.
+				end
 			end
 			if obj.children then
 				setPropertiesDefaultAndBuiltin(self, obj.children)
@@ -49,7 +47,8 @@ function ChildScene.recursiveMapEncIDs(addObjDatas, map, dataMap)
 	map = map or {}
 	dataMap = dataMap or {}
 	for i,addObjData in ipairs(addObjDatas) do
-		local id = getIDFromPropDatas(addObjData.properties)
+		local props = addObjData.properties.rootProperties or addObjData.properties
+		local id = getIDFromPropDatas(props)
 		map[id] = addObjData.enclosure
 		dataMap[id] = addObjData
 		if addObjData.children then
@@ -66,7 +65,11 @@ function ChildScene.applyModifiedProperties(self, mods)
 	end
 
 	-- Got detailed properties from import.
+	if mods.isChildSceneObj then  self.isChildSceneObj = true  end
 	self.sceneEnclosureIDMap = mods.sceneEnclosureIDMap
+	if self.children then
+		setPropertiesDefaultAndBuiltin(self, self.children)
+	end
 	if mods.rootProperties then
 		ChildScene.super.applyModifiedProperties(self, mods.rootProperties)
 	end
@@ -75,22 +78,9 @@ function ChildScene.applyModifiedProperties(self, mods)
 end
 
 function ChildScene.getModifiedProperties(self)
-	local propDatas
-	for i,property in ipairs(self.properties) do
-		local propData
-		if property.isClassBuiltin then
-			if not property:isAtDefault() then
-				propData = PropData.fromProp(property)
-			end
-		else
-			propData = PropData.fromProp(property)
-		end
-		if propData then
-			propDatas = propDatas or {}
-			table.insert(propDatas, propData)
-		end
-	end
+	local propDatas = ChildScene.super.getModifiedProperties(self)
 	return {
+		isChildSceneObj = self.isChildSceneObj,
 		rootProperties = propDatas,
 		sceneEnclosureIDMap = self.sceneEnclosureIDMap,
 		sceneFilepath = self.sceneFilepath,

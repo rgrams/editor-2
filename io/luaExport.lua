@@ -125,18 +125,21 @@ local function writePropExportValue(prop, filepath)
 end
 
 local function writePropertyData(child, omitUnmod, filepath, isSceneObj)
-	local nonBuiltinProps
+	local nonBuiltinProps = {}
 	for _,prop in ipairs(child.properties) do
-		if prop.isClassBuiltin then
-			if not (omitUnmod and prop:isAtDefault(isSceneObj and prop.sceneDefault)) then
-				writePropExportValue(prop, filepath)
+		if child.isChildSceneObj then
+			if not (omitUnmod and prop:isAtDefault()) then
+				if prop.isClassBuiltin then  writePropExportValue(prop, filepath)
+				else  table.insert(nonBuiltinProps, prop)  end
 			end
-		elseif not (isSceneObj and prop.isNonRemovable and prop:isAtDefault(prop.sceneDefault)) then
-			nonBuiltinProps = nonBuiltinProps or {}
-			table.insert(nonBuiltinProps, prop)
+		else
+			if not (omitUnmod and prop.isClassBuiltin and prop:isAtDefault()) then
+				if prop.isClassBuiltin then  writePropExportValue(prop, filepath)
+				else  table.insert(nonBuiltinProps, prop)  end
+			end
 		end
 	end
-	if nonBuiltinProps then
+	if nonBuiltinProps[1] then
 		openBlock("properties")
 		for _,prop in ipairs(nonBuiltinProps) do
 			writePropExportValue(prop, filepath)

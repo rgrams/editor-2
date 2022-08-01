@@ -186,15 +186,18 @@ function EditorObject.getProperty(self, name)
 end
 
 function EditorObject.getModifiedProperties(self)
-	local propDatas
+	local propDatas = { isChildSceneObj = self.isChildSceneObj }
 	for i,property in ipairs(self.properties) do
 		local propData
-		if property.isClassBuiltin then
-			if not property:isAtDefault() then
+		if self.isChildSceneObj then
+			local Class = getmetatable(property)
+			if not (Class.defaultValue == property.defaultValue and property:isAtDefault()) then
 				propData = PropData.fromProp(property)
 			end
 		else
-			propData = PropData.fromProp(property)
+			if not (property.isClassBuiltin and property:isAtDefault()) then
+				propData = PropData.fromProp(property)
+			end
 		end
 		if propData then
 			propDatas = propDatas or {}
@@ -205,6 +208,9 @@ function EditorObject.getModifiedProperties(self)
 end
 
 function EditorObject.applyModifiedProperties(self, propDatas)
+	if propDatas.isChildSceneObj ~= nil then
+		self.isChildSceneObj = propDatas.isChildSceneObj
+	end
 	for i,propData in ipairs(propDatas) do
 		if not self:hasProperty(propData.name) then
 			self:addProperty(propData)

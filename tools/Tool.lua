@@ -587,7 +587,7 @@ local function addScene(self, filepath)
 	local scene = scenes.active
 	local rootEnc = {}
 	local importer = require "io.defaultLuaImportExport"
-	local _, addRootObjDatas, scenePropDatas = importer.import(filepath, nil, rootEnc, scene)
+	local _, addRootObjDatas, scenePropDatas = importer.import(filepath, nil, rootEnc, scene, true)
 	if not addRootObjDatas then  return  end
 	self.lastAddScene = filepath
 
