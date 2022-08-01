@@ -27,6 +27,16 @@ local function newAddObjData(scene, Class, enclosure, properties, isSelected, pa
 	local proxy = {
 		unpack = function()
 			return scene, Class, enclosure, properties, isSelected, parentEnclosure, children
+		end,
+		rawset = function(key, value)
+			if key == "scene" then  scene = value
+			elseif key == "Class" then  Class = value
+			elseif key == "enclosure" then  enclosure = value
+			elseif key == "properties" then  properties = value
+			elseif key == "isSelected" then  isSelected = value
+			elseif key == "parentEnclosure" then  parentEnclosure = value
+			elseif key == "children" then  children = value  end
+			t[key] = value
 		end
 	}
 	return readOnly(t, proxy)
