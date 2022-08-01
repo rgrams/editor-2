@@ -190,6 +190,7 @@ function M.copyPasteDataFor(scene, parentEnclosure, addObjDatas, keepOrigParents
 		if not (isInsideChildScene and properties.isChildSceneObj) then
 			local newID = id.new()
 			setNewIDProp(properties, newID)
+			if properties.isChildSceneObj then  properties.isChildSceneObj = false  end
 		end
 		local newAddData = AddObjData(
 			scene,
