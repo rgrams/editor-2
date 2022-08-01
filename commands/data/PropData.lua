@@ -43,12 +43,16 @@ function PropData.new(name, value, Class, defaultVal, isClassBuiltin, isNonRemov
 	return readOnly(t, proxy)
 end
 
+-- Make PropData from Property object.
 function PropData.fromProp(p, overrideValue)
 	local name = p.name
 	local value = overrideValue
 	if value == nil then  value = p:copyValue()  end
 	local Class = getmetatable(p)
-	local defaultValue = p.defaultValue ~= Class.defaultValue and p.defaultValue
+	local defaultValue
+	if p.defaultValue ~= Class.defaultValue then
+		defaultValue = p.defaultValue
+	end
 	return PropData.new(name, value, Class, defaultValue, p.isClassBuiltin, p.isNonRemovable)
 end
 
