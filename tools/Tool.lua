@@ -598,7 +598,10 @@ local function addScene(self, filepath)
 		sceneFilepath = filepath,
 		sceneEnclosureIDMap = ChildScene.recursiveMapEncIDs(addRootObjDatas)
 	}
-	local addSceneData = AddObjData(scene, ChildScene, rootEnc, properties, false, false, addRootObjDatas) -- No nils in command args.
+	local children = addRootObjDatas
+	local isSelected = false
+	local parentEnc = scene.selection[1] or false -- No nils in command args.
+	local addSceneData = AddObjData(scene, ChildScene, rootEnc, properties, isSelected, parentEnc, children)
 	scene.history:perform("addObject", self, addSceneData.unpack())
 end
 
