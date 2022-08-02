@@ -108,7 +108,7 @@ function EditorObject.setProperty(self, pdata)
 			self.propertyMap[newName] = prop
 			self:call("propertyWasAdded", newName, prop.value, prop, getmetatable(prop))
 		end
-		if pdata.value then
+		if pdata.value ~= nil then
 			self:call("propertyWasSet", pdata.name, prop.value, prop)
 		end
 		if pdata.value or pdata.newName then
