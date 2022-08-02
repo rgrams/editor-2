@@ -24,7 +24,7 @@ local function setPropertiesDefaultAndBuiltin(self, objects)
 			if obj.isChildSceneObj then
 				for _,property in ipairs(obj.properties) do
 					property.isNonRemovable = true
-					property.defaultValue = property:copyValue() -- Use alternate default for export.
+					property.defaultValue = property:copyValue()
 				end
 			end
 			if obj.children then
