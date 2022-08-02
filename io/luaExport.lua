@@ -78,25 +78,7 @@ local function writePropExportValue(prop, filepath)
 	local val = prop:copyValue()
 	local name = prop.name
 	local propType = prop.typeName
-	if name == "scene" and propType == "file" then
-		if val ~= "" then
-			local origVal = val
-			val = fileUtil.getRelativePath(filepath, val)
-			local _, _, ext = fileUtil.splitFilepath(val)
-			if ext == ".lua" then
-				val = fileUtil.toRequirePath(val)
-
-				-- If the child-scene has a last-export-path, export that as well.
-				-- WARNING: Assumes all filepaths are project-relative.
-				local sceneModule = fileUtil.loadLuaFromAbsolutePath(origVal)
-				if sceneModule and sceneModule.lastExportFilepath then
-					local exPath = sceneModule.lastExportFilepath
-					exPath = fileUtil.toRequirePath(exPath)
-					write("exportedScene = "..objToStr(exPath)..",\n")
-				end
-			end
-		end
-	elseif propType == "file" or propType == "image" or propType == "script" then
+	if propType == "file" or propType == "image" or propType == "script" then
 		if val ~= "" then
 			val = fileUtil.getRelativePath(filepath, val)
 			local _, _, ext = fileUtil.splitFilepath(val)
@@ -183,6 +165,25 @@ local function writeChildData(child, options, filepath)
 	writePropertyData(child, omitUnmod, filepath)
 
 	if Class == ChildScene then
+		local absScenePath = child.sceneFilepath
+		local relScenePath = fileUtil.getRelativePath(filepath, absScenePath)
+		local _, _, ext = fileUtil.splitFilepath(relScenePath)
+		if ext == ".lua" then
+			relScenePath = fileUtil.toRequirePath(relScenePath)
+			write('scene = "'..relScenePath..'",\n')
+
+			-- If the child-scene has a last-export-path, export that as well.
+			-- WARNING: Assumes all filepaths are project-relative.
+			local sceneModule = fileUtil.loadLuaFromAbsolutePath(absScenePath)
+			if sceneModule and sceneModule.lastExportFilepath then
+				local exPath = sceneModule.lastExportFilepath
+				exPath = fileUtil.toRequirePath(exPath)
+				write('exportedScene = "'..exPath..'",\n')
+			end
+		else
+			write('scene = "'..relScenePath..'",\n')
+		end
+
 		openBlock("sceneObjProperties")
 		for id,enclosure in pairs(child.sceneEnclosureIDMap) do
 			local obj = enclosure[1]
