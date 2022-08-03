@@ -29,7 +29,14 @@ function EditorGuiColumn.initProperties(self)
 	self:addProperty(PropData("dir",         -1,    Float, -1, true))
 end
 
+function EditorGuiColumn.init(self)
+	if self.parent.allocateChild then  self.parent:allocateChild(self)  end
+	self:allocateChildren() -- Just force it.
+	self:updateAABB()
+end
+
 function EditorGuiColumn.allocateChildren(self, forceUpdate)
+	if not self.path then  return  end -- Gets called from propertyWasSet before init.
 	gui.Column.allocateChildren(self, forceUpdate)
 	self.hitWidth, self.hitHeight = self.w, self.h
 	self:updateAABB()
@@ -60,7 +67,7 @@ end
 -- If child is a ChildScene, skip it and grab all it's children.
 function EditorGuiColumn.getRealChildList(children, list)
 	list = list or {}
-	for i=1,children.maxn do
+	for i=1,children.maxn or #children do
 		local child = children[i]
 		if child then
 			if child:is(ChildScene) then

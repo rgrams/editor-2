@@ -8,6 +8,7 @@ EditorGuiRow.displayName = "GUI Row"
 _G.objClassList:add(EditorGuiRow, EditorGuiRow.displayName)
 
 function EditorGuiRow.allocateChildren(self, forceUpdate)
+	if not self.path then  return  end -- Gets called from propertyWasSet before init.
 	gui.Row.allocateChildren(self, forceUpdate)
 	self.hitWidth, self.hitHeight = self.w, self.h
 	self:updateAABB()
