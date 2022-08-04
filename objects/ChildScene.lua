@@ -17,18 +17,16 @@ function ChildScene.init(self)
 	assert(self.sceneFilepath, "ChildScene.init - no sceneFilepath")
 end
 
-local function setPropertiesDefaultAndBuiltin(self, objects)
-	for i=1,objects.maxn or #objects do
-		local obj = objects[i]
+local function setPropertiesDefaultAndBuiltin(self)
+	-- Only set for objects that are inherent to this scene.
+	for id,enclosure in pairs(self.sceneEnclosureIDMap) do
+		local obj = enclosure[1]
 		if obj then
 			if obj.isChildSceneObj then
 				for _,property in ipairs(obj.properties) do
 					property.isNonRemovable = true
 					property.defaultValue = property:copyValue()
 				end
-			end
-			if obj.children then
-				setPropertiesDefaultAndBuiltin(self, obj.children)
 			end
 		end
 	end
@@ -67,9 +65,7 @@ function ChildScene.applyModifiedProperties(self, mods)
 	-- Got detailed properties from import.
 	if mods.isChildSceneObj then  self.isChildSceneObj = true  end
 	self.sceneEnclosureIDMap = mods.sceneEnclosureIDMap
-	if self.children then
-		setPropertiesDefaultAndBuiltin(self, self.children)
-	end
+	setPropertiesDefaultAndBuiltin(self)
 	if mods.rootProperties then
 		ChildScene.super.applyModifiedProperties(self, mods.rootProperties)
 	end
