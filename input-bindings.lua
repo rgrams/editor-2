@@ -60,4 +60,5 @@ return {
 	{ "button", "ctrl shift e", "export as" },
 	{ "button", "f5", "run game" },
 	{ "button", "d", "duplicate drag modifier", true },
+	{ "button", "p", "select parent" },
 }

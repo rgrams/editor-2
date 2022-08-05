@@ -799,6 +799,15 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 			scene.history:perform("setSamePropertyOnMultiple", self, enclosures, propData)
 			updateHover(self)
 		end
+	elseif action == "select parent" and change == 1 then
+		local self, scene = wgt.object, scenes.active
+		if scene.selection[1] then
+			local obj = scene.selection[1][1]
+			if obj.parent and obj.parent ~= obj.tree then
+				local parentEnc = obj.parent and obj.parent.enclosure
+				scene.history:perform("setSelection", self, scene.selection, { parentEnc })
+			end
+		end
 	elseif dirKey[action] and (change == 1 or isRepeat) then
 		local self, scene = wgt.object, scenes.active
 		if scene.selection[1] then
