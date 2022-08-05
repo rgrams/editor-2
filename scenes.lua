@@ -7,7 +7,7 @@ local Selection = require "Selection"
 local History = require "philtre.lib.commands"
 local signals = require "signals"
 
-local layers = { "default" }
+local layers = { "default", "images" }
 local defaultLayer = "default"
 local commands = require "commands.all"
 local PropData = require "commands.data.PropData"

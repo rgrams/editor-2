@@ -16,6 +16,7 @@ function EditorSprite.set(self)
 	EditorSprite.super.set(self)
 	self.color = { 1, 1, 1, 1 }
 	self.blendMode = "alpha"
+	self.layer = "images"
 end
 
 function EditorSprite.initProperties(self)

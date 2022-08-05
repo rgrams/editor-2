@@ -19,6 +19,7 @@ local Script = require "objects.properties.Script"
 
 function EditorObject.set(self)
 	EditorObject.super.set(self)
+	self.layer = "default"
 	self.isSelected = false
 	self.isHovered = false
 	self.AABB = {}

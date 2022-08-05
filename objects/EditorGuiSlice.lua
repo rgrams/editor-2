@@ -21,6 +21,7 @@ function EditorGuiSlice.set(self)
 	self.color = { 1, 1, 1, 1 }
 	self.blendMode = "alpha"
 	self.innerQuadW, self.innerQuadH = self.w - 4, self.h - 4
+	self.layer = "images"
 end
 
 function EditorGuiSlice.initProperties(self)

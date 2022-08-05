@@ -13,6 +13,7 @@ local Color = require "objects.properties.Color"
 function EditorGuiSprite.set(self)
 	EditorGuiSprite.super.set(self)
 	self.color = { 1, 1, 1, 1 }
+	self.layer = "images"
 end
 
 function EditorGuiSprite.initProperties(self)
