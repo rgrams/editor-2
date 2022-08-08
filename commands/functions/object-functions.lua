@@ -192,6 +192,10 @@ function M.copyPasteDataFor(scene, parentEnclosure, addObjDatas, keepOrigParents
 			setNewIDProp(properties, newID)
 			if properties.isChildSceneObj then  properties.isChildSceneObj = false  end
 		end
+		if children and properties.sceneEnclosureIDMap then
+			local origIDMap = properties.sceneEnclosureIDMap
+			properties.sceneEnclosureIDMap = ChildScene.recursiveMapEncIDs(children, nil, nil, origIDMap)
+		end
 		local newAddData = AddObjData(
 			scene,
 			addData.Class,

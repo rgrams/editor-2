@@ -41,16 +41,19 @@ local function getIDFromPropDatas(propDatas)
 end
 
 -- Used by Tool & Importer when adding child scenes.
-function ChildScene.recursiveMapEncIDs(addObjDatas, map, dataMap)
+-- `isOrigID` - Optional map of IDs inherent to the scene, for remapping after extra children have been added.
+function ChildScene.recursiveMapEncIDs(addObjDatas, map, dataMap, isOrigID)
 	map = map or {}
 	dataMap = dataMap or {}
 	for i,addObjData in ipairs(addObjDatas) do
 		local props = addObjData.properties.rootProperties or addObjData.properties
 		local id = getIDFromPropDatas(props)
-		map[id] = addObjData.enclosure
-		dataMap[id] = addObjData
-		if addObjData.children then
-			ChildScene.recursiveMapEncIDs(addObjData.children, map, dataMap)
+		if not isOrigID or isOrigID[id] then
+			map[id] = addObjData.enclosure
+			dataMap[id] = addObjData
+			if addObjData.children then
+				ChildScene.recursiveMapEncIDs(addObjData.children, map, dataMap, isOrigID)
+			end
 		end
 	end
 	return map, dataMap
