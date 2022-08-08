@@ -132,8 +132,14 @@ end
 
 local function hasSceneModifications(obj, omitUnmod)
 	for _,prop in ipairs(obj.properties) do
-		if not (omitUnmod and prop.isNonRemovable and prop:isAtDefault(prop.sceneDefault)) then
-			return true
+		if obj.isChildSceneObj then
+			if not (omitUnmod and prop:isAtDefault()) then
+				return true
+			end
+		else
+			if not (omitUnmod and prop.isClassBuiltin and prop:isAtDefault()) then
+				return true
+			end
 		end
 	end
 end
