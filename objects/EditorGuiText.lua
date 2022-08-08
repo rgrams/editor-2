@@ -88,12 +88,14 @@ function EditorGuiText.propertyWasSet(self, name, value, property)
 	EditorGuiText.super.propertyWasSet(self, name, value, property)
 	if name == "text" then
 		self.text = value
-		if self.parent then  self:allocate()  end
+		if self.parent then  self:allocate()
+		else  self:updateInnerSize()  end
 	elseif name == "font" then
 		value = property:getValue()
 		self.font = property.font
 		self.fontFilename, self.fontSize = value[1], value[2]
-		if self.parent then  self:allocate()  end
+		if self.parent then  self:allocate()
+		else  self:updateInnerSize()  end
 	elseif name == "align" then
 		self:align(value)
 	elseif name == "isWrapping" then
