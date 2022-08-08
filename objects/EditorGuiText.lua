@@ -13,6 +13,7 @@ local PropData = require "commands.data.PropData"
 
 local Bool = require "objects.properties.Bool"
 local Vec2 = require "objects.properties.Vec2"
+local Color = require "objects.properties.Color"
 local Font = require "objects.properties.Font"
 local Float = require "objects.properties.Property"
 local String = require "objects.properties.String"
@@ -49,6 +50,7 @@ function EditorGuiText.initProperties(self)
 	self:addProperty(PropData("font",       nil,  Font, nil, true))
 	self:addProperty(PropData("align",      nil,  TextAlign, nil, true))
 	self:addProperty(PropData("isWrapping", nil,  Bool, nil, true))
+	self:addProperty(PropData("color", nil, Color, nil, true))
 end
 
 function EditorGuiText.updateScale(self, alloc)
