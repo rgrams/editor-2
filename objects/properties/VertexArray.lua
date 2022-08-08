@@ -38,10 +38,12 @@ function VertexArray.setValue(self, value)
 	self:_setValidValue(validValue)
 end
 
-function VertexArray._setValidValue(self, value)
+function VertexArray._setValidValue(self, newVal)
 	local val = self.value
-	for i,v in ipairs(value) do
-		val[i] = v
+	local oldLen, newLen = #val, #newVal
+	for i=1,math.max(oldLen, newLen) do
+		-- Will clear extra values if the old array is longer than the new one.
+		val[i] = newVal[i]
 	end
 end
 
