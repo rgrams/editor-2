@@ -15,7 +15,10 @@ _G.propClassList:add(Vec4, Vec4.typeName)
 
 function Vec4.isAtDefault(self, overrideDefault)
 	local cur, def = self.value, overrideDefault or self.defaultValue
-	return cur[1] == def[1] and cur[2] == def[2] and cur[3] == def[3] and cur[4] == def[4]
+	return self.eq(cur[1], def[1]) and
+		self.eq(cur[2], def[2]) and
+		self.eq(cur[3], def[3]) and
+		self.eq(cur[4], def[4])
 end
 
 function Vec4.isValid(self, value)

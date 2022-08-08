@@ -15,7 +15,7 @@ function VertexArray.isAtDefault(self, overrideDefault)
 		return false
 	else
 		for i,defVal in ipairs(default) do
-			if cur[i] ~= defVal then
+			if not self.eq(cur[i], defVal) then
 				return false
 			end
 		end

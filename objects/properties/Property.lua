@@ -25,6 +25,11 @@ function Property.getDefaultValue(self)
 	return self.defaultValue
 end
 
+function Property.eq(a, b, tolerance)
+	tolerance = tolerance or 0.000000001
+	return math.abs(a - b) <= tolerance
+end
+
 function Property.isAtDefault(self, overrideDefault)
 	local curVal = self:getValue()
 	return curVal == (overrideDefault or self.defaultValue)

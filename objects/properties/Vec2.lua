@@ -21,7 +21,7 @@ end
 
 function Vec2.isAtDefault(self, overrideDefault)
 	local cur, def = self.value, overrideDefault or self.defaultValue
-	return cur.x == def.x and cur.y == def.y
+	return self.eq(cur.x, def.x) and self.eq(cur.y, def.y)
 end
 
 function Vec2.isValid(self, value)
