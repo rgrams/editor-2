@@ -196,7 +196,11 @@ local function makeAddPropDatas(importedProperties, filepath, isChildSceneObj)
 		local Class = propClassList:get(prop.type)
 		local name = prop.name
 		local value = getPropImportValue(prop.value, name, Class, filepath)
-		table.insert(propDatas, PropData(name, value, Class))
+		local defaultValue, isNonRemovable
+		if isChildSceneObj then
+			defaultValue, isNonRemovable = value, true
+		end
+		table.insert(propDatas, PropData(name, value, Class, defaultValue, nil, isNonRemovable))
 	end
 	return propDatas
 end

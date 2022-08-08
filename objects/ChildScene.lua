@@ -9,27 +9,10 @@ ChildScene.hitHeight = 64
 
 _G.objClassList:add(ChildScene, ChildScene.displayName)
 
-local PropData = require "commands.data.PropData"
-
 function ChildScene.init(self)
 	ChildScene.super.init(self)
 	assert(self.sceneEnclosureIDMap, "ChildScene.init - no sceneEnclosureIDMap")
 	assert(self.sceneFilepath, "ChildScene.init - no sceneFilepath")
-end
-
-local function setPropertiesDefaultAndBuiltin(self)
-	-- Only set for objects that are inherent to this scene.
-	for id,enclosure in pairs(self.sceneEnclosureIDMap) do
-		local obj = enclosure[1]
-		if obj then
-			if obj.isChildSceneObj then
-				for _,property in ipairs(obj.properties) do
-					property.isNonRemovable = true
-					property.defaultValue = property:copyValue()
-				end
-			end
-		end
-	end
 end
 
 local function getIDFromPropDatas(propDatas)
@@ -68,7 +51,6 @@ function ChildScene.applyModifiedProperties(self, mods)
 	-- Got detailed properties from import.
 	if mods.isChildSceneObj then  self.isChildSceneObj = true  end
 	self.sceneEnclosureIDMap = mods.sceneEnclosureIDMap
-	setPropertiesDefaultAndBuiltin(self)
 	if mods.rootProperties then
 		ChildScene.super.applyModifiedProperties(self, mods.rootProperties)
 	end
