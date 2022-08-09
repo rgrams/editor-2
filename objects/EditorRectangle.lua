@@ -22,6 +22,7 @@ end
 
 function EditorRectangle.initProperties(self)
 	self:addProperty(PropData("id", id.new(), String, nil, true))
+	self:addProperty(PropData("name", nil, String, nil, true))
 	self:addProperty(PropData("pos", nil, Vec2, nil, true))
 	self:addProperty(PropData("angle", nil, Float, nil, true))
 	self:addProperty(PropData("size", { x = self.hitWidth, y = self.hitHeight }, Vec2, nil, true))

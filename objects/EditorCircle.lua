@@ -27,6 +27,7 @@ end
 
 function EditorCircle.initProperties(self)
 	self:addProperty(PropData("id", id.new(), String, nil, true))
+	self:addProperty(PropData("name", nil, String, nil, true))
 	self:addProperty(PropData("pos", nil, Vec2, nil, true))
 	self:addProperty(PropData("radius", self.radius, Float, self.radius, true))
 end
