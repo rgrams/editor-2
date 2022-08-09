@@ -3,7 +3,6 @@ local ButtonTheme = require(GetRequireFolder(...) .. "ButtonTheme")
 local MenuButtonTheme = ButtonTheme:extend()
 
 local font = { "assets/font/OpenSans-Regular.ttf", 13 }
-local textValue = 1.0
 
 MenuButtonTheme.font = new.font(unpack(font))
 MenuButtonTheme.normalValue = 0.2
@@ -14,7 +13,7 @@ function MenuButtonTheme.init(self, themeData)
 	MenuButtonTheme.super.init(self, themeData)
 
 	local textNode = self.object.text
-	MenuButtonTheme.setValue(textNode.color, textValue)
+	MenuButtonTheme.setValue(textNode.color, MenuButtonTheme.textNormalValue)
 	textNode.font = MenuButtonTheme.font
 	textNode.fontFilename, textNode.fontSize = font[1], font[2]
 	textNode:setPos(16)
