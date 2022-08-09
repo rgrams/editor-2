@@ -496,21 +496,25 @@ function Tool.drag(wgt, dx, dy, dragType)
 	end
 end
 
-local function hitCheckChildren(children, x, y, minDist, closestObj)
+local function hitCheckChildren(children, x, y, minDist, closestObj, all)
+	all = all or {}
 	minDist = minDist or math.huge
 	for i=1,children.maxn do
 		local child = children[i]
 		if child then
 			local hitDist = child:touchesPoint(x, y)
-			if hitDist and hitDist <= minDist then
-				minDist, closestObj = hitDist, child
+			if hitDist then
+				table.insert(all, child)
+				if hitDist <= minDist then
+					minDist, closestObj = hitDist, child
+				end
 			end
 			if child.children then
-				closestObj, minDist = hitCheckChildren(child.children, x, y, minDist, closestObj)
+				closestObj, minDist = hitCheckChildren(child.children, x, y, minDist, closestObj, all)
 			end
 		end
 	end
-	return closestObj, minDist
+	return closestObj, minDist, all
 end
 
 local function hitCheckHandles(self, mx, my, minDist)
@@ -538,8 +542,9 @@ local function updateHover(self, mx, my)
 			mx, my = love.mouse.getPosition()
 		end
 		local wx, wy = Camera.current:screenToWorld(mx, my)
-		local hoverObj, minDist = hitCheckChildren(scenes.active.children, wx, wy)
+		local hoverObj, minDist, allHovered = hitCheckChildren(scenes.active.children, wx, wy)
 		self.hoverObj = hoverObj
+		self.allHoveredObjs = allHovered
 
 		if scenes.active.selection[1] then
 			local hoverHandle = hitCheckHandles(self, mx, my, minDist)
@@ -720,6 +725,25 @@ local function addShapeDrawingScript(self)
 	end
 end
 
+local function contextMenuObjClick(self, object)
+	if scenes.active then
+		local shouldToggle = modkeys.isPressed("shift")
+		local selection = scenes.active.selection
+		local history = scenes.active.history
+
+		if shouldToggle then
+			if object.isSelected then
+				history:perform("removeFromSelection", self, selection, object.enclosure)
+			else
+				history:perform("addToSelection", self, selection, object.enclosure)
+			end
+		else
+			history:perform("setSelection", self, selection, { object.enclosure })
+		end
+	end
+	updateAABB(self)
+end
+
 function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
 	if action == wgt.ruu.MOUSE_MOVED then
 		local self = wgt.object
@@ -745,6 +769,19 @@ function Tool.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x
 			{ text = "remove physics shape prop.", fn = removePhysicsShapeProps, args = {self} },
 			{ text = "add shape drawing script", fn = addShapeDrawingScript, args = {self} },
 		}
+		if self.allHoveredObjs and next(self.allHoveredObjs) then
+			table.insert(items, { text = "   ---------", fn = function() end, args = {} })
+			for i,obj in ipairs(self.allHoveredObjs) do
+				local sel = obj.isSelected and "*" or ""
+				local name = obj:getProperty("name")
+				name = (name and name ~= "") and '"'..name..'"' or ""
+				local item = {
+					text = sel..obj.displayName.." ["..obj:getProperty("id").."] "..name,
+					fn = contextMenuObjClick, args = { self, obj }
+				}
+				table.insert(items, item)
+			end
+		end
 		local mx, my = love.mouse.getPosition()
 		local dropdown = Dropdown(mx, my, items)
 		self.tree:add(dropdown, self.tree:get("/Window"))
