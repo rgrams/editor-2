@@ -195,6 +195,7 @@ function love.quit()
 		userConfig.lastExportFolder = config.lastExportFolder
 		userConfig.lastFontPropFolder = config.lastFontPropFolder
 		userConfig.lastFilePropFolder = config.lastFilePropFolder
+		userConfig.translateSnapIncrement = config.translateSnapIncrement
 
 		local objToString = require "philtre.lib.object-to-string"
 		file:write("return "..objToString(userConfig).."\n")
