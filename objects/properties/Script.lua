@@ -20,10 +20,17 @@ function Script.isValid(self, filepath)
 	if filepath == "" then
 		return true, nil
 	elseif filepath then
-		script = scriptCache[filepath] or fileUtil.loadLuaFromAbsolutePath(filepath)
+		script = scriptCache[filepath]
+		local errMsg
+		if not script then
+			script, errMsg = fileUtil.loadLuaFromAbsolutePath(filepath)
+		end
 		if script then
 			scriptCache[filepath] = script
 			return true, script
+		else
+			print(errMsg)
+			editor.messageBox("Error loading script: "..tostring(errMsg), "Failed to load editor script")
 		end
 	end
 	return false, nil

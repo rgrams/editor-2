@@ -136,6 +136,8 @@ function M.findProject(sceneFilepath, projectFileExtension)
 	local mountPoint = "_searchFolder/"
 	local fromFolder = M.splitFilepath(sceneFilepath)
 	while true do
+		local oldMountPoint = urfs.getMountPoint(fromFolder)
+		if oldMountPoint then  urfs.unmount(fromFolder)  end
 		if not urfs.mount(fromFolder, mountPoint) then
 			print("      urfs.mount failed with folder: '"..tostring(fromFolder).."'.")
 			return
@@ -146,11 +148,13 @@ function M.findProject(sceneFilepath, projectFileExtension)
 				local fullPath = mountPoint .. path
 				if love.filesystem.getInfo(fullPath).type == "file" then
 					urfs.unmount(fromFolder, mountPoint)
+					if oldMountPoint then  urfs.mount(fromFolder, oldMountPoint)  end
 					return fromFolder, path
 				end
 			end
 		end
 		urfs.unmount(fromFolder, mountPoint)
+		if oldMountPoint then  urfs.mount(fromFolder, oldMountPoint)  end
 		if #fromFolder <= 1 then
 			return
 		end

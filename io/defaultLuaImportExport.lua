@@ -12,6 +12,7 @@ local config = require "config"
 local ChildScene = require "objects.ChildScene"
 local AddObjData = require "commands.data.AddObjData"
 local PropData = require "commands.data.PropData"
+local requirePath = require "require-path"
 
 M.defaultOptions = {
 	omitUnmodifiedBuiltins = true
@@ -331,6 +332,7 @@ function M.import(filepath, options, parentEnc, scene, isChildSceneObj)
 			editor.messageBox(msg, "Import Warning: Failed to find project")
 		else
 			relFilepathFolder = projectFolder
+			requirePath.prepend(projectFolder) -- Need to do this before loading other properties & objects.
 		end
 	end
 
