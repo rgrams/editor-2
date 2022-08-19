@@ -14,6 +14,7 @@ EditorCircle.radius = 16
 EditorCircle.hitWidth = EditorCircle.radius*2
 EditorCircle.hitHeight = EditorCircle.radius*2
 EditorCircle.segments = 24
+EditorCircle.drawFill = true
 
 local Float = require "objects.properties.Property"
 local String = require "objects.properties.String"
@@ -54,12 +55,13 @@ function EditorCircle.draw(self)
 	love.graphics.rotate(-math.pi/2) -- Orient low-poly circles pointing up.
 
 	local col = self.color
-	local alpha = 0.03
-	if self.isHovered then
-		alpha = 0.07
+	if self.drawFill then
+		local alpha = col[4]
+		if self.isHovered then  alpha = alpha * 0.07
+		else  alpha = alpha * 0.03  end
+		love.graphics.setColor(col[1], col[2], col[3], alpha)
+		love.graphics.circle("fill", 0, 0, r, self.segments)
 	end
-	love.graphics.setColor(col[1], col[2], col[3], alpha)
-	love.graphics.circle("fill", 0, 0, r, self.segments)
 
 	love.graphics.setColor(col)
 	love.graphics.circle("line", 0, 0, r, self.segments)

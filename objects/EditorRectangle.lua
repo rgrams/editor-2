@@ -6,6 +6,8 @@ EditorRectangle.displayName = "Rectangle"
 
 _G.objClassList:add(EditorRectangle, EditorRectangle.displayName)
 
+EditorRectangle.drawFill = true
+
 local config = require "config"
 local id = require "lib.id"
 local PropData = require "commands.data.PropData"
@@ -48,12 +50,13 @@ function EditorRectangle.draw(self)
 	local hw, hh = self.hitWidth/2 - lineWidth/2, self.hitHeight/2 - lineWidth/2
 
 	local col = self.color
-	local alpha = 0.03
-	if self.isHovered then
-		alpha = 0.07
+	if self.drawFill then
+		local alpha = col[4]
+		if self.isHovered then  alpha = alpha * 0.07
+		else  alpha = alpha * 0.03  end
+		love.graphics.setColor(col[1], col[2], col[3], alpha)
+		love.graphics.rectangle("fill", -hw, -hh, hw*2, hh*2)
 	end
-	love.graphics.setColor(col[1], col[2], col[3], alpha)
-	love.graphics.rectangle("fill", -hw, -hh, hw*2, hh*2)
 
 	love.graphics.setColor(config.xAxisColor)
 	love.graphics.line(0, 0, hw, 0)

@@ -7,6 +7,7 @@ EditorPolygon.displayName = "Polygon"
 local minHitWidth, minHitHeight = 16, 16
 EditorPolygon.hitWidth = minHitWidth
 EditorPolygon.hitHeight = minHitHeight
+EditorPolygon.drawFill = true
 
 _G.objClassList:add(EditorPolygon, EditorPolygon.displayName)
 
@@ -68,6 +69,7 @@ end
 local min, max = math.min, math.max
 
 function EditorPolygon.updateAABB(self)
+	if not self.path then  return  end -- Will update on init anyway.
 	local verts = self:getProperty("vertices")
 	if #verts < 4 then
 		self.hitWidth, self.hitHeight = minHitWidth, minHitHeight
@@ -138,10 +140,11 @@ function EditorPolygon.draw(self)
 	local vertCount = #verts/2
 
 	local col = self.color
+	local origAlpha = col[4]
 
-	if isLoop and vertCount >= 3 then
-		local alpha = 0.03
-		if self.isHovered then  alpha = 0.07  end
+	if self.drawFill and isLoop and vertCount >= 3 then
+		local alpha = origAlpha * 0.03
+		if self.isHovered then  alpha = origAlpha * 0.07  end
 		love.graphics.setColor(col[1], col[2], col[3], alpha)
 		love.graphics.polygon("fill", verts)
 	end
@@ -153,8 +156,8 @@ function EditorPolygon.draw(self)
 	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
 	love.graphics.circle("line", 0, 0, 0.5, 4)
 
-	local alpha = 0.7
-	if self.isHovered then  alpha = 1  end
+	local alpha = origAlpha * 0.7
+	if self.isHovered then  alpha = origAlpha * 1  end
 	love.graphics.setColor(col[1], col[2], col[3], alpha)
 	if isLoop and vertCount >= 3 then
 		love.graphics.polygon("line", verts)
