@@ -6,6 +6,9 @@ local M = {}
 local Selection = require "Selection"
 local History = require "philtre.lib.commands"
 local signals = require "signals"
+local fileUtil = require "lib.file-util"
+local requirePath = require "require-path"
+local config = require "config"
 
 local layers = { "default", "images" }
 local defaultLayer = "default"
@@ -31,7 +34,19 @@ function EditorScene.set(self, layers, defaultLayer)
 	self:initProperties()
 end
 
-function EditorScene.initProperties()  end
+function EditorScene.initProperties(self)
+	local Bool = require("objects.properties.Bool")
+	self:addProperty(PropData("useProjectLocalPaths", false, Bool, false, true))
+end
+
+function EditorScene.propertyWasSet(self, name, value, property)
+	EditorObject.propertyWasSet(self, name, value, property)
+	if name == "useProjectLocalPaths" and value == true and self.filepath then
+		-- Note: Won't have a filepath if it's never been saved.
+		local projectFolder = fileUtil.findProject(self.filepath, config.projectFileExtension)
+		if projectFolder then  requirePath.prepend(projectFolder)  end
+	end
+end
 ----------  -  ----------
 
 function M.create(name, filepath)
@@ -44,9 +59,6 @@ function M.create(name, filepath)
 	scene.isDirty = false
 	scene.filepath = filepath
 	scene.name = name or "Untitled"
-	scene.properties = {}
-	local Bool = require("objects.properties.Bool")
-	scene:addProperty(PropData("useProjectLocalPaths", false, Bool, false, true))
 	scene.camX, scene.camY, scene.camZoom = 0, 0, 1
 	return scene
 end

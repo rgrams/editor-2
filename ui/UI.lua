@@ -12,6 +12,7 @@ local ResizeHandle = require "ui.widgets.ResizeHandle"
 local scenes = require "scenes"
 local fileDialog = require "lib.native-file-dialog.dialog"
 local fileUtil = require "lib.file-util"
+local requirePath = require "require-path"
 local signals = require "signals"
 local updateSceneTitleScript = require "ui.updateSceneTitle_script"
 
@@ -198,6 +199,7 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 end
 
 function UI.saveScene(self, scene, filepath)
+	local isFirstSave = not scene.filepath
 	scene.filepath = filepath
 	local _, filename = fileUtil.splitFilepath(filepath)
 	scene.name = filename
@@ -206,6 +208,10 @@ function UI.saveScene(self, scene, filepath)
 	local exporter = require "io.defaultLuaImportExport"
 	exporter.export(scene, filepath)
 	signals.send("file saved", self, scene, filepath)
+	if isFirstSave and scene:getProperty("useProjectLocalPaths") then
+		local projectFolder = fileUtil.findProject(scene.filepath, config.projectFileExtension)
+		if projectFolder then  requirePath.prepend(projectFolder)  end
+	end
 end
 
 function UI.exportScene(self, scene, exporterName, isExportAs)
