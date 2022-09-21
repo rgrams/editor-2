@@ -1,16 +1,16 @@
 
 io.stdout:setvbuf("no")
 
-require "run"
-require "philtre.init"
-require "philtre.lib.math-patch"
-require "lib.GetRequireFolder" -- Global function.
-_G.gui = require "philtre.objects.gui.all"
-_G.vec2 = require "philtre.lib.vec2xy"
+require "core.run"
+require "core.philtre.init"
+require "core.philtre.lib.math-patch"
+require "core.lib.GetRequireFolder" -- Global function.
+_G.gui = require "core.philtre.objects.gui.all"
+_G.vec2 = require "core.philtre.lib.vec2xy"
 _G.scene_clipboard = nil
 
-local config = require "config"
-local fileUtil = require "lib.file-util"
+local config = require "core.config"
+local fileUtil = require "core.lib.file-util"
 
 do -- Load user config.
 	local dir = fileUtil.splitFilepath(love.filesystem.getSource().."/")
@@ -33,17 +33,17 @@ do -- Initialize window
 	love.window.setTitle("Editor")
 end
 
-local modkeys = require "modkeys"
-_G.Input = require "input"
+local modkeys = require "core.modkeys"
+_G.Input = require "core.input"
 
-local IndexedList = require "lib.IndexedList"
+local IndexedList = require "core.lib.IndexedList"
 _G.objClassList = IndexedList()
 _G.propClassList = IndexedList()
 _G.exporterList = IndexedList()
 
-_G.editor = require "editor"
+_G.editor = require "core.editor"
 
-local scenes = require "scenes"
+local scenes = require "core.scenes"
 local editorTree
 local window
 
@@ -73,27 +73,27 @@ function love.load()
 	math.random()  math.random()  math.random()
 
 	Input.init()
-	Input.bind( require("input-bindings") )
+	Input.bind( require("core.input-bindings") )
 	love.keyboard.setKeyRepeat(true)
 
 	love.graphics.setLineStyle("rough")
 
-	local config = require "config"
+	local config = require "core.config"
 	love.graphics.setBackgroundColor(config.viewportBackgroundColor)
 
 	-- Load property classes.
-	requireModulesInFolder("objects/properties/")
+	requireModulesInFolder("core/objects/properties/")
 
 	-- Load editor object classes.
-	requireModulesInFolder("objects/")
+	requireModulesInFolder("core/objects/")
 
 	-- Load exporters.
-	requireModulesInFolder("io/")
+	requireModulesInFolder("core/io/")
 
 	editorTree = SceneTree(layers, defaultLayer)
 
 	editorTree:add( Camera(0, 0, 0, {800,600}, "expand view") )
-	window = editorTree:add( require("ui.Window")() )
+	window = editorTree:add( require("core.ui.Window")() )
 
 	_G.editor.tree = editorTree
 	_G.editor.window = window
@@ -158,7 +158,7 @@ function love.filedropped(file)
 		if ext == ".png" or ext == ".jpg" then
 			local image = fileUtil.loadImageFromAbsolutePath(filepath)
 			if image then
-				local Class = require "objects.EditorSprite"
+				local Class = require "core.objects.EditorSprite"
 				local x, y = Camera.current:screenToWorld(love.mouse.getPosition())
 				local properties = {
 					{ "image", filepath },
@@ -197,7 +197,7 @@ function love.quit()
 		userConfig.lastFilePropFolder = config.lastFilePropFolder
 		userConfig.translateSnapIncrement = config.translateSnapIncrement
 
-		local objToString = require "philtre.lib.object-to-string"
+		local objToString = require "core.philtre.lib.object-to-string"
 		file:write("return "..objToString(userConfig).."\n")
 		file:close()
 		print("   saved config.")

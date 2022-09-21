@@ -1,7 +1,7 @@
-[submodule "philtre"]
-	path = philtre
+[submodule "core/philtre"]
+	path = core/philtre
 	url = git@github.com:JoshuaGrams/philtre2d.git
-[submodule "ui/ruu"]
-	path = ui/ruu
+[submodule "core/ui/ruu"]
+	path = core/ui/ruu
 	url = git@github.com:rgrams/love-ruu.git
 	branch = rewrite
