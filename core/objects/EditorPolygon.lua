@@ -78,7 +78,7 @@ function EditorPolygon.updateAABB(self)
 		return
 	end
 	if self.parent then  self:updateTransform()  end
-	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
+	local angle, sx, sy, kx, ky = matrix.parameters(self._toWorld)
 	local AABB = self.AABB
 	local inf = math.huge
 	local lt, rt, top, bot = inf, -inf, inf, -inf
@@ -94,7 +94,7 @@ function EditorPolygon.updateAABB(self)
 		end
 	elseif angle ~= 0 then
 		-- No skew, need to scale, rotate, and offset.
-		local wx, wy = self._to_world.x, self._to_world.y
+		local wx, wy = self._toWorld.x, self._toWorld.y
 		for iy=2,#verts,2 do
 			local x, y = verts[iy-1], verts[iy]
 			llt, lrt, ltop, lbot = min(llt, x), max(lrt, x), min(ltop, y), max(lbot, y)
@@ -104,7 +104,7 @@ function EditorPolygon.updateAABB(self)
 		end
 	else
 		-- No skew or rotation, just need to scale and offset.
-		local wx, wy = self._to_world.x, self._to_world.y
+		local wx, wy = self._toWorld.x, self._toWorld.y
 		for iy=2,#verts,2 do
 			local x, y = verts[iy-1], verts[iy]
 			llt, lrt, ltop, lbot = min(llt, x), max(lrt, x), min(ltop, y), max(lbot, y)

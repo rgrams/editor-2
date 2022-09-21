@@ -1,7 +1,7 @@
 
 -- Base class for properties and also a 'float' type property.
 
-local Class = require "core.philtre.modules.base-class"
+local Class = require "core.philtre.core.base-class"
 local Property = Class:extend()
 
 local config = require "core.config"

@@ -121,7 +121,7 @@ function love.draw()
 	if guiDebugDrawEnabled then
 		window:callRecursive("debugDraw", "guiDebug")
 		editorTree:draw("guiDebug")
-		editorTree.draw_order:clear("guiDebug")
+		editorTree.drawOrder:clear("guiDebug")
 	end
 end
 

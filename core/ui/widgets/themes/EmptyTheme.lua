@@ -1,7 +1,7 @@
 
 -- (Mostly) Empty theme class to inherit from so none of the basic callbacks will be missing.
 
-local Class = require "core.philtre.modules.base-class"
+local Class = require "core.philtre.core.base-class"
 local EmptyTheme = Class:extend()
 
 function EmptyTheme.setValue(color, val)

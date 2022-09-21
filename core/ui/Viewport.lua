@@ -44,7 +44,7 @@ end
 
 function Viewport.allocate(self, ...)
 	Viewport.super.allocate(self, ...)
-	local left, top = self._to_world.x - self.w/2, self._to_world.y - self.h/2
+	local left, top = self._toWorld.x - self.w/2, self._toWorld.y - self.h/2
 	Camera.current:setViewport(left, top, self.w, self.h)
 end
 

@@ -1,7 +1,7 @@
 
 local Input = {}
 
-local folder = (...):gsub("input$", "") .. "philtre.modules."
+local folder = (...):gsub("input$", "") .. "philtre.core."
 local mergeInputCallbacks = require(folder .. "input-callbacks-merger")
 local InputStack = require(folder .. "input-stack")
 

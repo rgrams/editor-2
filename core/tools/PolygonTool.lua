@@ -493,7 +493,7 @@ end
 -- Convert an obj-local vertex position to a Tool/Viewport-local position for drawing.
 local function vertPosToViewPos(self, obj, x, y)
 	x, y = Camera.current:worldToScreen(obj:toWorld(x, y))
-	return x - self._to_world.x, y - self._to_world.y
+	return x - self._toWorld.x, y - self._toWorld.y
 end
 
 function PolygonTool.draw(self)

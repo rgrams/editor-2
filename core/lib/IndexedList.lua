@@ -3,7 +3,7 @@
 -- For mapping names --> Classes for EditorObjects, Properties, etc.
 -- Also an iterable sequence for selector menus, etc.
 
-local Class = require "core.philtre.modules.base-class"
+local Class = require "core.philtre.core.base-class"
 local IndexedList = Class:extend()
 
 function IndexedList.set(self)

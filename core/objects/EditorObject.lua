@@ -226,7 +226,7 @@ function EditorObject.getLocalPos(self)
 end
 
 function EditorObject.getWorldPos(self)
-	return self._to_world.x, self._to_world.y
+	return self._toWorld.x, self._toWorld.y
 end
 
 function EditorObject.toLocalPos(self, wx, wy)
@@ -281,14 +281,14 @@ function EditorObject.drawParentChildLines(self, children)
 
 		local arrowLen = config.parentLineArrowLength
 		local arrowAngle = config.parentLineArrowAngle
-		local px, py = self._to_world.x, self._to_world.y
+		local px, py = self._toWorld.x, self._toWorld.y
 
 		for i=1,children.maxn or #children do
 			local child = children[i]
 			if child then
 				love.graphics.setColor(config.parentLineColor)
 				local frac = config.parentLineLenFrac
-				local chx, chy = child._to_world.x, child._to_world.y
+				local chx, chy = child._toWorld.x, child._toWorld.y
 				local dx, dy = (chx - px)*frac, (chy - py)*frac
 				chx, chy = px + dx, py + dy
 				love.graphics.line(px, py, chx, chy)
@@ -301,7 +301,7 @@ function EditorObject.drawParentChildLines(self, children)
 		end
 
 		-- Re-apply our world transform.
-		local t = matrix.toTransform(self._to_world, tempTransform)
+		local t = matrix.toTransform(self._toWorld, tempTransform)
 		love.graphics.push()
 		love.graphics.applyTransform(t)
 	end
@@ -335,7 +335,7 @@ function EditorObject.updateAABB(self)
 	if not self.path then  return  end -- Will update on init anyway.
 	if self.parent then  self:updateTransform()  end
 	local hw, hh = self.hitWidth/2, self.hitHeight/2
-	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
+	local angle, sx, sy, kx, ky = matrix.parameters(self._toWorld)
 	local AABB = self.AABB
 
 	if kx ~= 0 or ky ~= 0 then
@@ -354,7 +354,7 @@ function EditorObject.updateAABB(self)
 	elseif angle ~= 0 then
 		-- Just need to rotate and scale.
 		local _hw, _hh = hw*sx, hh*sy
-		local x, y = self._to_world.x, self._to_world.y
+		local x, y = self._toWorld.x, self._toWorld.y
 		local x1, y1 = vec2.rotate(-_hw, -_hh, angle)
 		local x2, y2 = vec2.rotate(_hw, -_hh, angle)
 		local x3, y3 = vec2.rotate(_hw, _hh, angle)
@@ -373,7 +373,7 @@ function EditorObject.updateAABB(self)
 	else
 		-- Just need to scale.
 		local _hw, _hh = hw*sx, hh*sy
-		local x, y = self._to_world.x, self._to_world.y
+		local x, y = self._toWorld.x, self._toWorld.y
 		AABB.w, AABB.h = _hw*2, _hh*2
 		AABB.lt, AABB.top, AABB.rt, AABB.bot = x - _hw, y - _hh, x + _hw, y + _hh
 	end
@@ -401,7 +401,7 @@ local function drawSkewedRectangle(self, mode, pad, sx, sy, cam)
 	-- Get the skewed screen vectors for up and right in object-space.
 	-- Then normalize and scale them by `pad` in screen space.
 	-- (Screen-space is the same as world-space here except for translation - no rotation on camera.)
-	local wx, wy = self._to_world.x, self._to_world.y
+	local wx, wy = self._toWorld.x, self._toWorld.y
 	local upX, upY = self:toWorld(0, 1)
 	upX, upY = vec2.normalize(upX - wx, upY - wy)
 	local rtX, rtY = self:toWorld(1, 0)
@@ -425,12 +425,12 @@ end
 function EditorObject.drawSelectionHighlight(self, node)
 
 	love.graphics.push()
-	love.graphics.translate(-node._to_world.x, -node._to_world.y)
+	love.graphics.translate(-node._toWorld.x, -node._toWorld.y)
 
 	love.graphics.setColor(config.selectedHighlightColor)
 	love.graphics.setLineWidth(config.highlightLineWidth)
 
-	local angle, sx, sy, kx, ky = matrix.parameters(self._to_world)
+	local angle, sx, sy, kx, ky = matrix.parameters(self._toWorld)
 
 	local pad = config.highlightPadding
 

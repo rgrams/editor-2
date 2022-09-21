@@ -1,5 +1,5 @@
 
-local Class = require "core.philtre.modules.base-class"
+local Class = require "core.philtre.core.base-class"
 local Selection = Class:extend()
 
 function Selection.set(self, scene)
