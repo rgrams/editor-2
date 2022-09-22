@@ -22,7 +22,7 @@ M.lastExportFolder = nil
 M.lastFontPropFolder = nil
 M.lastFilePropFolder = nil
 
-M.zoomRate = 0.1
+M.zoomRate = 0.2
 
 M.translateSnapIncrement = 8
 M.rotateSnapIncrement = 15

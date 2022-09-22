@@ -91,8 +91,6 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 		elseif change == -1 then
 			wgt.ruu:stopDrag("pan")
 		end
-	elseif action == "scroll" then
-		wgt:scroll(depth, dx, dy)
 	elseif action == "cut" and change == 1 and scenes.active then
 		local scene = scenes.active
 		local selection = scene.selection
