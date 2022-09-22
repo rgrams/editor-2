@@ -8,7 +8,6 @@ local signals = require "core.signals"
 local BackgroundGrid = require "core.ui.BackgroundGrid"
 local MultiTool = require "core.tools.Tool"
 local PolygonTool = require "core.tools.PolygonTool"
-local objectFn = require "core.commands.functions.object-functions"
 
 function Viewport.set(self, ruu)
 	Viewport.super.set(self, 50, 50, "C", "C", "fill")
@@ -92,41 +91,22 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 		elseif change == -1 then
 			wgt.ruu:stopDrag("pan")
 		end
-	elseif action == "cut" and change == 1 and scenes.active then
-		local scene = scenes.active
-		local selection = scene.selection
-		if selection[1] then
-			local enclosures = selection:copyList()
-			objectFn.removeDescendantsFromList(enclosures)
-			-- Don't want redo to set the clipboard, so just copy and then perform delete.
-			_G.scene_clipboard = objectFn.copy(scene, enclosures)
-			scene.history:perform("deleteObjects", wgt.object, scene, enclosures)
-			return true
-		end
-	elseif action == "copy" and change == 1 and scenes.active then
-		local scene = scenes.active
-		local selection = scene.selection
-		if selection[1] then
-			local enclosures = selection:copyList()
-			objectFn.removeDescendantsFromList(enclosures)
-			_G.scene_clipboard = objectFn.copy(scene, enclosures)
-			return true
-		end
-	elseif action == "paste" and change == 1 and scenes.active then
-		local scene = scenes.active
-		local selection = scene.selection
-		if _G.scene_clipboard then
-			local parentEnclosures = selection:copyList() or false
-			local firstParent = parentEnclosures and parentEnclosures[1] or false
-			-- Do NOT want to put the mutable clipboard table into the command history.
-			local addObjDatas = objectFn.copyPasteDataFor(scene, firstParent, _G.scene_clipboard)
-			scene.history:perform("paste", wgt.object, scene, parentEnclosures, addObjDatas)
-			return true
-		end
+		return true
 	elseif action == "default tool" and change == 1 then
 		wgt.object:setTool("default")
+		return true
 	elseif action == "polygon tool" and change == 1 then
 		wgt.object:setTool("polygon")
+		return true
+	end
+
+	local inputMap = wgt.object.inputMap
+	if isRepeat and inputMap._callOnRepeat[action] then
+		local editorAction = inputMap[action]
+		if editorAction then  return editor.runAction(editorAction)  end
+	elseif change == 1 then
+		local editorAction = inputMap[action]
+		if editorAction then  return editor.runAction(editorAction)  end
 	end
 end
 
