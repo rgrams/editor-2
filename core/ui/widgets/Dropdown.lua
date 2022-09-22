@@ -35,6 +35,7 @@ function Dropdown.set(self, x, y, items, focusedIndex)
 	y = math.max(minY, math.min(y, maxY))
 	x, y = math.floor(x), math.floor(y)
 	self:setPos(x, y)
+	self._initialPos = { x, y }
 
 	self.items = items
 	self.ruu = Ruu()
@@ -57,6 +58,7 @@ function Dropdown.init(self)
 	self.ruu:setFocus(self.children[self.initFocusIndex].widget)
 
 	Dropdown.super.init(self)
+	self.pos.x, self.pos.y = unpack(self._initialPos) -- To ignore any allocation scale.
 	Input.enable(self)
 end
 
