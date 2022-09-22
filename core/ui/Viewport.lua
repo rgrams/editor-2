@@ -37,6 +37,7 @@ end
 
 function Viewport.init(self)
 	Viewport.super.init(self)
+	self.inputMap = _G.editor._registerInputContext(self)
 	-- Add Background Grid to scene-tree root so our Node transform doesn't make things difficult.
 	self.tree:add( BackgroundGrid(self) )
 	self.ruu:setFocus(self.tool.widget)

@@ -57,10 +57,15 @@ function UI.set(self)
 	self.propertyPanel = mainRow.children[3]
 
 	self.scripts = { updateSceneTitleScript }
+
+	_G.editor.UI = self
+	_G.editor.Viewport = vpCol.children[2]
+	_G.editor.PropertyPanel = self.propertyPanel
 end
 
 function UI.init(self)
 	UI.super.init(self)
+	self.inputMap = _G.editor._registerInputContext(self)
 	Input.enable(self)
 	self.ruu:mouseMoved(love.mouse.getPosition()) -- NOTE: Always gives 0, 0 :/
 end

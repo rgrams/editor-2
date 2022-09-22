@@ -95,11 +95,14 @@ function love.load()
 	editorTree:add( Camera(0, 0, 0, {800,600}, "expand view") )
 	window = editorTree:add( require("core.ui.Window")() )
 
-	_G.editor.tree = editorTree
-	_G.editor.window = window
+	_G.editor.Tree = editorTree
+	_G.editor.Window = window
 
 	-- Add default editing scene.
 	scenes.add( scenes.create() )
+
+	requireModulesInFolder("core/plugins/")
+	requireModulesInFolder("user/plugins/")
 end
 
 function love.update(dt)

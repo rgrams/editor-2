@@ -33,6 +33,11 @@ function PropertyPanel.set(self, ruu)
 	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
 end
 
+function PropertyPanel.init(self)
+	PropertyPanel.super.init(self)
+	self.inputMap = _G.editor._registerInputContext(self)
+end
+
 function PropertyPanel.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
 	if action == "add property" and change == 1 then
 		if scenes.active then
