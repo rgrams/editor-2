@@ -166,8 +166,6 @@ function ObjectSelectorTool.ruuInput(wgt, depth, action, value, change, rawChang
 		elseif change == -1 then
 			wgt.ruu:stopDrag("pan")
 		end
-	elseif action == "scroll" then
-		wgt:scroll(depth, dx, dy)
 	end
 end
 
