@@ -70,7 +70,7 @@ function Viewport.scroll(wgt, depth, dx, dy)
 	if scenes.active then
 		scenes.active.camZoom = Camera.current.zoom
 	end
-	wgt.object.tool:zoomUpdated()
+	signals.send("zoom changed", wgt.object)
 end
 
 function Viewport.drag(wgt, dx, dy, dragType)

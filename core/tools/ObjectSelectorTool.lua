@@ -10,6 +10,7 @@ ObjectSelectorTool.className = "ObjectSelectorTool"
 local Ruu = require "core.ui.ruu.ruu"
 local config = require "core.config"
 local scenes = require "core.scenes"
+local signals = require "core.signals"
 
 local overlayFont = { "core/assets/font/OpenSans-Semibold.ttf", 36 }
 local tooltipFont = new.font("core/assets/font/OpenSans-Semibold.ttf", 16)
@@ -79,8 +80,7 @@ function ObjectSelectorTool.scroll(wgt, depth, dx, dy)
 	Camera.current:zoomIn(config.zoomRate*dy, love.mouse.getPosition()) -- dy is actual, signed, mouse wheel dy.
 	if scenes.active then
 		scenes.active.camZoom = Camera.current.zoom
-		local self = wgt.object
-		self.viewport.tool:zoomUpdated()
+		signals.send("zoom changed", wgt.object)
 	end
 end
 

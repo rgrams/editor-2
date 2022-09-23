@@ -547,7 +547,4 @@ function PolygonTool.draw(self)
 	end
 end
 
-function PolygonTool.zoomUpdated(self)
-end
-
 return PolygonTool

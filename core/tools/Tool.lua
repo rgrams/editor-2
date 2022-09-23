@@ -74,6 +74,7 @@ function Tool.init(self)
 		"selection changed",
 		"active scene changed"
 	)
+	signals.subscribe(self, self.onZoomChange, "zoom changed")
 	self:onObjectsChanged()
 end
 
@@ -693,7 +694,7 @@ function Tool.onObjectsChanged(self, sender, signal)
 	end
 end
 
-function Tool.zoomUpdated(self)
+function Tool.onZoomChange(self)
 	if not self.isDragging then
 		updateAABB(self)
 	else
