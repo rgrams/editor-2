@@ -12,6 +12,7 @@ TabCloseButtonTheme.textUncheckNormalVal = 0.5
 
 function TabCloseButtonTheme.init(self, themeData)
 	self.object = themeData
+	themeData.widget = self
 	self.object.text:setPos(0, -2)
 	self.theme.updateColors(self)
 end

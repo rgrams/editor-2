@@ -10,6 +10,7 @@ end
 
 function EmptyTheme.init(self, themeData)
 	self.object = themeData
+	themeData.widget = self
 end
 
 function EmptyTheme.hover(self)  end
