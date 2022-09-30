@@ -19,7 +19,7 @@ function PanelTheme.draw(self, obj)
 	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
 
 	local val, alpha = obj.color[1], obj.color[4]
-	local Theme = self.wgtTheme
+	local Theme = self.theme
 	local v1 = val + Theme.bevelLighten
 	local v2 = val - Theme.bevelDarken
 	local depth = Theme.bevelDepth

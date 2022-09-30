@@ -13,7 +13,7 @@ TabCloseButtonTheme.textUncheckNormalVal = 0.5
 function TabCloseButtonTheme.init(self, themeData)
 	self.object = themeData
 	self.object.text:setPos(0, -2)
-	self.wgtTheme.updateColors(self)
+	self.theme.updateColors(self)
 end
 
 function TabCloseButtonTheme.draw(self, obj)
@@ -28,7 +28,7 @@ function TabCloseButtonTheme.draw(self, obj)
 end
 
 function TabCloseButtonTheme.release(self, dontFire, mx, my, isKeyboard)
-	self.wgtTheme.updateColors(self)
+	self.theme.updateColors(self)
 end
 
 return TabCloseButtonTheme

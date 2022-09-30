@@ -1,5 +1,5 @@
 
-local DefaultTheme = require("core.ui.ruu.defaultTheme").InputField
+local DefaultTheme = require("core.ui.ruu.defaultThemes").InputField
 local InputFieldTheme = DefaultTheme:extend()
 
 InputFieldTheme.normalValue = 0.18
@@ -16,24 +16,24 @@ end
 
 function InputFieldTheme.init(self, themeData)
 	InputFieldTheme.super.init(self, themeData)
-	setValue(self.object.color, self.wgtTheme.normalValue)
+	setValue(self.object.color, self.theme.normalValue)
 end
 
 function InputFieldTheme.hover(self)
-	local val = self.isPressed and self.wgtTheme.pressValue or self.wgtTheme.hoverValue
+	local val = self.isPressed and self.theme.pressValue or self.theme.hoverValue
 	setValue(self.object.color, val)
 end
 
 function InputFieldTheme.unhover(self)
-	setValue(self.object.color, self.wgtTheme.normalValue)
+	setValue(self.object.color, self.theme.normalValue)
 end
 
 function InputFieldTheme.press(self)
-	setValue(self.object.color, self.wgtTheme.pressValue)
+	setValue(self.object.color, self.theme.pressValue)
 end
 
 function InputFieldTheme.release(self)
-	local val = self.isHovered and self.wgtTheme.hoverValue or self.wgtTheme.normalValue
+	local val = self.isHovered and self.theme.hoverValue or self.theme.normalValue
 	setValue(self.object.color, val)
 end
 
@@ -44,7 +44,7 @@ function InputFieldTheme.draw(self, obj)
 	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
 
 	local val, alpha = obj.color[1], obj.color[4]
-	local Theme = self.wgtTheme
+	local Theme = self.theme
 	local v1 = val - Theme.bevelDarken
 	local v2 = val + (self.isHovered and Theme.bevelHoverLighten or Theme.bevelLighten)
 	love.graphics.setColor(v1, v1, v1, alpha)

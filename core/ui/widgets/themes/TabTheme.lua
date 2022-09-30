@@ -31,15 +31,15 @@ function TabTheme.init(self, themeData)
 	textNode.fontFilename, textNode.fontSize = font[1], font[2]
 	textNode:setPos(0, 1)
 
-	self.wgtTheme.updateColors(self)
+	self.theme.updateColors(self)
 
 	local closeBtn = self.object.closeBtn.widget
 	closeBtn.isChecked = self.isChecked
-	closeBtn.wgtTheme.updateColors(closeBtn)
+	closeBtn.theme.updateColors(closeBtn)
 end
 
 function TabTheme.updateColors(self)
-	local Theme = self.wgtTheme
+	local Theme = self.theme
 	local val, textVal
 	if self.isHovered then
 		val = self.isChecked and Theme.hoverCheckVal or Theme.hoverUncheckVal
@@ -54,30 +54,30 @@ function TabTheme.updateColors(self)
 end
 
 function TabTheme.hover(self)
-	self.wgtTheme.updateColors(self)
+	self.theme.updateColors(self)
 end
 
 function TabTheme.unhover(self)
-	self.wgtTheme.updateColors(self)
+	self.theme.updateColors(self)
 end
 
 function TabTheme.press(self, mx, my, isKeyboard)
-	local Theme = self.wgtTheme
+	local Theme = self.theme
 	TabTheme.setValue(self.object.color, Theme.pressValue)
 end
 
 function TabTheme.release(self, dontFire, mx, my, isKeyboard)
 	local closeBtn = self.object.closeBtn.widget
 	closeBtn.isChecked = self.isChecked
-	closeBtn.wgtTheme.updateColors(closeBtn)
-	self.wgtTheme.updateColors(self)
+	closeBtn.theme.updateColors(closeBtn)
+	self.theme.updateColors(self)
 end
 
 function TabTheme.setChecked(self, isChecked)
 	local closeBtn = self.object.closeBtn.widget
 	closeBtn.isChecked = self.isChecked
-	closeBtn.wgtTheme.updateColors(closeBtn)
-	self.wgtTheme.updateColors(self)
+	closeBtn.theme.updateColors(closeBtn)
+	self.theme.updateColors(self)
 end
 
 return TabTheme

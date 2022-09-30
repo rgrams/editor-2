@@ -131,7 +131,7 @@ end
 function AddPropDialog.draw(self)
 	local widget = self.widget
 	if widget then
-		widget.wgtTheme.draw(widget, self)
+		widget.theme.draw(widget, self)
 	end
 end
 

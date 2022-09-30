@@ -2,7 +2,7 @@
 local EmptyTheme = require(GetRequireFolder(...) .. "EmptyTheme")
 local ButtonTheme = EmptyTheme:extend()
 
-require("core.ui.ruu.defaultTheme").Button = ButtonTheme
+require("core.ui.ruu.defaultThemes").Button = ButtonTheme
 
 ButtonTheme.normalValue = 0.32
 ButtonTheme.hoverValue = 0.34
@@ -18,38 +18,38 @@ ButtonTheme.bevelDepth = 2
 
 function ButtonTheme.init(self, themeData)
 	ButtonTheme.super.init(self, themeData)
-	local val = self.wgtTheme.normalValue
+	local val = self.theme.normalValue
 	ButtonTheme.setValue(self.object.color, val)
 	if self.object.text then
-		ButtonTheme.setValue(self.object.text.color, self.wgtTheme.textNormalValue)
+		ButtonTheme.setValue(self.object.text.color, self.theme.textNormalValue)
 	end
 end
 
 function ButtonTheme.hover(self)
-	local val = self.wgtTheme.hoverValue
+	local val = self.theme.hoverValue
 	ButtonTheme.setValue(self.object.color, val)
 	if self.object.text then
-		local textVal = self.wgtTheme.textHoverValue
+		local textVal = self.theme.textHoverValue
 		ButtonTheme.setValue(self.object.text.color, textVal)
 	end
 end
 
 function ButtonTheme.unhover(self)
-	local val = self.wgtTheme.normalValue
+	local val = self.theme.normalValue
 	ButtonTheme.setValue(self.object.color, val)
 	if self.object.text then
-		local textVal = self.wgtTheme.textNormalValue
+		local textVal = self.theme.textNormalValue
 		ButtonTheme.setValue(self.object.text.color, textVal)
 	end
 end
 
 function ButtonTheme.press(self, mx, my, isKeyboard)
-	local val = self.wgtTheme.pressValue
+	local val = self.theme.pressValue
 	ButtonTheme.setValue(self.object.color, val)
 end
 
 function ButtonTheme.release(self, dontFire, mx, my, isKeyboard)
-	local Theme = self.wgtTheme
+	local Theme = self.theme
 	local val = self.isHovered and Theme.hoverValue or Theme.normalValue
 	ButtonTheme.setValue(self.object.color, val)
 	if self.object.text then
@@ -64,7 +64,7 @@ function ButtonTheme.draw(self, obj)
 	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
 
 	local val, alpha = obj.color[1], obj.color[4]
-	local Theme = self.wgtTheme
+	local Theme = self.theme
 	local v1 = val + (self.isHovered and Theme.bevelHoverLighten or Theme.bevelLighten)
 	local v2 = val - Theme.bevelDarken
 	local depth = Theme.bevelDepth
