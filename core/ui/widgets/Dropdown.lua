@@ -24,7 +24,7 @@ function Dropdown.set(self, x, y, items, focusedIndex)
 	local width = maxTextWidth + pad*4 + 16
 
 	Dropdown.super.set(self, spacing, false, -1, width, height, "NW", "NW")
-	self:pad(pad, pad)
+	self:setPad(pad, pad)
 	self.layer = "dropdown"
 
 	-- Adjust position so the dropdown fits on screen.
@@ -67,7 +67,7 @@ function Dropdown.final(self)
 end
 
 function Dropdown.addButtonObject(self, btnText)
-	local btn = Button(btnText, self.w - pad*2):mode("fill")
+	local btn = Button(btnText, self.w - pad*2):setMode("fill")
 	btn.layer = "dropdown"
 	btn.text.layer = "dropdown text"
 	table.insert(self.children, btn)

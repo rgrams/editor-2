@@ -17,7 +17,7 @@ local height = 24
 
 function TabBar.set(self, ruu)
 	TabBar.super.set(self, spacing, false, -1, width, height)
-	self:mode("fill", "none")
+	self:setMode("fill", "none")
 	self.layer = "gui"
 	self.ruu = ruu
 	self.widget = ruu:Panel(self, PanelTheme)

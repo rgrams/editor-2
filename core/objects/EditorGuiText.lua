@@ -23,7 +23,7 @@ local ResizeMode = require "core.objects.properties.Enum_GuiResizeMode"
 
 function EditorGuiText.set(self)
 	EditorGuiText.super.set(self)
-	self:size(nil, self.hitHeight, true)
+	self:setSize(nil, self.hitHeight, true)
 	self.text = ""
 	self.font = nil
 	self.fontFilename = nil
@@ -53,12 +53,12 @@ function EditorGuiText.initProperties(self)
 	self:addProperty(PropData("color", nil, Color, nil, true))
 end
 
-function EditorGuiText.updateScale(self, alloc)
-	local isDirty = EditorGuiText.super.updateScale(self, alloc)
+function EditorGuiText.updateScale(self, x, y, w, h, designW, designH, scale)
+	local isDirty = EditorGuiText.super.updateScale(self, x, y, w, h, designW, designH, scale)
 	if isDirty then
 		-- TODO: Load new font like Font property does, with new.custom, etc.
 		-- NOTE: Won't be used currently since there's no way to set the allocation scale.
-		-- local size = self.fontSize * self._givenRect.scale
+		-- local size = self.fontSize * self.lastAlloc.scale
 		-- if self.fontFilename then
 			-- self.font = new.font(self.fontFilename, size)
 		-- else
@@ -68,16 +68,16 @@ function EditorGuiText.updateScale(self, alloc)
 	end
 end
 
-function EditorGuiText.updateInnerSize(self)
+function EditorGuiText.updateInnerSize(self, x, y, w, h, designW, designH, scale)
 	if self.font then
-		gui.Text.updateInnerSize(self)
+		gui.Text.updateInnerSize(self, x, y, w, h, designW, designH, scale)
 		self.hitWidth, self.hitHeight = self.w, self.h
 		self:updateAABB()
 	end
 end
 
-EditorGuiText.align = gui.Text.align
-EditorGuiText.wrap = gui.Text.wrap
+EditorGuiText.setAlign = gui.Text.setAlign
+EditorGuiText.setWrap = gui.Text.setWrap
 
 function EditorGuiText.draw(self)
 	EditorGuiText.super.draw(self)
@@ -91,17 +91,17 @@ function EditorGuiText.propertyWasSet(self, name, value, property)
 	if name == "text" then
 		self.text = value
 		if self.parent then  self:allocate()
-		else  self:updateInnerSize()  end
+		else  self:updateInnerSize(self.lastAlloc:unpack())  end
 	elseif name == "font" then
 		value = property:getValue()
 		self.font = property.font
 		self.fontFilename, self.fontSize = value[1], value[2]
 		if self.parent then  self:allocate()
-		else  self:updateInnerSize()  end
+		else  self:updateInnerSize(self.lastAlloc:unpack())  end
 	elseif name == "align" then
-		self:align(value)
+		self:setAlign(value)
 	elseif name == "isWrapping" then
-		self:wrap(value)
+		self:setWrap(value)
 	elseif name == "color" then
 		self.color = property:getValue()
 	end

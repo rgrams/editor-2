@@ -9,10 +9,10 @@ Tab.buttonWidth = 20
 
 function Tab.set(self, text)
 	Tab.super.set(self, text, self.width, "left")
-	self.text:pivot("W"):anchor("W")
-	self:pad(3)
+	self.text:setPivot("W"):setAnchor("W")
+	self:setPad(3)
 	local w = self.buttonWidth
-	self.closeBtn = Button("x", w, "center"):pivot("E"):anchor("E"):size(w, w, true):setPos(1)
+	self.closeBtn = Button("x", w, "center"):setPivot("E"):setAnchor("E"):setSize(w, w, true):setPos(1)
 	table.insert(self.children, self.closeBtn)
 end
 

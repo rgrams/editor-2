@@ -22,8 +22,8 @@ function EditorGuiSprite.initProperties(self)
 	self:addProperty(PropData("color", nil, Color, nil, true))
 end
 
-function EditorGuiSprite.updateInnerSize(self)
-	EditorGuiSprite.super.updateInnerSize(self)
+function EditorGuiSprite.updateInnerSize(self, ...)
+	EditorGuiSprite.super.updateInnerSize(self, ...)
 	if self.image then
 		-- Will mess up .touchesPoint distance calculation if we use `sx` and `sy`.
 		self.imgSX, self.imgSY = self.w / self.imgW, self.h / self.imgH
@@ -45,7 +45,7 @@ function EditorGuiSprite.setImage(self, image)
 		local imgW, imgH = self.image:getDimensions()
 		self.imgW, self.imgH = imgW, imgH
 		self.imgOX, self.imgOY = imgW/2, imgH/2
-		self:updateInnerSize()
+		self:updateInnerSize(self.lastAlloc:unpack())
 	end
 end
 

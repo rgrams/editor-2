@@ -61,7 +61,7 @@ end
 function EditorGuiNode.toLocalPos(self, wx, wy)
 	local lx, ly = self.parent:toLocal(wx, wy)
 	lx, ly = lx - self.anchorPosX, ly - self.anchorPosY
-	lx, ly = lx - self._givenRect.x, ly - self._givenRect.y
+	lx, ly = lx - self.lastAlloc.x, ly - self.lastAlloc.y
 	local pivotX, pivotY = self.w * self.px/2, self.h * self.py/2
 	lx, ly = lx + pivotX, ly + pivotY
 	return lx, ly
@@ -82,31 +82,31 @@ function EditorGuiNode.propertyWasSet(self, name, value, property)
 		local w, h = value.x, value.y
 
 		-- Tell our children that we've always been this size.
-		if w then  self._contentRect.designW = w - self.padX*2  end
-		if h then  self._contentRect.designH = h - self.padY*2  end
+		if w then  self.contentAlloc.designW = w - self.padX*2  end
+		if h then  self.contentAlloc.designH = h - self.padY*2  end
 
-		self:size(w, h, true)
+		self:setSize(w, h, true)
 		self.hitWidth, self.hitHeight = self.w, self.h
 		self:updateAABB()
 	elseif name == "skew" then
 		self:setSkew(value.x, value.y)
 		self:updateAABB()
 	elseif name == "pivot" then
-		self:pivot(value) -- Cardinal
+		self:setPivot(value) -- Cardinal
 		self:updateAABB()
 	elseif name == "anchor" then
-		self:anchor(value) -- Cardinal
+		self:setAnchor(value) -- Cardinal
 		self:updateAABB()
 	elseif name == "modeX" then
-		self:mode(value, nil)
+		self:setMode(value, nil)
 		self.hitWidth, self.hitHeight = self.w, self.h
 		self:updateAABB()
 	elseif name == "modeY" then
-		self:mode(nil, value)
+		self:setMode(nil, value)
 		self.hitWidth, self.hitHeight = self.w, self.h
 		self:updateAABB()
 	elseif name == "pad" then
-		self:pad(value.x, value.y)
+		self:setPad(value.x, value.y)
 		self:updateAABB()
 	elseif name == "isGreedy" and property:is(Bool) then
 		self.isGreedy = value

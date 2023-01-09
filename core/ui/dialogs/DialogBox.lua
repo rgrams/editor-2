@@ -24,7 +24,7 @@ function DialogBox.set(self, title, x, y)
 
 	DialogBox.super.set(self, spacing, nil, -1, self.width, self.height)
 	self:setPos(x, y)
-	self:pad(self.padW, self.padW)
+	self:setPad(self.padW, self.padW)
 	self.layer = "gui"
 
 	local titleBox = gui.Node(100, self.titleHeight, "C", "C", "fill", "none")
@@ -34,7 +34,7 @@ function DialogBox.set(self, title, x, y)
 	local contentBox = gui.Node(100, 10, "C", "C", "fill", "fill")
 	contentBox.isGreedy = true
 
-	local buttonBox = gui.Node(100, self.btnBoxHeight):mode("fill"):pad(0, 5)
+	local buttonBox = gui.Node(100, self.btnBoxHeight):setMode("fill"):setPad(0, 5)
 
 	self.children = {
 		titleBox,

@@ -33,7 +33,7 @@ function InputField.set(self, text, width)
 	self.text.layer = "gui text"
 	self.cursor = gui.Node(cursorW, self.height - pad*2)
 	self.selection = gui.Node(width, self.height, "W", "W")
-	self.mask = gui.Mask(nil, width, self.height, "W", "W", "fill"):pad(pad, pad)
+	self.mask = gui.Mask(nil, width, self.height, "W", "W", "fill"):setPad(pad, pad)
 
 	self.children = {
 		mod(self.mask, { children = {

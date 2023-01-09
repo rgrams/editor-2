@@ -34,11 +34,11 @@ end
 
 function MultiChoiceBox.addButtons(self, buttonBox)
 	self.cancelBtn = Button("Cancel", nil, "center")
-	self.cancelBtn:pivot("E"):setPos(-15, 0)
+	self.cancelBtn:setPivot("E"):setPos(-15, 0)
 	self.ruu:Button(self.cancelBtn, self.cancel):args(self)
 
 	self.okBtn = Button("OK", nil, "center")
-	self.okBtn:pivot("W"):setPos(15, 0)
+	self.okBtn:setPivot("W"):setPos(15, 0)
 	self.ruu:Button(self.okBtn, self.okBtnPressed):args(self)
 
 	buttonBox.children = { self.cancelBtn, self.okBtn }
@@ -76,7 +76,7 @@ function MultiChoiceBox.dropdownBtnPressed(self)
 	local x, y = btn:toWorld(-btn.w/2, -btn.h/2)
 	local focusedIndex = getChoiceIndex(self, self.choice)
 	local dropdown = Dropdown(x, y, self.dropdownItems, focusedIndex)
-	dropdown:size(dropdownWidth, nil, true)
+	dropdown:setSize(dropdownWidth, nil, true)
 	local guiRoot = self.tree:get("/Window")
 	self.tree:add(dropdown, guiRoot)
 end

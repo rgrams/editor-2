@@ -9,7 +9,7 @@ BaseClass.height = 26
 
 function BaseClass.set(self, name, value, PropClass, propObj)
 	BaseClass.super.set(self, self.spacing, false, -1, self.width, self.height)
-	self:mode("fill", "none")
+	self:setMode("fill", "none")
 	self.layer = "gui"
 	self.propertyName = name
 	self.propertyObj = propObj

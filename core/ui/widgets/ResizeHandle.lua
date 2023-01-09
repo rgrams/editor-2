@@ -50,12 +50,12 @@ function ResizeHandle.drag(wgt, dx, dy, dragType)
 	local self = wgt.object
 	if self.target then
 		if self.isXAxis and dx ~= 0 then
-			local curW = self.target._designRect.w
-			self.target:size(curW + dx * self.dir, nil, true)
+			local curW = self.target.designRect.w
+			self.target:setSize(curW + dx * self.dir, nil, true)
 			self.target.parent:call("allocateChildren")
 		elseif not self.isXAxis and dy ~= 0 then
-			local curH = self.target._designRect.h
-			self.target:size(nil, curH + dy * self.dir, true)
+			local curH = self.target.designRect.h
+			self.target:setSize(nil, curH + dy * self.dir, true)
 			self.target.parent:call("allocateChildren")
 		end
 	end

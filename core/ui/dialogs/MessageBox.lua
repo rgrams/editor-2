@@ -23,7 +23,7 @@ function MessageBox.set(self, msg, title, x, y)
 end
 
 function MessageBox.addContent(self, contentBox)
-	contentBox:pad(0, textPad)
+	contentBox:setPad(0, textPad)
 	local msgText = gui.Text(self.msg, msgFontData, self.width, "C", "C", "center", "fill", "none", true)
 	contentBox.children = { msgText }
 end

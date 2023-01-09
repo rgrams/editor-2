@@ -42,8 +42,8 @@ function Viewport.init(self)
 	self.ruu:setFocus(self.tool.widget)
 end
 
-function Viewport.allocate(self, ...)
-	Viewport.super.allocate(self, ...)
+function Viewport.allocate(self, x, y, w, h, designW, designH, scale)
+	Viewport.super.allocate(self, x, y, w, h, designW, designH, scale)
 	local left, top = self._toWorld.x - self.w/2, self._toWorld.y - self.h/2
 	Camera.current:setViewport(left, top, self.w, self.h)
 end

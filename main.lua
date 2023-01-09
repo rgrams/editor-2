@@ -47,7 +47,7 @@ local scenes = require "core.scenes"
 local editorTree
 local window
 
-local screenRect = gui.Rect(0, 0, love.graphics.getDimensions())
+local screenRect = gui.Alloc(0, 0, love.graphics.getDimensions())
 
 local layers = {
 	world = { "default", "background" },
@@ -137,7 +137,7 @@ end
 
 function love.resize(w, h)
 	screenRect.w, screenRect.h = w, h
-	window:allocate(screenRect)
+	window:allocate(screenRect:unpack())
 	_G.shouldRedraw = true
 	if not love.window.isMaximized() then
 		config.winWidth, config.winHeight = w, h

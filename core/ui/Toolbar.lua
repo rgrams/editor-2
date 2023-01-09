@@ -12,8 +12,8 @@ local height = 26
 
 function Toolbar.set(self, ruu)
 	Toolbar.super.set(self, spacing, false, -1, width, height)
-	self:mode("fill", "none")
-	self:pad(4, 1)
+	self:setMode("fill", "none")
+	self:setPad(4, 1)
 	self.layer = "gui"
 	self.ruu = ruu
 	self.widget = ruu:Panel(self, PanelTheme)
@@ -28,7 +28,7 @@ function Toolbar.set(self, ruu)
 	table.insert(self.children, snapLabel)
 	local snapField = InputField(snapIncr, 40)
 	table.insert(self.children, snapField)
-	snapField:anchor("NW"):pivot("NW")
+	snapField:setAnchor("NW"):setPivot("NW")
 	local snapWgt = self.ruu:InputField(snapField, self.snapIncrementSet, snapIncr, InputFieldTheme)
 	snapWgt:args(self, snapWgt)
 end

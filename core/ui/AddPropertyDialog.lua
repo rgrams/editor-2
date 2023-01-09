@@ -15,13 +15,13 @@ function AddPropDialog.set(self, callback, callbackArgs)
 	AddPropDialog.super.set(self, spacing, false, nil, 400, 125)
 	self.callback = callback
 	self.callbackArgs = callbackArgs
-	self:pad(4, 4)
+	self:setPad(4, 4)
 	self.children = {
 		gui.Text("Add Property", headerFont, 250, "C", "C", "center", "fill"),
 		gui.Node(10, 10),
-		gui.Row(4, nil, nil, 100, 25):pad(4, 0):mode("fill"),
+		gui.Row(4, nil, nil, 100, 25):setPad(4, 0):setMode("fill"),
 		gui.Node(10, 20),
-		gui.Node(100, 25):mode("fill")
+		gui.Node(100, 25):setMode("fill")
 	}
 	local inputRow = self.children[3]
 	local btnRow = self.children[5]
@@ -31,8 +31,8 @@ function AddPropDialog.set(self, callback, callbackArgs)
 		self.inputFld,
 		self.typeBtn,
 	}
-	self.cancelBtn = Button("Cancel", nil, "center"):pivot("E"):anchor("C"):setPos(-4, 0)
-	self.OKBtn = Button("OK", nil, "center"):pivot("W"):anchor("C"):setPos(4, 0)
+	self.cancelBtn = Button("Cancel", nil, "center"):setPivot("E"):setAnchor("C"):setPos(-4, 0)
+	self.OKBtn = Button("OK", nil, "center"):setPivot("W"):setAnchor("C"):setPos(4, 0)
 	btnRow.children = {
 		self.cancelBtn,
 		self.OKBtn,

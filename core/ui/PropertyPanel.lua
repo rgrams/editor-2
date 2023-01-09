@@ -15,7 +15,7 @@ local spacing = 2
 
 function PropertyPanel.set(self, ruu)
 	PropertyPanel.super.set(self, spacing, false, nil, 250, 600, "E", "E", "fill")
-	self:pad(4, 4)
+	self:setPad(4, 4)
 	self.children = {
 		gui.Text("Properties", headerFont, 250, "C", "C", "center", "fill"),
 	}
