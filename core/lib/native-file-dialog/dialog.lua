@@ -23,19 +23,43 @@ libPath = sourceDir .. libPath
 
 local nfd = ffi.load(libPath)
 ffi.cdef[[
-	enum {
-		NFD_ERROR,
-		NFD_OKAY,
-		NFD_CANCEL
-	};
-	unsigned int NFD_SaveDialog(const char *filterList, const char *defaultPath, char **outPath);
-	unsigned int NFD_OpenDialog(const char *filterList, const char *defaultPath, char **outPath);
-	const char *NFD_GetError(void);
-]]
+	typedef char nfdchar_t;
+	typedef struct {
+		nfdchar_t *buf;
+		size_t *indices; /* byte offsets into buf */
+		size_t count;    /* number of indices into buf */
+	}nfdpathset_t;
 
--- TODO: Add open multiple option.
--- Need to define `nfdpathset_t` struct type https://github.com/Alloyed/nativefiledialog/blob/master/src/include/nfd.h
--- unsigned int NFD_OpenDialogMultiple(const char *filterList, const char *defaultPath, nfdpathset_t *outPaths);
+	typedef enum {
+		NFD_ERROR,       /* programmatic error */
+		NFD_OKAY,        /* user pressed okay, or successful return */
+		NFD_CANCEL       /* user pressed cancel */
+	}nfdresult_t;
+
+	/* single file open dialog */
+	nfdresult_t NFD_OpenDialog( const nfdchar_t *filterList,
+	                            const nfdchar_t *defaultPath,
+	                            nfdchar_t **outPath );
+	/* multiple file open dialog */
+	nfdresult_t NFD_OpenDialogMultiple( const nfdchar_t *filterList,
+	                                    const nfdchar_t *defaultPath,
+	                                    nfdpathset_t *outPaths );
+	/* save dialog */
+	nfdresult_t NFD_SaveDialog( const nfdchar_t *filterList,
+	                            const nfdchar_t *defaultPath,
+	                            nfdchar_t **outPath );
+	/* select folder dialog */
+	nfdresult_t NFD_PickFolder( const nfdchar_t *defaultPath,
+	                            nfdchar_t **outPath);
+	/* get last error -- set when nfdresult_t returns NFD_ERROR */
+	const char *NFD_GetError( void );
+	/* get the number of entries stored in pathSet */
+	size_t      NFD_PathSet_GetCount( const nfdpathset_t *pathSet );
+	/* Get the UTF-8 path at offset index */
+	nfdchar_t  *NFD_PathSet_GetPath( const nfdpathset_t *pathSet, size_t index );
+	/* Free the pathSet */
+	void        NFD_PathSet_Free( nfdpathset_t *pathSet );
+]]
 
 -- 	File Filter Syntax:
 -- A wildcard filter is always added to every dialog.
@@ -57,22 +81,47 @@ function dialog.save(default_path, filters)
 	else
 		print("Dialog error: " .. tostring(ffi.string(nfd.NFD_GetError())))
 	end
-
-	return nil
 end
 
-function dialog.open(default_path, isOpenMultiple, filters)
-	local out_path = ffi.new 'char*[1]'
-	local r = nfd.NFD_OpenDialog(filters, default_path, out_path)
-	if r == nfd.NFD_OKAY then
+function dialog.open(default_path, filters)
+	local out_path = ffi.new('nfdchar_t *[1]')
+	local result = nfd.NFD_OpenDialog(filters, default_path, out_path)
+	if result == nfd.NFD_OKAY then
 		return ffi.string(out_path[0])
-	elseif r == nfd.NFD_CANCEL then
+	elseif result == nfd.NFD_CANCEL then
 		print("User canceled dialog.")
 	else
 		print("Dialog error: " .. tostring(ffi.string(nfd.NFD_GetError())))
 	end
+end
 
-	return nil
+function dialog.openMultiple(filters, default_path)
+	local pathset = ffi.new('nfdpathset_t')
+	local result = nfd.NFD_OpenDialogMultiple(filters, default_path, pathset)
+	if result == nfd.NFD_OKAY then
+		local paths = {}
+		for i=1,tonumber(nfd.NFD_PathSet_GetCount(pathset)) do
+			paths[i] = ffi.string(nfd.NFD_PathSet_GetPath(pathset, i-1))
+		end
+		nfd.NFD_PathSet_Free(pathset)
+		return paths
+	elseif result == nfd.NFD_CANCEL then
+		print("User canceled dialog.")
+	else
+		print("Dialog error: " .. tostring(ffi.string(nfd.NFD_GetError())))
+	end
+end
+
+function dialog.pickFolder(default_path)
+	local out_path = ffi.new('nfdchar_t *[1]')
+	local result = nfd.NFD_PickFolder(default_path, out_path)
+	if result == nfd.NFD_OKAY then
+		return ffi.string(out_path[0])
+	elseif result == nfd.NFD_CANCEL then
+		print("User canceled dialog.")
+	else
+		print("Dialog error: " .. tostring(ffi.string(nfd.NFD_GetError())))
+	end
 end
 
 return dialog
