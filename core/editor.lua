@@ -80,18 +80,18 @@ local inputMaps = {}
 
 -- Called by context objects (UI, Viewport, PropertyPanel) when they are initialized.
 function M._registerInputContext(context)
-	local map = { _callOnRepeat = {} }
+	local map = { _doActionOnKeyRepeat = {} }
 	inputMaps[context] = map
 	return map
 end
 
-function M.bindActionToInput(name, input, context, callOnRepeat)
+function M.bindActionToInput(name, input, context, doActionOnKeyRepeat)
 	assert(actions[name], errStr("bindActionToInput", name, "...") .. "No action registered with that name.")
 	context = context or M.UI
 	local map = inputMaps[context]
 	assert(map, errStr("bindActionToInput", name, input, context) .. "No input map found for context object.")
 	map[input] = name
-	map._callOnRepeat[input] = callOnRepeat
+	map._doActionOnKeyRepeat[input] = doActionOnKeyRepeat
 end
 
 function M.unBindActionFromInput(name, input, context)
@@ -102,7 +102,14 @@ function M.unBindActionFromInput(name, input, context)
 		assert(map[input] == name, errStr("bindActionToInput", name, input, context) .. "Bound action doesn't match the action-name given.")
 	end
 	map[input] = nil
-	map._callOnRepeat[input] = nil
+	map._doActionOnKeyRepeat[input] = nil
+end
+
+function M.handleInputsForMap(inputMap, action, value, change, rawChange, isRepeat, ...)
+	if (change == 1) or (isRepeat and inputMap._doActionOnKeyRepeat[action]) then
+		local editorAction = inputMap[action]
+		if editorAction then  return M.runAction(editorAction)  end
+	end
 end
 
 -- M.makePluginObject()

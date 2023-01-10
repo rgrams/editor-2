@@ -38,7 +38,7 @@ function PropertyPanel.init(self)
 	self.inputMap = _G.editor._registerInputContext(self)
 end
 
-function PropertyPanel.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat)
+function PropertyPanel.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, ...)
 	if action == "add property" and change == 1 then
 		if scenes.active then
 			local self = wgt.object
@@ -48,6 +48,9 @@ function PropertyPanel.ruuInput(wgt, depth, action, value, change, rawChange, is
 			return true
 		end
 	end
+
+	local inputMap = wgt.object.inputMap
+	editor.handleInputsForMap(inputMap, action, value, change, rawChange, isRepeat, ...)
 end
 
 function PropertyPanel.addProperty(self, propType, propName)

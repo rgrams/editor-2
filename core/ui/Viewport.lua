@@ -84,7 +84,7 @@ function Viewport.drag(wgt, dx, dy, dragType)
 	end
 end
 
-function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, x, y, dx, dy, isTouch, presses)
+function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepeat, ...)
 	if action == "pan camera" then
 		if change == 1 then
 			wgt.ruu:startDrag(wgt, "pan")
@@ -101,13 +101,7 @@ function Viewport.ruuInput(wgt, depth, action, value, change, rawChange, isRepea
 	end
 
 	local inputMap = wgt.object.inputMap
-	if isRepeat and inputMap._callOnRepeat[action] then
-		local editorAction = inputMap[action]
-		if editorAction then  return editor.runAction(editorAction)  end
-	elseif change == 1 then
-		local editorAction = inputMap[action]
-		if editorAction then  return editor.runAction(editorAction)  end
-	end
+	editor.handleInputsForMap(inputMap, action, value, change, rawChange, isRepeat, ...)
 end
 
 function Viewport.draw(self)

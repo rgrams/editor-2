@@ -72,13 +72,7 @@ function UI.input(self, action, value, change, rawChange, isRepeat, ...)
 	local r = self.ruu:input(action, value, change, rawChange, isRepeat, ...)
 	if r then  return r  end
 
-	if isRepeat and self.inputMap._callOnRepeat[action] then
-		local editorAction = self.inputMap[action]
-		if editorAction then  return editor.runAction(editorAction)  end
-	elseif change == 1 then
-		local editorAction = self.inputMap[action]
-		if editorAction then  return editor.runAction(editorAction)  end
-	end
+	editor.handleInputsForMap(self.inputMap, action, value, change, rawChange, isRepeat, ...)
 end
 
 return UI
