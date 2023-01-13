@@ -11,7 +11,7 @@ function Button.set(self, text, width, textAlign)
 	textAlign = textAlign or "left"
 	Button.super.set(self, width, self.height)
 	self.text = gui.Text(text or "text", self.font, width-6, "C", "C", textAlign)
-	self.text:setPos(0, -1)
+	self.text:setPos(0, -2)
 	self.children = { self.text }
 	self.color = {1, 1, 1, 1}
 	self.layer = "gui"
