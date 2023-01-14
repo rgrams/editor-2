@@ -2,10 +2,11 @@
 local ResizeHandle = gui.Node:extend()
 
 ResizeHandle.theme = require "core.ui.object-as-theme"
+local style = require "core.ui.style"
 
-ResizeHandle.normalColor = { 0.17, 0.17, 0.17, 1 }
-ResizeHandle.hoverColor = { 0.25, 0.25, 0.25, 1 }
-ResizeHandle.pressColor = { 0.5, 0.5, 0.5, 1 }
+ResizeHandle.normalColor = style.resizeHandleColor
+ResizeHandle.hoverColor = style.resizeHandleHoverColor
+ResizeHandle.pressColor = style.resizeHandlePressColor
 
 local xCursor = love.mouse.getSystemCursor("sizewe")
 local yCursor = love.mouse.getSystemCursor("sizens")

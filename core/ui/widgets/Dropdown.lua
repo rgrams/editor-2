@@ -4,6 +4,7 @@ Dropdown.className = "Dropdown"
 
 local Ruu = require "core.ui.ruu.ruu"
 local MenuButton = require "core.ui.widgets.MenuButton"
+local style = require "core.ui.style"
 
 local spacing = 1
 local pad = 2
@@ -95,9 +96,9 @@ end
 
 function Dropdown.draw(self)
 	local w, h = self.w, self.h
-	love.graphics.setColor(0, 0, 0, 1)
+	love.graphics.setColor(style.dropdownEdgeColor)
 	love.graphics.rectangle("line", -w/2-0.5, -h/2-0.5, w+1, h+1)
-	love.graphics.setColor(0.2, 0.2, 0.2, 1)
+	love.graphics.setColor(style.dropdownBGColor)
 	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
 end
 

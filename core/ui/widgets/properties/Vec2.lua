@@ -5,15 +5,16 @@ Vec2.className = "Vec2"
 
 local PropData = require "core.commands.data.PropData"
 local InputField = require "core.ui.widgets.InputField"
+local style = require "core.ui.style"
 
-local sublabelFont = { "core/assets/font/OpenSans-Regular.ttf", 12 }
+local sublabelFont = style.propertySubLabelFont
 
 local function Sublabel(text)
 	local fnt = new.font(unpack(sublabelFont))
 	local w = fnt:getWidth(text) + 4
 	local label = gui.Text(text, sublabelFont, w, "C", "C", "right")
 	label:setPos(0, -1)
-	label.color = { 0.6, 0.6, 0.6, 1 }
+	label.color = style.propertyTextColor
 	return label
 end
 

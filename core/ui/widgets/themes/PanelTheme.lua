@@ -2,16 +2,16 @@
 local Class = require "core.philtre.core.base-class"
 local PanelTheme = Class:extend()
 
-local value = 0.22
+local style = require "core.ui.style"
 
-PanelTheme.bevelLighten = 0.1
-PanelTheme.bevelDarken = 0.1
-PanelTheme.bevelDepth = 1
+PanelTheme.bevelLighten = style.panelBevelLighten
+PanelTheme.bevelDarken = style.panelBevelDarken
+PanelTheme.bevelDepth = style.panelBevelDepth
 
 function PanelTheme.init(self, themeData)
 	self.object = themeData
 	themeData.widget = self
-	self.object.color = { value, value, value, 1 }
+	self.object.color = style.panelColor
 end
 
 function PanelTheme.hover(self)  end
@@ -21,20 +21,24 @@ function PanelTheme.unfocus(self, isKeyboard)  end
 function PanelTheme.press(self, mx, my, isKeyboard)  end
 function PanelTheme.release(self, dontFire, mx, my, isKeyboard)  end
 
+local function drawBevel(w, h, depth, color, lighten, darken)
+	local r, g, b, a = color[1], color[2], color[3], color[4]
+	if depth < 0 then
+		depth, lighten, darken = -depth, -darken, -lighten
+	end
+	love.graphics.setColor(r+lighten, g+lighten, b+lighten, a)
+	love.graphics.rectangle("fill", -w/2, -h/2, w, depth)
+	love.graphics.setColor(r-darken, g-darken, b-darken, a)
+	love.graphics.rectangle("fill", -w/2, h/2 - depth, w, depth)
+end
+
 function PanelTheme.draw(self, obj)
 	love.graphics.setColor(obj.color)
 	local w, h = obj.w, obj.h
 	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
 
-	local val, alpha = obj.color[1], obj.color[4]
-	local Theme = self.theme
-	local v1 = val + Theme.bevelLighten
-	local v2 = val - Theme.bevelDarken
-	local depth = Theme.bevelDepth
-	love.graphics.setColor(v1, v1, v1, alpha)
-	love.graphics.rectangle("fill", -w/2, -h/2, w, depth)
-	love.graphics.setColor(v2, v2, v2, alpha)
-	love.graphics.rectangle("fill", -w/2, h/2 - depth, w, depth)
+	local thm = self.theme
+	drawBevel(w, h, thm.bevelDepth, obj.color, thm.bevelLighten, thm.bevelDarken)
 
 	if self.isFocused then
 		love.graphics.setColor(1, 1, 1, 0.5)

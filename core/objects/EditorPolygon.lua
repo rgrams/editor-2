@@ -11,7 +11,7 @@ EditorPolygon.drawFill = true
 
 _G.objClassList:add(EditorPolygon, EditorPolygon.displayName)
 
-local config = require "core.config"
+local style = require "core.ui.style"
 local PropData = require "core.commands.data.PropData"
 
 local Bool = require "core.objects.properties.Bool"
@@ -149,9 +149,9 @@ function EditorPolygon.draw(self)
 		love.graphics.polygon("fill", verts)
 	end
 
-	love.graphics.setColor(config.xAxisColor)
+	love.graphics.setColor(style.xAxisColor)
 	love.graphics.line(0, 0, hw, 0)
-	love.graphics.setColor(config.yAxisColor)
+	love.graphics.setColor(style.yAxisColor)
 	love.graphics.line(0, 0, 0, -hh)
 	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
 	love.graphics.circle("line", 0, 0, 0.5, 4)

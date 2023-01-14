@@ -2,8 +2,10 @@
 local DialogBox = require "core.ui.dialogs.DialogBox"
 local MessageBox = DialogBox:extend()
 
+local style = require "core.ui.style"
+
 local textPad = 7
-local msgFontData = { "core/assets/font/OpenSans-Regular.ttf", 14 }
+local msgFontData = style.textFont
 local msgFont = new.font(unpack(msgFontData))
 local msgFontHeight = msgFont:getHeight()
 
@@ -25,6 +27,7 @@ end
 function MessageBox.addContent(self, contentBox)
 	contentBox:setPad(0, textPad)
 	local msgText = gui.Text(self.msg, msgFontData, self.width, "C", "C", "center", "fill", "none", true)
+	msgText.color = style.textColor
 	contentBox.children = { msgText }
 end
 

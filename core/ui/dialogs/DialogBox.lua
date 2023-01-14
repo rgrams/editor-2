@@ -8,6 +8,7 @@ local DialogBox = gui.Column:extend()
 local Ruu = require "core.ui.ruu.ruu"
 local Button = require "core.ui.widgets.Button"
 local PanelTheme = require "core.ui.widgets.themes.PanelTheme"
+local style = require "core.ui.style"
 
 local spacing = 0
 DialogBox.width = 400
@@ -15,8 +16,6 @@ DialogBox.height = 150
 DialogBox.padW = 4
 DialogBox.titleHeight = 25
 DialogBox.btnBoxHeight = 35
-
-local titleFontData = { "core/assets/font/OpenSans-Semibold.ttf", 16 }
 
 function DialogBox.set(self, title, x, y)
 	title = title or "Notification"
@@ -28,7 +27,8 @@ function DialogBox.set(self, title, x, y)
 	self.layer = "gui"
 
 	local titleBox = gui.Node(100, self.titleHeight, "C", "C", "fill", "none")
-	local titleText = gui.Text(title, titleFontData, 100, "C", "C", "center", "fill")
+	local titleText = gui.Text(title, style.titleFont, 100, "C", "C", "center", "fill")
+	titleText.color = style.titleTextColor
 	titleBox.children = { titleText }
 
 	local contentBox = gui.Node(100, 10, "C", "C", "fill", "fill")

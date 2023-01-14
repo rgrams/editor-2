@@ -2,6 +2,7 @@
 local Toolbar = gui.Row:extend()
 
 local config = require "core.config"
+local style = require "core.ui.style"
 local InputField = require "core.ui.widgets.InputField"
 local PanelTheme = require "core.ui.widgets.themes.PanelTheme"
 
@@ -23,7 +24,7 @@ function Toolbar.set(self, ruu)
 	local font = { "core/assets/font/OpenSans-Semibold.ttf", 12 }
 	local snapLabel = gui.Text("snap to:", font, 50, "NW", "NW")
 	snapLabel:setPos(0, 3)
-	snapLabel.color[4] = 0.5
+	snapLabel.color = style.textColor
 	table.insert(self.children, snapLabel)
 	local snapField = InputField(snapIncr, 40)
 	table.insert(self.children, snapField)

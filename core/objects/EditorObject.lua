@@ -9,6 +9,7 @@ EditorObject.hitHeight = 32
 _G.objClassList:add(EditorObject, EditorObject.displayName)
 
 local config = require "core.config"
+local style = require "core.ui.style"
 local id = require "core.lib.id"
 local PropData = require "core.commands.data.PropData"
 
@@ -318,9 +319,9 @@ function EditorObject.draw(self)
 		love.graphics.rectangle("fill", -hw, -hh, hw*2, hh*2)
 	end
 
-	love.graphics.setColor(config.xAxisColor)
+	love.graphics.setColor(style.xAxisColor)
 	love.graphics.line(0, 0, hw, 0)
-	love.graphics.setColor(config.yAxisColor)
+	love.graphics.setColor(style.yAxisColor)
 	love.graphics.line(0, 0, 0, -hh)
 	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
 	love.graphics.rectangle("line", -hw, -hh, hw*2, hh*2)

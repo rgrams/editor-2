@@ -3,25 +3,25 @@ local Button = require "core.ui.widgets.Button"
 local Tab = Button:extend()
 Tab.className = "Tab"
 
+local style = require "core.ui.style"
 local TabCloseBtn = require(GetRequireFolder(...) .. "TabCloseBtn")
-local setValue = require "core.lib.setValue"
 Tab.theme = require "core.ui.object-as-theme"
 
-Tab.font = { "core/assets/font/OpenSans-Semibold.ttf", 13 }
+Tab.font = style.tabFont
 Tab.width = 100
 Tab.height = 24
 Tab.closeBtnWidth = 20
 
-Tab.normalCheckVal = 0.47
-Tab.hoverCheckVal = 0.5
-Tab.normalUncheckVal = 0.26
-Tab.hoverUncheckVal = 0.28
-Tab.pressValue = 0.5
+Tab.normalCheckColor = style.tabNormalCheckColor
+Tab.hoverCheckColor = style.tabHoverCheckColor
+Tab.normalUncheckColor = style.tabNormalUncheckColor
+Tab.hoverUncheckColor = style.tabHoverUncheckColor
+Tab.pressColor = style.tabPressColor
 
-Tab.textCheckNormalVal = 1.0
-Tab.textCheckHoverVal = 1.0
-Tab.textUncheckNormalVal = 0.65
-Tab.textUncheckHoverVal = 0.85
+Tab.textCheckNormalColor = style.tabTextNormalCheckColor
+Tab.textCheckHoverColor = style.tabTextHoverCheckColor
+Tab.textUncheckNormalColor = style.tabTextNormalUncheckColor
+Tab.textUncheckHoverColor = style.tabTextHoverUncheckColor
 
 function Tab.set(self, text)
 	Tab.super.set(self, text, self.width, "left")
@@ -44,17 +44,17 @@ end
 
 function Tab.updateColors(self)
 	local wgt = self.widget
-	local val, textVal
+	local col, textCol
 	if wgt.isHovered then
-		val = wgt.isChecked and Tab.hoverCheckVal or Tab.hoverUncheckVal
-		textVal = wgt.isChecked and Tab.textCheckHoverVal or Tab.textUncheckHoverVal
+		col = wgt.isChecked and self.hoverCheckColor or self.hoverUncheckColor
+		textCol = wgt.isChecked and self.textCheckHoverColor or self.textUncheckHoverColor
 	else
-		val = wgt.isChecked and Tab.normalCheckVal or Tab.normalUncheckVal
-		textVal = wgt.isChecked and Tab.textCheckNormalVal or Tab.textUncheckNormalVal
+		col = wgt.isChecked and self.normalCheckColor or self.normalUncheckColor
+		textCol = wgt.isChecked and self.textCheckNormalColor or self.textUncheckNormalColor
 	end
-	if wgt.isPressed then  val = Tab.pressValue  end
-	setValue(self.color, val)
-	setValue(self.text.color, textVal)
+	if wgt.isPressed then  col = self.pressColor  end
+	self.color = col
+	self.text.color = textCol
 end
 TabCloseBtn.updateColors = Tab.updateColors
 
@@ -67,7 +67,7 @@ function Tab.unhover(self, wgt)
 end
 
 function Tab.press(self, wgt, mx, my, isKeyboard)
-	setValue(self.color, self.pressValue)
+	self.color = self.pressColor
 end
 
 function Tab.release(self, wgt, dontFire, mx, my, isKeyboard)

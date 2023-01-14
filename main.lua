@@ -78,8 +78,8 @@ function love.load()
 
 	love.graphics.setLineStyle("rough")
 
-	local config = require "core.config"
-	love.graphics.setBackgroundColor(config.viewportBackgroundColor)
+	local style = require "core.ui.style"
+	love.graphics.setBackgroundColor(style.viewportBackgroundColor)
 
 	-- Load property classes.
 	requireModulesInFolder("core/objects/properties/")

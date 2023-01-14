@@ -3,7 +3,7 @@ local Button = require(GetRequireFolder(...) .. "Button")
 local Checkbox = Button:extend()
 Checkbox.className = "Checkbox"
 
-local setValue = require "core.lib.setValue"
+local style = require "core.ui.style"
 Checkbox.theme = require "core.ui.object-as-theme"
 
 local totalW = 24
@@ -11,13 +11,10 @@ local totalH = 24
 local boxWidth = 14
 local boxHeight = 14
 local checkW = 6
-local bgColor = { 0.15, 0.15, 0.15, 1 }
-local checkColor = { 0.8, 0.8, 0.8, 1 }
 
 function Checkbox.set(self)
 	gui.Node.set(self, totalW, totalH, "C", "C")
-	self.color = { 1, 1, 1, 1 }
-	setValue(self.color, self.normalValue)
+	self.color = style.buttonColor
 	self.layer = "gui"
 end
 
@@ -34,7 +31,7 @@ end
 
 function Checkbox.draw(self)
 	local w, h = boxWidth, boxHeight
-	love.graphics.setColor(bgColor)
+	love.graphics.setColor(style.checkboxBGColor)
 	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
 	love.graphics.setColor(self.color)
 	love.graphics.rectangle("line", -w/2, -h/2, w, h)
@@ -42,12 +39,12 @@ function Checkbox.draw(self)
 	local widget = self.widget
 	if widget then
 		if widget.isChecked then
-			love.graphics.setColor(checkColor)
+			love.graphics.setColor(style.textColor)
 			love.graphics.rectangle("fill", -checkW/2, -checkW/2, checkW, checkW)
 		end
 
 		if widget.isFocused then
-			love.graphics.setColor(1, 1, 1, 1)
+			love.graphics.setColor(style.focusLineColor)
 			w, h = self.w - 2, self.h - 2
 			love.graphics.rectangle("line", -w/2, -h/2, w, h)
 		end

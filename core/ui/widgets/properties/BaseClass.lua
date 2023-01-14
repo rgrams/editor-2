@@ -2,7 +2,10 @@
 local BaseClass = gui.Row:extend()
 BaseClass.className = "BaseClass"
 
-BaseClass.font = { "core/assets/font/OpenSans-Semibold.ttf", 15 }
+local style = require "core.ui.style"
+
+BaseClass.font = style.buttonFont
+BaseClass.labelColor = style.propertyTextColor
 BaseClass.spacing = 2
 BaseClass.width = 100
 BaseClass.height = 26
@@ -17,7 +20,7 @@ function BaseClass.set(self, name, value, PropClass, propObj)
 
 	self.label = gui.Text(name, self.font, self.labelWidth or self.width, "W", "W", "left")
 	self.label:setPos(2)
-	self.label.color = { 0.6, 0.6, 0.6, 1 }
+	self.label.color = self.labelColor
 	self.label.isGreedy = true
 	self.children = { self.label }
 

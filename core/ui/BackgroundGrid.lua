@@ -4,14 +4,15 @@ BackgroundGrid.className = "BackgroundGrid"
 
 -- local fnt = require "core.theme.fonts"
 local config = require "core.config"
+local style = require "core.ui.style"
 
-local fnt = { "core/assets/font/OpenSans-Regular.ttf", 12 }
+local fnt = style.gridFont
 
-local gridColor = config.gridColor
-local emphasizeColor = config.bigGridColor
-local numberColor = config.gridNumberColor
-local yAxisColor = config.yAxisColor
-local xAxisColor = config.xAxisColor
+local gridColor = style.gridColor
+local emphasizeColor = style.bigGridColor
+local numberColor = style.gridNumberColor
+local yAxisColor = style.yAxisColor
+local xAxisColor = style.xAxisColor
 
 local maxGridLines = 48
 

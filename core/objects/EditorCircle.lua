@@ -6,7 +6,7 @@ EditorCircle.displayName = "Circle"
 
 _G.objClassList:add(EditorCircle, EditorCircle.displayName)
 
-local config = require "core.config"
+local style = require "core.ui.style"
 local id = require "core.lib.id"
 local PropData = require "core.commands.data.PropData"
 
@@ -67,9 +67,9 @@ function EditorCircle.draw(self)
 	love.graphics.circle("line", 0, 0, r, self.segments)
 	love.graphics.pop()
 
-	love.graphics.setColor(config.xAxisColor)
+	love.graphics.setColor(style.xAxisColor)
 	love.graphics.line(0, 0, r, 0)
-	love.graphics.setColor(config.yAxisColor)
+	love.graphics.setColor(style.yAxisColor)
 	love.graphics.line(0, 0, 0, -r)
 	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
 	love.graphics.circle("line", 0, 0, 0.5, 4)

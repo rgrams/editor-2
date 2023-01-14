@@ -1,7 +1,7 @@
 
 local script = {}
 
-local config = require "core.config"
+local style = require "core.ui.style"
 local PropData = require "core.commands.data.PropData"
 local EditorObject = require "core.objects.EditorObject"
 local Circle = require "core.objects.EditorCircle"
@@ -27,9 +27,9 @@ end
 
 local function drawAxes(self)
 	local hw, hh = self.hitWidth/2, self.hitHeight/2
-	love.graphics.setColor(config.xAxisColor)
+	love.graphics.setColor(style.xAxisColor)
 	love.graphics.line(0, 0, hw, 0)
-	love.graphics.setColor(config.yAxisColor)
+	love.graphics.setColor(style.yAxisColor)
 	love.graphics.line(0, 0, 0, -hh)
 	love.graphics.setColor(0.7, 0.7, 0.7, 0.4)
 	love.graphics.circle("line", 0, 0, 0.5, 4)

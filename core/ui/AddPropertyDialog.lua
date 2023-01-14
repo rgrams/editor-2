@@ -6,8 +6,8 @@ local Button = require "core.ui.widgets.Button"
 local InputField = require "core.ui.widgets.InputField"
 local Dropdown = require "core.ui.widgets.Dropdown"
 local PanelTheme = require "core.ui.widgets.themes.PanelTheme"
+local style = require "core.ui.style"
 
-local headerFont = { "core/assets/font/OpenSans-Semibold.ttf", 17 }
 local spacing = 2
 
 function AddPropDialog.set(self, callback, callbackArgs)
@@ -16,12 +16,13 @@ function AddPropDialog.set(self, callback, callbackArgs)
 	self.callbackArgs = callbackArgs
 	self:setPad(4, 4)
 	self.children = {
-		gui.Text("Add Property", headerFont, 250, "C", "C", "center", "fill"),
+		gui.Text("Add Property", style.titleFont, 250, "C", "C", "center", "fill"),
 		gui.Node(10, 10),
 		gui.Row(4, nil, nil, 100, 25):setPad(4, 0):setMode("fill"),
 		gui.Node(10, 20),
 		gui.Node(100, 25):setMode("fill")
 	}
+	self.children[1].color = style.titleTextColor
 	local inputRow = self.children[3]
 	local btnRow = self.children[5]
 	self.inputFld = InputField("propertyName", 325)

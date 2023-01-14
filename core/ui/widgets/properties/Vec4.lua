@@ -5,8 +5,9 @@ Vec4.className = "Vec4"
 
 local PropData = require "core.commands.data.PropData"
 local InputField = require "core.ui.widgets.InputField"
+local style = require "core.ui.style"
 
-local sublabelFont = { "core/assets/font/OpenSans-Regular.ttf", 12 }
+local sublabelFont = style.propertySubLabelFont
 local fieldWidth = 32
 local defaultLabels = { "x", "y", "z", "w" }
 Vec4.labelWidth = 50
@@ -16,7 +17,7 @@ local function Sublabel(text)
 	local w = fnt:getWidth(text) - 1
 	local label = gui.Text(text, sublabelFont, w, "C", "C", "right")
 	label:setPos(0, -1)
-	label.color = { 0.6, 0.6, 0.6, 1 }
+	label.color = style.propertyTextColor
 	return label
 end
 

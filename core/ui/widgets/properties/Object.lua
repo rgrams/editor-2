@@ -6,10 +6,11 @@ Object.className = "Object"
 local PropData = require "core.commands.data.PropData"
 local Button = require "core.ui.widgets.Button"
 local ObjectSelectorTool = require "core.tools.ObjectSelectorTool"
+local style = require "core.ui.style"
 
 Object.labelWidth = Object.width/4
 local selectBtnWidth = 45
-local labelFont = { "core/assets/font/OpenSans-Regular.ttf", 14 }
+local labelFont = style.inputFieldFont
 
 function Object.set(self, name, value, PropClass, propObj)
 	Object.super.set(self, name, value, PropClass, propObj)

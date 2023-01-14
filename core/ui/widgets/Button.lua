@@ -2,22 +2,22 @@
 local Button = gui.Node:extend()
 Button.className = "Button"
 
-local setValue = require "core.lib.setValue"
+local style = require "core.ui.style"
 Button.theme = require "core.ui.object-as-theme"
 
-Button.normalValue = 0.32
-Button.hoverValue = 0.34
-Button.pressValue = 0.5
+Button.normalColor = style.buttonColor
+Button.hoverColor = style.buttonHoverColor
+Button.pressColor = style.buttonPressColor
 
-Button.textNormalValue = 0.8
-Button.textHoverValue = 1.0
+Button.textNormalColor = style.buttonTextColor
+Button.textHoverColor = style.buttonTextHoverColor
 
-Button.bevelLighten = 0.15
-Button.bevelHoverLighten = 0.25
-Button.bevelDarken = 0.15
-Button.bevelDepth = 2
+Button.bevelLighten = style.buttonBevelLighten
+Button.bevelHoverLighten = style.buttonBevelHoverLighten
+Button.bevelDarken = style.buttonBevelDarken
+Button.bevelDepth = style.buttonBevelDepth
 
-Button.font = { "core/assets/font/OpenSans-Semibold.ttf", 15 }
+Button.font = style.buttonFont
 Button.width = 100
 Button.height = 24
 Button.textX, Button.textY = 0, -2
@@ -29,9 +29,8 @@ function Button.set(self, text, width, textAlign)
 	self.text = gui.Text(text or "text", self.font, width-6, "C", "C", textAlign)
 	self.text:setPos(self.textX, self.textY)
 	self.children = { self.text }
-	self.color = { 1, 1, 1, 1 }
-	setValue(self.color, self.normalValue)
-	setValue(self.text.color, self.textNormalValue)
+	self.color = self.normalColor
+	self.text.color = self.textNormalColor
 	self.layer = "gui"
 end
 
@@ -44,28 +43,26 @@ function Button.initRuu(self, ruu, fn, ...)
 end
 
 function Button.hover(self, widget)
-	setValue(self.color, self.hoverValue)
-	if self.text then  setValue(self.text.color, self.textHoverValue)  end
+	self.color = self.hoverColor
+	if self.text then  self.text.color = self.textHoverColor  end
 end
 
 function Button.unhover(self, widget)
-	setValue(self.color, self.normalValue)
-	if self.text then  setValue(self.text.color, self.textNormalValue)  end
+	self.color = self.normalColor
+	if self.text then  self.text.color = self.textNormalColor  end
 end
 
 function Button.focus(self, widget)  end
 function Button.unfocus(self, widget)  end
 
 function Button.press(self, widget, mx, my, isKeyboard)
-	setValue(self.color, self.pressValue)
+	self.color = self.pressColor
 end
 
 function Button.release(self, widget, dontFire, mx, my, isKeyboard)
-	local val = widget.isHovered and self.hoverValue or self.normalValue
-	setValue(self.color, val)
+	self.color = widget.isHovered and self.hoverColor or self.normalColor
 	if self.text then
-		local textVal = widget.isHovered and self.textHoverValue or self.textNormalValue
-		setValue(self.text.color, textVal)
+		self.text.color = widget.isHovered and self.textHoverColor or self.textNormalColor
 	end
 end
 
@@ -93,7 +90,7 @@ function Button.draw(self)
 	love.graphics.rectangle("fill", -w/2, h/2 - depth, w, depth)
 
 	if isFocused then
-		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.setColor(style.focusLineColor)
 		local fw, fh = w+1, h+1
 		love.graphics.rectangle("line", -fw/2, -fh/2, fw, fh)
 	end

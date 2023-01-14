@@ -2,11 +2,13 @@
 local Button = require(GetRequireFolder(...) .. "Button")
 local MenuButton = Button:extend()
 
-MenuButton.font = { "core/assets/font/OpenSans-Regular.ttf", 13 }
+local style = require "core.ui.style"
+
+MenuButton.font = style.menuButtonFont
 MenuButton.fontObj = new.font(unpack(MenuButton.font)) -- For Dropdown to check widths.
-MenuButton.normalValue = 0.2
-MenuButton.hoverValue = 0.35
-MenuButton.pressValue = 0.4
+MenuButton.normalColor = style.menuButtonColor
+MenuButton.hoverColor = style.menuButtonHoverColor
+MenuButton.pressColor = style.menuButtonPressColor
 MenuButton.textX = 16
 
 function MenuButton.draw(self)

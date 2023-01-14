@@ -5,24 +5,21 @@ InputField.className = "InputField"
 local DefaultTheme = require("core.ui.ruu.defaultThemes").InputField
 InputField.theme = DefaultTheme:extend()
 
-local setValue = require "core.lib.setValue"
+local style = require "core.ui.style"
 
-InputField.font = { "core/assets/font/OpenSans-Regular.ttf", 14 }
+InputField.font = style.inputFieldFont
 InputField.width = 100
 InputField.height = 24
 local pad = 2
 local cursorW = 2
 
-InputField.normalValue = 0.18
-InputField.hoverValue = 0.15
-InputField.pressValue = 0.1
+InputField.normalColor = style.inputFieldColor
+InputField.hoverColor = style.inputFieldHoverColor
+InputField.pressColor = style.inputFieldPressColor
 
-InputField.bevelLighten = 0.15
-InputField.bevelHoverLighten = 0.20
-InputField.bevelDarken = 0.15
-
-local selectionColor = { 0.16, 0.44, 0.78, 1 }
-local cursorColor = { 1, 1, 1, 1 }
+InputField.bevelLighten = style.inputFieldBevelLighten
+InputField.bevelHoverLighten = style.inputFieldBevelHoverLighten
+InputField.bevelDarken = style.inputFieldBevelDarken
 
 -- Modify Ruu InputField widget class directly to add select-all to all fields.
 local RuuInputField = require "core.ui.ruu.widgets.InputField"
@@ -58,48 +55,63 @@ function InputField.set(self, text, width)
 
 	self.selection.draw = drawRect
 	self.cursor.draw = drawRect
-	self.selection.color = selectionColor
-	self.cursor.color = cursorColor
+	self.selection.color = style.textSelectColor
+	self.cursor.color = style.textCursorColor
 
-	self.text.color = { 1, 1, 1, 1 }
-	self.color = { 1, 1, 1, 1 }
-	setValue(self.color, self.normalValue)
+	self.text.color = style.inputFieldTextColor
+	self.color = self.normalColor
 	self.layer = "gui"
 end
 
 function InputField.initRuu(self, ruu, fn, ...)
 	self.ruu = ruu
 	local widget = ruu:InputField(self, fn, self.text.text, self.theme):args(...)
-	widget.object = self
-	self.widget = widget
 	return widget
 end
 
 function InputField.theme.init(wgt, self)
-	InputField.theme.super.init(wgt, self)
-	setValue(self.color, self.normalValue)
+	wgt.object = self
+	self.widget = wgt
+	wgt.textObj = self.text
+	wgt.cursorObj = self.cursor
+	wgt.selectionObj = self.selection
+
+	if self.tree then
+		self.cursor:setVisible(wgt.isFocused)
+		self.selection:setVisible(wgt.isFocused)
+	else
+		self.cursor.visible = wgt.isFocused
+		self.selection.visible = wgt.isFocused
+	end
+
+	wgt.font = self.text.font
+	wgt.scrollOX = 0
+	wgt.textOriginX = self.text.pos.x
+
+	wgt.theme.updateMaskSize(wgt)
+	wgt.theme.updateText(wgt)
+	self.color = self.normalColor
 end
 
 function InputField.theme.hover(wgt)
 	local self = wgt.object
-	local val = wgt.isPressed and self.pressValue or self.hoverValue
-	setValue(self.color, val)
+	self.color = wgt.isPressed and self.pressColor or self.hoverColor
 end
 
 function InputField.theme.unhover(wgt)
 	local self = wgt.object
-	setValue(self.color, self.normalValue)
+	self.color = self.normalColor
 end
 
 function InputField.theme.press(wgt)
 	local self = wgt.object
-	setValue(self.color, self.pressValue)
+	self.color = self.pressColor
 end
 
 function InputField.theme.release(wgt)
 	local self = wgt.object
-	local val = wgt.isHovered and self.hoverValue or self.normalValue
-	setValue(self.color, val)
+	local col = wgt.isHovered and self.hoverColor or self.normalColor
+	self.color = col
 end
 
 function InputField.draw(self)
@@ -116,7 +128,7 @@ function InputField.draw(self)
 	love.graphics.rectangle("fill", -w/2, h/2 - 2, w, 2)
 
 	if self.widget and self.widget.isFocused then
-		love.graphics.setColor(1, 1, 1, 1)
+		love.graphics.setColor(style.focusLineColor)
 		local fw, fh = w+1, h+1
 		love.graphics.rectangle("line", -fw/2, -fh/2, fw, fh)
 	end

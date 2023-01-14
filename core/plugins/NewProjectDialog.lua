@@ -3,6 +3,7 @@ local DialogBox = require "core.ui.dialogs.DialogBox"
 local NewProjectDialog = DialogBox:extend()
 
 local config = require "core.config"
+local style = require "core.ui.style"
 local fileDialog = require "core.lib.native-file-dialog.dialog"
 local Button = require "core.ui.widgets.Button"
 local InputField = require "core.ui.widgets.InputField"
@@ -17,8 +18,8 @@ function NewProjectDialog.set(self, callback)
 end
 
 local defaultProjectName = "My Project"
-local labelFontData = { "core/assets/font/OpenSans-Semibold.ttf", 16 }
-local pathLabelFontData = { "core/assets/font/OpenSans-Regular.ttf", 14 }
+local labelFontData = style.titleFont
+local pathLabelFontData = style.textFont
 
 local titleSet -- Callback for project title input field.
 local selectParentFolder -- Callback for select parent folder button.
@@ -33,12 +34,15 @@ function NewProjectDialog.addContent(self, contentBox)
 	self.folder = config.lastOpenFolder
 
 	local projectTitle = gui.Text("Project Title:", labelFontData, 100, "C", "C", "center", "fill")
+	projectTitle.color = style.textColor
 	local titleField = InputField(defaultProjectName, 250):setMode("none", "none")
 	local parentFolder = gui.Text("Select Parent Folder:", labelFontData, 100, "C", "C", "center", "fill")
+	parentFolder.color = style.textColor
 	local selectFolderBtn = Button("...", nil, "center")
 	local finalPath = gui.Text("Final Project Path:", labelFontData, 100, "C", "C", "center", "fill")
+	finalPath.color = style.textColor
 	local path = gui.Text(self.folder..defaultProjectName, pathLabelFontData, 100, "C", "C", "center", "fill", true)
-	path.color = {1, 1, 1, 0.5}
+	path.color = style.dimTextColor
 	contentColumn.children = {
 		projectTitle,
 		titleField,

@@ -7,8 +7,8 @@ local signals = require "core.signals"
 local PanelTheme = require "core.ui.widgets.themes.PanelTheme"
 local AddPropertyDialog = require "core.ui.AddPropertyDialog"
 local PropData = require "core.commands.data.PropData"
+local style = require "core.ui.style"
 
-local headerFont = { "core/assets/font/OpenSans-Semibold.ttf", 17 }
 local propClass = _G.propClassList
 
 local spacing = 2
@@ -17,8 +17,9 @@ function PropertyPanel.set(self, ruu)
 	PropertyPanel.super.set(self, spacing, false, nil, 250, 600, "E", "E", "fill")
 	self:setPad(4, 4)
 	self.children = {
-		gui.Text("Properties", headerFont, 250, "C", "C", "center", "fill"),
+		gui.Text("Properties", style.titleFont, 250, "C", "C", "center", "fill"),
 	}
+	self.children[1].color = style.titleTextColor
 	self.layer = "gui"
 	self.ruu = ruu
 	self.widget = self.ruu:Panel(self, PanelTheme)
