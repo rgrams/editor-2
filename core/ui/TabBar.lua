@@ -6,10 +6,8 @@ local scenes = require "core.scenes"
 local signals = require "core.signals"
 local Tab = require "core.ui.widgets.Tab"
 local PanelTheme = require "core.ui.widgets.themes.PanelTheme"
-local TabTheme = require "core.ui.widgets.themes.TabTheme"
-local TabCloseButtonTheme = require "core.ui.widgets.themes.TabCloseButtonTheme"
 local tabFont = new.font(unpack(Tab.font))
-local maxTabTitleWidth = Tab.width - Tab.buttonWidth + 3
+local maxTabTitleWidth = Tab.width - Tab.closeBtnWidth + 3
 
 local spacing = 2
 local width = 100
@@ -50,9 +48,9 @@ function TabBar.addTab(self, text, scene)
 	local tab = Tab(TabBar.getTrimmedText(text))
 	self.tree:add(tab, self)
 
-	local closeWgt = self.ruu:Button(tab.closeBtn, self.tabCloseBtnPressed, TabCloseButtonTheme)
+	local closeWgt = tab.closeBtn:initRuu(self.ruu, self.tabCloseBtnPressed)
 
-	local wgt = self.ruu:RadioButton(tab, self.tabBtnPressed, false, TabTheme)
+	local wgt = tab:initRuu(self.ruu, self.tabBtnPressed, self)
 	wgt.scene = scene
 	wgt.closeWgt = closeWgt -- Used in TabBar.removeTab()
 	wgt:args(self, wgt)

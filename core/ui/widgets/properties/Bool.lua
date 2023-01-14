@@ -5,12 +5,10 @@ Bool.className = "Bool"
 
 local PropData = require "core.commands.data.PropData"
 local Checkbox = require "core.ui.widgets.Checkbox"
-local CheckboxTheme = require "core.ui.widgets.themes.CheckboxTheme"
 
 function Bool.set(self, name, value, PropClass, propObj)
 	Bool.super.set(self, name, value, PropClass, propObj)
 	self.checkbox = Checkbox()
-	self.checkbox.color = { 1.65, 0.65, 0.65, 1 }
 	table.insert(self.children, self.checkbox)
 end
 
@@ -33,7 +31,7 @@ end
 
 function Bool.initRuu(self, ruu, navList)
 	Bool.super.initRuu(self, ruu, navList)
-	self.wgt = self.ruu:ToggleButton(self.checkbox, self.onToggle, self.value, CheckboxTheme)
+	self.wgt = self.checkbox:initRuu(ruu, self.onToggle, self.value)
 	self.wgt:args(self, self.wgt)
 	self:addWidget(self.wgt)
 end

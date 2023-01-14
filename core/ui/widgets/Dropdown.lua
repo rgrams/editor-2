@@ -3,19 +3,17 @@ local Dropdown = gui.Column:extend()
 Dropdown.className = "Dropdown"
 
 local Ruu = require "core.ui.ruu.ruu"
-local Button = require "core.ui.widgets.Button"
-local MenuButtonTheme = require "core.ui.widgets.themes.MenuButtonTheme"
+local MenuButton = require "core.ui.widgets.MenuButton"
 
 local spacing = 1
 local pad = 2
-local width = Button.width + pad*2
 
  -- item = { text=, fn=, args= }
 function Dropdown.set(self, x, y, items, focusedIndex)
 	self.initFocusIndex = focusedIndex or 1
-	local height = #items * (Button.height + spacing) - spacing + pad*2
+	local height = #items * (MenuButton.height + spacing) - spacing + pad*2
 
-	local fnt = MenuButtonTheme.font
+	local fnt = MenuButton.fontObj
 	local maxTextWidth = 0
 	for i,item in ipairs(items) do
 		local w = fnt:getWidth(item.text)
@@ -49,8 +47,7 @@ function Dropdown.init(self)
 	-- Initialize Ruu stuff.
 	local wgtMap = {}
 	for i,btn in ipairs(self.children) do
-		local wgt = self.ruu:Button(btn, self.confirm, MenuButtonTheme)
-		btn.widget = wgt
+		local wgt = btn:initRuu(self.ruu, self.confirm)
 		wgt:args(self, btn, wgt, self.items[i])
 		table.insert(wgtMap, { wgt })
 	end
@@ -67,7 +64,7 @@ function Dropdown.final(self)
 end
 
 function Dropdown.addButtonObject(self, btnText)
-	local btn = Button(btnText, self.w - pad*2):setMode("fill")
+	local btn = MenuButton(btnText, self.w - pad*2):setMode("fill")
 	btn.layer = "dropdown"
 	btn.text.layer = "dropdown text"
 	table.insert(self.children, btn)

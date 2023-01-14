@@ -56,7 +56,7 @@ end
 function DialogBox.addButtons(self, buttonBox)
 	local okBtn = Button("OK", nil, "center")
 	buttonBox.children = { okBtn }
-	self.ruu:Button(okBtn, self.close):args(self)
+	okBtn:initRuu(self.ruu, self.close, self)
 	self.initialFocusWidget = okBtn.widget
 end
 

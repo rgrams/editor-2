@@ -13,7 +13,6 @@ function Enum.set(self, name, value, PropClass, propObj)
 
 	self.button = Button(value, nil, "center")
 	table.insert(self.children, self.button)
-	self.button.color = { 1.65, 0.65, 0.65, 1 }
 
 	local items = {} -- item = { text=, fn=, args= }
 	self.dropdownItems = items
@@ -53,7 +52,7 @@ end
 function Enum.initRuu(self, ruu, navList)
 	Enum.super.initRuu(self, ruu, navList)
 
-	self.wgt = self.ruu:Button(self.button, self.onButtonPress)
+	self.wgt = self.button:initRuu(self.ruu, self.onButtonPress)
 	self.wgt:args(self, self.wgt)
 	self:addWidget(self.wgt)
 end

@@ -52,7 +52,7 @@ function NewProjectDialog.addContent(self, contentBox)
 	self.finalPathLabel = path
 	local field = self.ruu:InputField(titleField, titleSet, defaultProjectName, InputFieldTheme)
 	field:args(self, field)
-	local folderBtn = self.ruu:Button(selectFolderBtn, selectParentFolder):args(self)
+	local folderBtn = selectFolderBtn:initRuu(self.ruu, selectParentFolder, self)
 	self.titleField = field
 	self.selectFolderBtn = folderBtn
 end
@@ -63,8 +63,8 @@ function NewProjectDialog.addButtons(self, buttonBox)
 	local cancelBtn = Button("Cancel", btnWidth, "center"):setPos(-btnOX)
 	local confirmBtn = Button("Create Project", btnWidth, "center"):setPos(btnOX)
 	buttonBox.children = { cancelBtn, confirmBtn }
-	local btn1 = self.ruu:Button(cancelBtn, self.cancel):args(self)
-	local btn2 = self.ruu:Button(confirmBtn, createProject):args(self)
+	local btn1 = cancelBtn:initRuu(self.ruu, self.cancel, self)
+	local btn2 = confirmBtn:initRuu(self.ruu, createProject, self)
 	self.ruu:mapNextPrev({ self.titleField, self.selectFolderBtn, btn1, btn2 })
 	self.ruu:mapNeighbors({
 		{ self.titleField },

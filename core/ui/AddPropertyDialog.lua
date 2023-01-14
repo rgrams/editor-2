@@ -44,11 +44,11 @@ function AddPropDialog.set(self, callback, callbackArgs)
 
 	local inputWgt = self.ruu:InputField(self.inputFld, self.inputConfirmed, "propertyName", InputFieldTheme)
 	inputWgt:args(self, inputWgt)
-	local typeWgt = self.ruu:Button(self.typeBtn, self.typeBtnPressed)
+	local typeWgt = self.typeBtn:initRuu(self.ruu, self.typeBtnPressed)
 	typeWgt:args(self, typeWgt)
 
-	local cancelWgt = self.ruu:Button(self.cancelBtn, self.cancelBtnPressed):args(self)
-	local OKWgt = self.ruu:Button(self.OKBtn, self.OKBtnPressed):args(self)
+	local cancelWgt = self.cancelBtn:initRuu(self.ruu, self.cancelBtnPressed, self)
+	local OKWgt = self.OKBtn:initRuu(self.ruu, self.OKBtnPressed, self)
 
 	self.wgtMap = { inputWgt, typeWgt, cancelWgt, OKWgt }
 	self.ruu:mapNextPrev(self.wgtMap)

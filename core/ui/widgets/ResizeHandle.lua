@@ -1,8 +1,14 @@
 
 local ResizeHandle = gui.Node:extend()
 
-local Theme = require "core.ui.widgets.themes.ResizeHandleTheme"
+ResizeHandle.theme = require "core.ui.object-as-theme"
 
+ResizeHandle.normalColor = { 0.17, 0.17, 0.17, 1 }
+ResizeHandle.hoverColor = { 0.25, 0.25, 0.25, 1 }
+ResizeHandle.pressColor = { 0.5, 0.5, 0.5, 1 }
+
+local xCursor = love.mouse.getSystemCursor("sizewe")
+local yCursor = love.mouse.getSystemCursor("sizens")
 ResizeHandle.width = 6
 
 function ResizeHandle.set(self, target, dir, isYAxis, width)
@@ -12,7 +18,7 @@ function ResizeHandle.set(self, target, dir, isYAxis, width)
 	self.dir = dir or -1
 	self.isXAxis = not isYAxis
 	self.layer = "gui"
-	self.color = Theme.normalColor
+	self.color = self.normalColor
 end
 
 function ResizeHandle.init(self)
@@ -25,28 +31,30 @@ end
 
 function ResizeHandle.initRuu(self, ruu)
 	self.ruu = ruu
-	self.widget = ruu:Panel(self, Theme)
-	self.widget.press = self.press
-	self.widget.release = self.release
-	self.widget.drag = self.drag
+	local widget = ruu:Panel(self, self.theme)
+	widget.object = self
+	self.widget = widget
+	widget.press = self.pressWgt
+	widget.release = self.releaseWgt
+	widget.drag = self.dragWgt
 end
 
 function ResizeHandle.destroyRuu(self)
 	self.ruu:destroy(self.widget)
 end
 
-function ResizeHandle.press(wgt, depth, mx, my, isKeyboard)
+function ResizeHandle.pressWgt(wgt, depth, mx, my, isKeyboard)
 	wgt.super.press(wgt, depth, mx, my, isKeyboard)
 	if isKeyboard or depth ~= 1 then  return  end
 	wgt.ruu:startDrag(wgt, "resize")
 end
 
-function ResizeHandle.release(wgt, depth, mx, my, isKeyboard)
+function ResizeHandle.releaseWgt(wgt, depth, mx, my, isKeyboard)
 	wgt.super.release(wgt, depth, mx, my, isKeyboard)
 	wgt.ruu:stopDraggingWidget(wgt)
 end
 
-function ResizeHandle.drag(wgt, dx, dy, dragType)
+function ResizeHandle.dragWgt(wgt, dx, dy, dragType)
 	local self = wgt.object
 	if self.target then
 		if self.isXAxis and dx ~= 0 then
@@ -61,10 +69,50 @@ function ResizeHandle.drag(wgt, dx, dy, dragType)
 	end
 end
 
+function ResizeHandle.hover(self, wgt)
+	self.color = self.hoverColor
+	love.mouse.setCursor(self.isXAxis and xCursor or yCursor)
+end
+
+function ResizeHandle.unhover(self, wgt)
+	self.color = self.normalColor
+	love.mouse.setCursor()
+end
+
+function ResizeHandle.focus(self, widget)  end
+function ResizeHandle.unfocus(self, widget)  end
+
+function ResizeHandle.press(self, wgt)
+	self.color = self.pressColor
+end
+
+function ResizeHandle.release(self, wgt, dontFire, mx, my, isKeyboard)
+	self.color = self.isHovered and self.hoverColor or self.normalColor
+end
+
 function ResizeHandle.draw(self)
-	local widget = self.widget
-	if widget then
-		widget.theme.draw(widget, self)
+	love.graphics.setColor(self.color)
+	local w, h = self.w, self.h
+	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
+
+	-- Draw handle lines.
+	love.graphics.setColor(0, 0, 0, 1)
+	local padX = 2
+	local left, right = -w/2 + padX, w/2 - padX
+	local lineCt = 4
+	local handleLineWidth = 1
+	local spacing = 3 + handleLineWidth
+	for i=0,lineCt-1 do
+		local topY = -(lineCt - 1)/2 * spacing
+		local y = topY + i*spacing
+		love.graphics.line(left, y, right, y)
+	end
+
+	if self.widget and self.widget.isFocused then
+		local lineWidth = 1
+		love.graphics.setColor(1, 1, 1, 0.2)
+		w, h = w - lineWidth, h - lineWidth
+		love.graphics.rectangle("line", -w/2, -h/2, w, h)
 	end
 end
 

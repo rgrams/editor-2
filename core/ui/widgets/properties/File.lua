@@ -61,7 +61,7 @@ function File.initRuu(self, ruu, navList)
 	self.fieldWgt.alignRightOnUnfocus = true
 	self:addWidget(self.fieldWgt)
 
-	self.buttonWgt = self.ruu:Button(self.button, self.buttonPressed)
+	self.buttonWgt = self.button:initRuu(self.ruu, self.buttonPressed)
 	self.buttonWgt:args(self)
 	self:addWidget(self.buttonWgt)
 end

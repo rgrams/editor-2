@@ -28,18 +28,18 @@ function MultiChoiceBox.addContent(self, contentBox)
 
 	-- Add dropdown button.
 	self.dropdownBtn = Button(self.choices[1], dropdownWidth, "center")
-	self.ruu:Button(self.dropdownBtn, self.dropdownBtnPressed):args(self)
+	self.dropdownBtn:initRuu(self.ruu, self.dropdownBtnPressed, self)
 	contentBox.children = { self.dropdownBtn }
 end
 
 function MultiChoiceBox.addButtons(self, buttonBox)
 	self.cancelBtn = Button("Cancel", nil, "center")
 	self.cancelBtn:setPivot("E"):setPos(-15, 0)
-	self.ruu:Button(self.cancelBtn, self.cancel):args(self)
+	self.cancelBtn:initRuu(self.ruu, self.cancel, self)
 
 	self.okBtn = Button("OK", nil, "center")
 	self.okBtn:setPivot("W"):setPos(15, 0)
-	self.ruu:Button(self.okBtn, self.okBtnPressed):args(self)
+	self.okBtn:initRuu(self.ruu, self.okBtnPressed, self)
 
 	buttonBox.children = { self.cancelBtn, self.okBtn }
 end

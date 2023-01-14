@@ -79,7 +79,7 @@ function Font.initRuu(self, ruu, navList)
 	self.pathWgt.alignRightOnUnfocus = true
 	self:addWidget(self.pathWgt)
 
-	self.buttonWgt = self.ruu:Button(self.button, self.buttonPressed)
+	self.buttonWgt = self.button:initRuu(self.ruu, self.buttonPressed)
 	self.buttonWgt:args(self)
 	self:addWidget(self.buttonWgt)
 end
