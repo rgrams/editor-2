@@ -6,10 +6,9 @@ Font.className = "Font"
 local PropData = require "core.commands.data.PropData"
 local config = require "core.config"
 local InputField = require "core.ui.widgets.InputField"
+local FilepathInputField = require "core.ui.widgets.InputField-Filepath"
 local Button = require "core.ui.widgets.Button"
 local fileDialog = require "core.lib.native-file-dialog.dialog"
-local InputFieldTheme = require "core.ui.widgets.themes.InputFieldTheme"
-local FilepathFieldTheme = require "core.ui.widgets.themes.FilepathFieldTheme"
 local fileUtil = require "core.lib.file-util"
 
 Font.labelWidth = Font.width/3
@@ -21,7 +20,7 @@ function Font.set(self, name, value, PropClass, propObj)
 	self.sizeField = InputField(self.value[2], 35)
 	table.insert(self.children, self.sizeField)
 
-	self.pathField = InputField(self.value[1], 115)
+	self.pathField = FilepathInputField(self.value[1], 115)
 	table.insert(self.children, self.pathField)
 
 	self.button = Button("...", dialogBtnWidth, "center")
@@ -70,13 +69,12 @@ end
 function Font.initRuu(self, ruu, navList)
 	Font.super.initRuu(self, ruu, navList)
 
-	self.sizeWgt = self.ruu:InputField(self.sizeField, self.onConfirm, self.value[2], InputFieldTheme)
+	self.sizeWgt = self.sizeField:initRuu(self.ruu, self.onConfirm)
 	self.sizeWgt:args(self, self.sizeWgt, "size")
 	self:addWidget(self.sizeWgt)
 
-	self.pathWgt = self.ruu:InputField(self.pathField, self.onConfirm, self.value[1], FilepathFieldTheme)
+	self.pathWgt = self.pathField:initRuu(self.ruu, self.onConfirm)
 	self.pathWgt:args(self, self.pathWgt, "path")
-	self.pathWgt.alignRightOnUnfocus = true
 	self:addWidget(self.pathWgt)
 
 	self.buttonWgt = self.button:initRuu(self.ruu, self.buttonPressed)

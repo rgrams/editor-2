@@ -2,11 +2,24 @@
 local InputField = gui.Node:extend()
 InputField.className = "InputField"
 
+local DefaultTheme = require("core.ui.ruu.defaultThemes").InputField
+InputField.theme = DefaultTheme:extend()
+
+local setValue = require "core.lib.setValue"
+
 InputField.font = { "core/assets/font/OpenSans-Regular.ttf", 14 }
 InputField.width = 100
 InputField.height = 24
 local pad = 2
 local cursorW = 2
+
+InputField.normalValue = 0.18
+InputField.hoverValue = 0.15
+InputField.pressValue = 0.1
+
+InputField.bevelLighten = 0.15
+InputField.bevelHoverLighten = 0.20
+InputField.bevelDarken = 0.15
 
 local selectionColor = { 0.16, 0.44, 0.78, 1 }
 local cursorColor = { 1, 1, 1, 1 }
@@ -19,11 +32,11 @@ function RuuInputField.ruuInput(wgt, depth, action, value, change, rawChange, is
 	end
 end
 
-local function selectionDraw(self)
+-- Simple draw method for selection and cursor nodes.
+local function drawRect(self)
 	love.graphics.setColor(self.color)
 	love.graphics.rectangle("fill", -self.w/2, -self.h/2, self.w, self.h)
 end
-local cursorDraw = selectionDraw
 
 function InputField.set(self, text, width)
 	width = width or self.width
@@ -43,20 +56,69 @@ function InputField.set(self, text, width)
 		} })
 	}
 
-	self.selection.draw = selectionDraw
-	self.cursor.draw = cursorDraw
+	self.selection.draw = drawRect
+	self.cursor.draw = drawRect
 	self.selection.color = selectionColor
 	self.cursor.color = cursorColor
 
-	self.text.color = {1, 1, 1, 1}
-	self.color = {0.3, 0.3, 0.3, 1}
+	self.text.color = { 1, 1, 1, 1 }
+	self.color = { 1, 1, 1, 1 }
+	setValue(self.color, self.normalValue)
 	self.layer = "gui"
 end
 
+function InputField.initRuu(self, ruu, fn, ...)
+	self.ruu = ruu
+	local widget = ruu:InputField(self, fn, self.text.text, self.theme):args(...)
+	widget.object = self
+	self.widget = widget
+	return widget
+end
+
+function InputField.theme.init(wgt, self)
+	InputField.theme.super.init(wgt, self)
+	setValue(self.color, self.normalValue)
+end
+
+function InputField.theme.hover(wgt)
+	local self = wgt.object
+	local val = wgt.isPressed and self.pressValue or self.hoverValue
+	setValue(self.color, val)
+end
+
+function InputField.theme.unhover(wgt)
+	local self = wgt.object
+	setValue(self.color, self.normalValue)
+end
+
+function InputField.theme.press(wgt)
+	local self = wgt.object
+	setValue(self.color, self.pressValue)
+end
+
+function InputField.theme.release(wgt)
+	local self = wgt.object
+	local val = wgt.isHovered and self.hoverValue or self.normalValue
+	setValue(self.color, val)
+end
+
 function InputField.draw(self)
-	local widget = self.widget
-	if widget then
-		widget.theme.draw(widget, self)
+	love.graphics.setColor(self.color)
+	local w, h = self.w, self.h
+	love.graphics.rectangle("fill", -w/2, -h/2, w, h)
+
+	local val, alpha = self.color[1], self.color[4]
+	local v1 = val - self.bevelDarken
+	local v2 = val + (self.isHovered and self.bevelHoverLighten or self.bevelLighten)
+	love.graphics.setColor(v1, v1, v1, alpha)
+	love.graphics.rectangle("fill", -w/2, -h/2, w, 2)
+	love.graphics.setColor(v2, v2, v2, alpha)
+	love.graphics.rectangle("fill", -w/2, h/2 - 2, w, 2)
+
+	if self.widget and self.widget.isFocused then
+		love.graphics.setColor(1, 1, 1, 1)
+		local fw, fh = w+1, h+1
+		love.graphics.rectangle("line", -fw/2, -fh/2, fw, fh)
 	end
 end
 

@@ -5,7 +5,6 @@ Vec2.className = "Vec2"
 
 local PropData = require "core.commands.data.PropData"
 local InputField = require "core.ui.widgets.InputField"
-local InputFieldTheme = require "core.ui.widgets.themes.InputFieldTheme"
 
 local sublabelFont = { "core/assets/font/OpenSans-Regular.ttf", 12 }
 
@@ -60,8 +59,8 @@ end
 function Vec2.initRuu(self, ruu, navList)
 	Vec2.super.initRuu(self, ruu, navList)
 
-	self.widgetX = self.ruu:InputField(self.fieldX, self.onConfirm, self.xValue, InputFieldTheme)
-	self.widgetY = self.ruu:InputField(self.fieldY, self.onConfirm, self.yValue, InputFieldTheme)
+	self.widgetX = self.fieldX:initRuu(self.ruu, self.onConfirm)
+	self.widgetY = self.fieldY:initRuu(self.ruu, self.onConfirm)
 	self.widgetX:args(self, self.widgetX, "x")
 	self.widgetY:args(self, self.widgetY, "y")
 	self:addWidget(self.widgetX)

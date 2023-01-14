@@ -6,7 +6,6 @@ local config = require "core.config"
 local fileDialog = require "core.lib.native-file-dialog.dialog"
 local Button = require "core.ui.widgets.Button"
 local InputField = require "core.ui.widgets.InputField"
-local InputFieldTheme = require "core.ui.widgets.themes.InputFieldTheme"
 
 NewProjectDialog.width = 600
 NewProjectDialog.height = 400
@@ -50,7 +49,7 @@ function NewProjectDialog.addContent(self, contentBox)
 	}
 	self.parentFolderLabel = parentFolder
 	self.finalPathLabel = path
-	local field = self.ruu:InputField(titleField, titleSet, defaultProjectName, InputFieldTheme)
+	local field = titleField:initRuu(self.ruu, titleSet)
 	field:args(self, field)
 	local folderBtn = selectFolderBtn:initRuu(self.ruu, selectParentFolder, self)
 	self.titleField = field

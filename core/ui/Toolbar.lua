@@ -4,7 +4,6 @@ local Toolbar = gui.Row:extend()
 local config = require "core.config"
 local InputField = require "core.ui.widgets.InputField"
 local PanelTheme = require "core.ui.widgets.themes.PanelTheme"
-local InputFieldTheme = require "core.ui.widgets.themes.InputFieldTheme"
 
 local spacing = 2
 local width = 100
@@ -29,7 +28,7 @@ function Toolbar.set(self, ruu)
 	local snapField = InputField(snapIncr, 40)
 	table.insert(self.children, snapField)
 	snapField:setAnchor("NW"):setPivot("NW")
-	local snapWgt = self.ruu:InputField(snapField, self.snapIncrementSet, snapIncr, InputFieldTheme)
+	local snapWgt = snapField:initRuu(self.ruu, self.snapIncrementSet)
 	snapWgt:args(self, snapWgt)
 end
 

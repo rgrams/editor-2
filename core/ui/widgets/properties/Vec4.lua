@@ -5,7 +5,6 @@ Vec4.className = "Vec4"
 
 local PropData = require "core.commands.data.PropData"
 local InputField = require "core.ui.widgets.InputField"
-local InputFieldTheme = require "core.ui.widgets.themes.InputFieldTheme"
 
 local sublabelFont = { "core/assets/font/OpenSans-Regular.ttf", 12 }
 local fieldWidth = 32
@@ -74,10 +73,10 @@ end
 function Vec4.initRuu(self, ruu, navList)
 	Vec4.super.initRuu(self, ruu, navList)
 
-	self.widgetX = self.ruu:InputField(self.fieldX, self.onConfirm, self.X, InputFieldTheme)
-	self.widgetY = self.ruu:InputField(self.fieldY, self.onConfirm, self.Y, InputFieldTheme)
-	self.widgetZ = self.ruu:InputField(self.fieldZ, self.onConfirm, self.Z, InputFieldTheme)
-	self.widgetW = self.ruu:InputField(self.fieldW, self.onConfirm, self.W, InputFieldTheme)
+	self.widgetX = self.fieldX:initRuu(self.ruu, self.onConfirm)
+	self.widgetY = self.fieldY:initRuu(self.ruu, self.onConfirm)
+	self.widgetZ = self.fieldZ:initRuu(self.ruu, self.onConfirm)
+	self.widgetW = self.fieldW:initRuu(self.ruu, self.onConfirm)
 	self.widgetX:args(self, self.widgetX, 1)
 	self.widgetY:args(self, self.widgetY, 2)
 	self.widgetZ:args(self, self.widgetZ, 3)

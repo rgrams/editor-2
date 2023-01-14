@@ -1,6 +1,6 @@
 
-local EmptyTheme = require(GetRequireFolder(...) .. "EmptyTheme")
-local PanelTheme = EmptyTheme:extend()
+local Class = require "core.philtre.core.base-class"
+local PanelTheme = Class:extend()
 
 local value = 0.22
 
@@ -9,9 +9,17 @@ PanelTheme.bevelDarken = 0.1
 PanelTheme.bevelDepth = 1
 
 function PanelTheme.init(self, themeData)
-	PanelTheme.super.init(self, themeData)
+	self.object = themeData
+	themeData.widget = self
 	self.object.color = { value, value, value, 1 }
 end
+
+function PanelTheme.hover(self)  end
+function PanelTheme.unhover(self)  end
+function PanelTheme.focus(self, isKeyboard)  end
+function PanelTheme.unfocus(self, isKeyboard)  end
+function PanelTheme.press(self, mx, my, isKeyboard)  end
+function PanelTheme.release(self, dontFire, mx, my, isKeyboard)  end
 
 function PanelTheme.draw(self, obj)
 	love.graphics.setColor(obj.color)

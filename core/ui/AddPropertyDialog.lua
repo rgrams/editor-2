@@ -6,7 +6,6 @@ local Button = require "core.ui.widgets.Button"
 local InputField = require "core.ui.widgets.InputField"
 local Dropdown = require "core.ui.widgets.Dropdown"
 local PanelTheme = require "core.ui.widgets.themes.PanelTheme"
-local InputFieldTheme = require "core.ui.widgets.themes.InputFieldTheme"
 
 local headerFont = { "core/assets/font/OpenSans-Semibold.ttf", 17 }
 local spacing = 2
@@ -42,7 +41,7 @@ function AddPropDialog.set(self, callback, callbackArgs)
 	self.ruu:registerLayers({"gui"})
 	self.widget = self.ruu:Panel(self, PanelTheme)
 
-	local inputWgt = self.ruu:InputField(self.inputFld, self.inputConfirmed, "propertyName", InputFieldTheme)
+	local inputWgt = self.inputFld:initRuu(self.ruu, self.inputConfirmed)
 	inputWgt:args(self, inputWgt)
 	local typeWgt = self.typeBtn:initRuu(self.ruu, self.typeBtnPressed)
 	typeWgt:args(self, typeWgt)

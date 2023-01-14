@@ -5,10 +5,9 @@ File.className = "File"
 
 local PropData = require "core.commands.data.PropData"
 local config = require "core.config"
-local InputField = require "core.ui.widgets.InputField"
+local FilepathInputField = require "core.ui.widgets.InputField-Filepath"
 local Button = require "core.ui.widgets.Button"
 local fileDialog = require "core.lib.native-file-dialog.dialog"
-local FilepathFieldTheme = require "core.ui.widgets.themes.FilepathFieldTheme"
 local fileUtil = require "core.lib.file-util"
 
 File.labelWidth = File.width/3
@@ -17,7 +16,7 @@ local dialogBtnWidth = 24
 function File.set(self, name, value, PropClass, propObj)
 	File.super.set(self, name, value, PropClass, propObj)
 
-	self.field = InputField(self.value, 150)
+	self.field = FilepathInputField(self.value, 150)
 	table.insert(self.children, self.field)
 
 	self.button = Button("...", dialogBtnWidth, "center")
@@ -56,9 +55,8 @@ end
 function File.initRuu(self, ruu, navList)
 	File.super.initRuu(self, ruu, navList)
 
-	self.fieldWgt = self.ruu:InputField(self.field, self.onConfirm, self.value, FilepathFieldTheme)
+	self.fieldWgt = self.field:initRuu(self.ruu, self.onConfirm)
 	self.fieldWgt:args(self, self.fieldWgt)
-	self.fieldWgt.alignRightOnUnfocus = true
 	self:addWidget(self.fieldWgt)
 
 	self.buttonWgt = self.button:initRuu(self.ruu, self.buttonPressed)

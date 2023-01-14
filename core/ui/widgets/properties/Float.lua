@@ -5,7 +5,6 @@ Float.className = "Float"
 
 local PropData = require "core.commands.data.PropData"
 local InputField = require "core.ui.widgets.InputField"
-local InputFieldTheme = require "core.ui.widgets.themes.InputFieldTheme"
 
 function Float.set(self, name, value, PropClass, propObj)
 	Float.super.set(self, name, value, PropClass, propObj)
@@ -38,7 +37,7 @@ end
 
 function Float.initRuu(self, ruu, navList)
 	Float.super.initRuu(self, ruu, navList)
-	self.wgt = self.ruu:InputField(self.field, self.onConfirm, self.value, InputFieldTheme)
+	self.wgt = self.field:initRuu(self.ruu, self.onConfirm)
 	self.wgt:args(self, self.wgt)
 	self:addWidget(self.wgt)
 end

@@ -5,7 +5,6 @@ String.className = "String"
 
 local PropData = require "core.commands.data.PropData"
 local InputField = require "core.ui.widgets.InputField"
-local InputFieldTheme = require "core.ui.widgets.themes.InputFieldTheme"
 
 String.labelWidth = String.width/4
 
@@ -37,7 +36,7 @@ end
 
 function String.initRuu(self, ruu, navList)
 	String.super.initRuu(self, ruu, navList)
-	self.wgt = self.ruu:InputField(self.field, self.onConfirm, self.value, InputFieldTheme)
+	self.wgt = self.field:initRuu(self.ruu, self.onConfirm)
 	self.wgt:args(self, self.wgt)
 	self:addWidget(self.wgt)
 end
