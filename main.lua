@@ -45,16 +45,6 @@ local defaultLayer = "default"
 
 local guiDebugDrawEnabled = false
 
-local function requireModulesInFolder(folderPath) -- path should include trailing slash
-	local requireFolderPath = folderPath:gsub("[\\/]", ".")
-	for i,filename in ipairs(love.filesystem.getDirectoryItems(folderPath)) do
-		local info = love.filesystem.getInfo(folderPath..filename)
-		if info and info.type == "file" and filename:sub(-4) == ".lua" then
-			require(requireFolderPath..filename:sub(1, -5))
-		end
-	end
-end
-
 function love.load()
 	math.randomseed(love.timer.getTime() * 10000)
 	math.random()  math.random()  math.random()
@@ -69,13 +59,13 @@ function love.load()
 	love.graphics.setBackgroundColor(style.viewportBackgroundColor)
 
 	-- Load property classes.
-	requireModulesInFolder("core/objects/properties/")
+	fileUtil.requireModulesInFolder("core/objects/properties/")
 
 	-- Load editor object classes.
-	requireModulesInFolder("core/objects/")
+	fileUtil.requireModulesInFolder("core/objects/")
 
 	-- Load exporters.
-	requireModulesInFolder("core/io/")
+	fileUtil.requireModulesInFolder("core/io/")
 
 	editorTree = SceneTree(layers, defaultLayer)
 
@@ -88,8 +78,8 @@ function love.load()
 	-- Add default editing scene.
 	scenes.add( scenes.create() )
 
-	requireModulesInFolder("core/plugins/")
-	requireModulesInFolder("user/plugins/")
+	fileUtil.requireModulesInFolder("core/plugins/")
+	fileUtil.requireModulesInFolder("user/plugins/")
 end
 
 function love.update(dt)
