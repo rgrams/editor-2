@@ -58,6 +58,10 @@ function Dropdown.init(self)
 	Dropdown.super.init(self)
 	self.pos.x, self.pos.y = unpack(self._initialPos) -- To ignore any allocation scale.
 	Input.enable(self)
+	self:updateTransform()
+	SceneTree.updateTransforms(self) -- A bit hokey, but updates recursive child transforms.
+	-- TODO: Find out why our transforms are out of date here.
+	self.ruu:mouseMoved(love.mouse.getPosition())
 end
 
 function Dropdown.final(self)
