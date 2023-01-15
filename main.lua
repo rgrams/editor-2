@@ -12,20 +12,7 @@ _G.scene_clipboard = nil
 local config = require "core.config"
 local fileUtil = require "core.lib.file-util"
 
-do -- Load user config.
-	local dir = fileUtil.splitFilepath(love.filesystem.getSource().."/")
-	local filepath = dir .. config.userConfigFilename
-	print("Checking for user config file at: "..filepath)
-	local userConfig = fileUtil.loadLuaFromAbsolutePath(filepath)
-	if userConfig then
-		for k,v in pairs(userConfig) do
-			config[k] = v
-		end
-		print("   user config loaded.")
-	else
-		print("   not found.")
-	end
-end
+config.load()
 
 do -- Initialize window
 	love.window.setMode(config.winWidth, config.winHeight, config.windowSettings)
@@ -128,20 +115,13 @@ function love.draw()
 	end
 end
 
-local function saveWindowPosInConfig()
-	local win = config.windowSettings
-	win.x, win.y, win.display = love.window.getPosition()
-	win.x = win.x - config.winDecorationOX
-	win.y = win.y - config.winDecorationOY
-end
-
 function love.resize(w, h)
 	screenRect.w, screenRect.h = w, h
 	window:allocate(screenRect:unpack())
 	_G.shouldRedraw = true
 	if not love.window.isMaximized() then
 		config.winWidth, config.winHeight = w, h
-		saveWindowPosInConfig()
+		config.storeWindowPos()
 	end
 end
 
@@ -178,33 +158,5 @@ function love.filedropped(file)
 end
 
 function love.quit()
-	-- Save user config.
-
-	local dir = fileUtil.splitFilepath(love.filesystem.getSource().."/")
-	local filepath = dir .. config.userConfigFilename
-	print("Saving user config file at: "..filepath)
-	local file, errMsg = io.open(filepath, "w")
-	if file then
-		local userConfig = {}
-		userConfig.winWidth = config.winWidth
-		userConfig.winHeight = config.winHeight
-		saveWindowPosInConfig() -- No callback for window -move-, so grab it now.
-		userConfig.windowSettings = config.windowSettings
-		userConfig.isWindowMaximized = love.window.isMaximized()
-		userConfig.winDecorationOX = config.winDecorationOX
-		userConfig.winDecorationOY = config.winDecorationOY
-		userConfig.lastOpenFolder = config.lastOpenFolder
-		userConfig.lastSaveFolder = config.lastSaveFolder
-		userConfig.lastExportFolder = config.lastExportFolder
-		userConfig.lastFontPropFolder = config.lastFontPropFolder
-		userConfig.lastFilePropFolder = config.lastFilePropFolder
-		userConfig.translateSnapIncrement = config.translateSnapIncrement
-
-		local objToString = require "core.philtre.lib.object-to-string"
-		file:write("return "..objToString(userConfig).."\n")
-		file:close()
-		print("   saved config.")
-	else
-		print("   failed: "..errMsg)
-	end
+	config.save()
 end
