@@ -23,4 +23,8 @@ function M.alpha(color, a)
 	return color
 end
 
+function M.getValue(color)
+	return color[1]*0.2126 + color[2]*0.7152 + color[3]*0.0722
+end
+
 return M
