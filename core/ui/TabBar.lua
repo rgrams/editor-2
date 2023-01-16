@@ -23,6 +23,10 @@ function TabBar.set(self)
 	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
 end
 
+function TabBar.fromData(Class, data)
+	return Class()
+end
+
 function TabBar.initRuu(self, ruu)
 	self.ruu = ruu
 	self.widget = ruu:Panel(self, PanelTheme)

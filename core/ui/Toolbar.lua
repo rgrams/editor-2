@@ -30,6 +30,10 @@ function Toolbar.set(self)
 	self.snapField = snapField
 end
 
+function Toolbar.fromData(Class, data)
+	return Class()
+end
+
 function Toolbar.initRuu(self, ruu)
 	self.ruu = ruu
 	self.widget = ruu:Panel(self, PanelTheme)

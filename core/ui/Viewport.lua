@@ -29,6 +29,10 @@ function Viewport.set(self)
 	}
 end
 
+function Viewport.fromData(Class, data)
+	return Class()
+end
+
 function Viewport.initRuu(self, ruu)
 	self.ruu = ruu
 	self.widget = ruu:Panel(self)

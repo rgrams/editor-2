@@ -22,6 +22,11 @@ function ResizeHandle.set(self, target, dir, isYAxis, width)
 	self.color = self.normalColor
 end
 
+function ResizeHandle.fromData(Class, d)
+	local props = d.properties
+	return Class(props and props.target)
+end
+
 function ResizeHandle.init(self)
 	ResizeHandle.super.init(self)
 	if type(self.target) == "string" then

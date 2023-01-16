@@ -23,28 +23,18 @@ function UI.set(self)
 
 	self.widget = self.ruu:Panel(self)
 	self.widget.ruuInput = self.ruuInput
+	self.scripts = { updateSceneTitleScript }
+end
 
-	local vpCol = gui.Column(0, false, -1, 100, 100, "C", "C", "fill")
-	vpCol.name = "VPColumn"
-	vpCol.isGreedy = true
-	vpCol.children = {
-		TabBar(),
-		Viewport(),
-	}
+function UI.fromData(Class, data)
+	return Class()
+end
 
-	local mainRow = gui.Row(0, false, -1, 50, 50, "C", "C", "fill")
-	mainRow.name = "MainRow"
-	mainRow.isGreedy = true
-	mainRow.children = {
-		vpCol,
-		ResizeHandle("/Window/UI/MainRow/PropertyPanel"),
-		PropertyPanel()
-	}
+function UI.init(self)
+	UI.super.init(self)
 
-	self.children = {
-		Toolbar(),
-		mainRow,
-	}
+	local mainRow = self.children[2]
+	local vpCol = mainRow.children[1]
 
 	local toolbar = self.children[1]
 	local tabBar = vpCol.children[1]
@@ -61,15 +51,6 @@ function UI.set(self)
 	resizeHandle:initRuu(self.ruu)
 	self.propertyPanel:initRuu(self.ruu)
 
-	self.scripts = { updateSceneTitleScript }
-end
-
-function UI.fromData(Class, data)
-	return Class()
-end
-
-function UI.init(self)
-	UI.super.init(self)
 	self.inputMap = _G.editor._registerInputContext(self)
 	Input.enable(self)
 	self.ruu:mouseMoved(love.mouse.getPosition()) -- NOTE: Always gives 0, 0 :/

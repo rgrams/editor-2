@@ -8,7 +8,6 @@ local PanelTheme = require "core.ui.widgets.themes.PanelTheme"
 local AddPropertyDialog = require "core.ui.AddPropertyDialog"
 local PropData = require "core.commands.data.PropData"
 local style = require "core.ui.style"
-
 local propClass = _G.propClassList
 
 local spacing = 2
@@ -28,6 +27,10 @@ function PropertyPanel.set(self)
 	local signalFn = self.onSelectedObjectsModified
 	signals.subscribe(self, signalFn, "selection changed", "selected objects modified")
 	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
+end
+
+function PropertyPanel.fromData(Class, data)
+	return Class()
 end
 
 function PropertyPanel.initRuu(self, ruu)
