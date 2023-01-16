@@ -10,13 +10,11 @@ local spacing = 2
 local width = 100
 local height = 26
 
-function Toolbar.set(self, ruu)
+function Toolbar.set(self)
 	Toolbar.super.set(self, spacing, false, -1, width, height)
 	self:setMode("fill", "none")
 	self:setPad(4, 1)
 	self.layer = "gui"
-	self.ruu = ruu
-	self.widget = ruu:Panel(self, PanelTheme)
 	self.children =  {}
 
 	-- TODO: wrap this all into a labeled inputField class. (just a Node as root)
@@ -27,9 +25,15 @@ function Toolbar.set(self, ruu)
 	snapLabel.color = style.textColor
 	table.insert(self.children, snapLabel)
 	local snapField = InputField(snapIncr, 40)
-	table.insert(self.children, snapField)
 	snapField:setAnchor("NW"):setPivot("NW")
-	local snapWgt = snapField:initRuu(self.ruu, self.snapIncrementSet)
+	table.insert(self.children, snapField)
+	self.snapField = snapField
+end
+
+function Toolbar.initRuu(self, ruu)
+	self.ruu = ruu
+	self.widget = ruu:Panel(self, PanelTheme)
+	local snapWgt = self.snapField:initRuu(self.ruu, self.snapIncrementSet)
 	snapWgt:args(self, snapWgt)
 end
 

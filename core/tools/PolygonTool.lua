@@ -31,15 +31,14 @@ local segmentIntersectColor = PolygonTool.normalVertColor
 
 local dirKey = { left = {-1,0}, right = {1,0}, up = {0,-1}, down = {0,1} }
 
-function PolygonTool.set(self, ruu)
+function PolygonTool.set(self)
 	PolygonTool.super.set(self, 1, 1, "C", "C", "fill")
 	self.layer = "viewport"
-	self.ruu = ruu
 	signals.subscribe(self, self.onSceneAdded, "scene added")
 end
 
-function PolygonTool.init(self)
-	PolygonTool.super.init(self)
+function PolygonTool.initRuu(self, ruu)
+	self.ruu = ruu
 	self.widget = self.ruu:Panel(self)
 	self.widget.drag = self.drag
 	self.widget.press = self.press

@@ -13,7 +13,7 @@ local propClass = _G.propClassList
 
 local spacing = 2
 
-function PropertyPanel.set(self, ruu)
+function PropertyPanel.set(self)
 	PropertyPanel.super.set(self, spacing, false, nil, 250, 600, "E", "E", "fill")
 	self:setPad(4, 4)
 	self.children = {
@@ -21,10 +21,6 @@ function PropertyPanel.set(self, ruu)
 	}
 	self.children[1].color = style.titleTextColor
 	self.layer = "gui"
-	self.ruu = ruu
-	self.widget = self.ruu:Panel(self, PanelTheme)
-	self.widget.ruuInput = self.ruuInput
-	self.wgtMap = {}
 
 	self.lastProps = {}
 	self.wgtForProp = {}
@@ -32,6 +28,13 @@ function PropertyPanel.set(self, ruu)
 	local signalFn = self.onSelectedObjectsModified
 	signals.subscribe(self, signalFn, "selection changed", "selected objects modified")
 	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
+end
+
+function PropertyPanel.initRuu(self, ruu)
+	self.ruu = ruu
+	self.widget = self.ruu:Panel(self, PanelTheme)
+	self.widget.ruuInput = self.ruuInput
+	self.wgtMap = {}
 end
 
 function PropertyPanel.init(self)

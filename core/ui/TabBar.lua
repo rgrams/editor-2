@@ -13,16 +13,19 @@ local spacing = 2
 local width = 100
 local height = 24
 
-function TabBar.set(self, ruu)
+function TabBar.set(self)
 	TabBar.super.set(self, spacing, false, -1, width, height)
 	self:setMode("fill", "none")
 	self.layer = "gui"
-	self.ruu = ruu
-	self.widget = ruu:Panel(self, PanelTheme)
 	self.tabWidgets = {}
 	signals.subscribe(self, self.onSceneAdded, "scene added")
 	signals.subscribe(self, self.onSceneRemoved, "scene removed")
 	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
+end
+
+function TabBar.initRuu(self, ruu)
+	self.ruu = ruu
+	self.widget = ruu:Panel(self, PanelTheme)
 end
 
 function TabBar.onSceneAdded(self, sender, signal, scene)

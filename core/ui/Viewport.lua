@@ -9,22 +9,17 @@ local BackgroundGrid = require "core.ui.BackgroundGrid"
 local MultiTool = require "core.tools.Tool"
 local PolygonTool = require "core.tools.PolygonTool"
 
-function Viewport.set(self, ruu)
+function Viewport.set(self)
 	Viewport.super.set(self, 50, 50, "C", "C", "fill")
 	self.isGreedy = true
 	self.layer = "viewport"
-	self.ruu = ruu
-	self.widget = ruu:Panel(self)
-	self.widget.scroll = Viewport.scroll
-	self.widget.ruuInput = Viewport.ruuInput
-	self.widget.drag = Viewport.drag
 
 	-- Subscribe before tool so camera updates before tool AABB.
 	signals.subscribe(self, self.onActiveSceneChanged, "active scene changed")
 
 	self.tools = {
-		default = MultiTool(ruu),
-		polygon = PolygonTool(ruu),
+		default = MultiTool(),
+		polygon = PolygonTool(),
 	}
 
 	self.curToolName = "default"
@@ -34,12 +29,21 @@ function Viewport.set(self, ruu)
 	}
 end
 
+function Viewport.initRuu(self, ruu)
+	self.ruu = ruu
+	self.widget = ruu:Panel(self)
+	self.widget.drag = Viewport.drag
+	self.widget.scroll = Viewport.scroll
+	self.widget.ruuInput = Viewport.ruuInput
+	self.tool:initRuu(self.ruu)
+	self.ruu:setFocus(self.tool.widget)
+end
+
 function Viewport.init(self)
 	Viewport.super.init(self)
 	self.inputMap = _G.editor._registerInputContext(self)
 	-- Add Background Grid to scene-tree root so our Node transform doesn't make things difficult.
 	self.tree:add( BackgroundGrid(self) )
-	self.ruu:setFocus(self.tool.widget)
 end
 
 function Viewport.allocate(self, x, y, w, h, designW, designH, scale)
@@ -56,6 +60,7 @@ function Viewport.setTool(self, toolName)
 	self.curToolName = toolName
 	self.tool = self.tools[toolName]
 	self.tree:add(self.tool, self)
+	self.tool:initRuu(self.ruu)
 	self.ruu:setFocus(self.tool.widget)
 end
 

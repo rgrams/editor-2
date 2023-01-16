@@ -28,8 +28,8 @@ function UI.set(self)
 	vpCol.name = "VPColumn"
 	vpCol.isGreedy = true
 	vpCol.children = {
-		TabBar(self.ruu),
-		Viewport(self.ruu),
+		TabBar(),
+		Viewport(),
 	}
 
 	local mainRow = gui.Row(0, false, -1, 50, 50, "C", "C", "fill")
@@ -38,23 +38,34 @@ function UI.set(self)
 	mainRow.children = {
 		vpCol,
 		ResizeHandle("/Window/UI/MainRow/PropertyPanel"),
-		PropertyPanel(self.ruu)
+		PropertyPanel()
 	}
 
 	self.children = {
-		Toolbar(self.ruu),
+		Toolbar(),
 		mainRow,
 	}
 
-	mainRow.children[2]:initRuu(self.ruu)
-
+	local toolbar = self.children[1]
+	local tabBar = vpCol.children[1]
+	local viewport = vpCol.children[2]
+	local resizeHandle = mainRow.children[2]
 	self.propertyPanel = mainRow.children[3]
+	_G.editor.UI = self
+	_G.editor.Viewport = viewport
+	_G.editor.PropertyPanel = self.propertyPanel
+
+	toolbar:initRuu(self.ruu)
+	tabBar:initRuu(self.ruu)
+	viewport:initRuu(self.ruu)
+	resizeHandle:initRuu(self.ruu)
+	self.propertyPanel:initRuu(self.ruu)
 
 	self.scripts = { updateSceneTitleScript }
+end
 
-	_G.editor.UI = self
-	_G.editor.Viewport = vpCol.children[2]
-	_G.editor.PropertyPanel = self.propertyPanel
+function UI.fromData(Class, data)
+	return Class()
 end
 
 function UI.init(self)

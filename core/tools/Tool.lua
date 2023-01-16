@@ -39,10 +39,9 @@ Tool.symmetricalKey = "alt"
 
 local dirKey = { left = {-1,0}, right = {1,0}, up = {0,-1}, down = {0,1} }
 
-function Tool.set(self, ruu)
+function Tool.set(self)
 	Tool.super.set(self, 1, 1, "C", "C", "fill")
 	self.layer = "viewport"
-	self.ruu = ruu
 	self.lastAddClass = EditorObject
 	self.AABB = { lt = 0, top = 0, rt = 0, bot = 0 }
 
@@ -57,15 +56,18 @@ function Tool.set(self, ruu)
 	}
 end
 
+function Tool.initRuu(self, ruu)
+	self.ruu = ruu
+	self.widget = self.ruu:Panel(self)
+	self.widget.drag = self.drag
+	self.widget.press = self.press
+	self.widget.release = self.release
+	self.widget.ruuInput = self.ruuInput
+end
+
 function Tool.init(self)
 	Tool.super.init(self)
 	self.propertyPanel = self.tree:get("/Window/UI/PropertyPanel")
-
-	self.widget = self.ruu:Panel(self)
-	self.widget.ruuInput = self.ruuInput
-	self.widget.press = self.press
-	self.widget.release = self.release
-	self.widget.drag = self.drag
 
 	signals.subscribe(self, self.onObjectsChanged,
 		"objects added",
