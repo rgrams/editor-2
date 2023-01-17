@@ -38,7 +38,7 @@ style.viewportBackgroundColor = color.lower(style.baseColor, 0.12 )-- 0.1
 local bgCol = style.viewportBackgroundColor
 style.gridColor = color.alpha( color.raise(bgCol, 0.2), 0.06 )--{ 0.3, 0.3, 0.3, 0.06 }
 style.bigGridColor = color.alpha( color.raise(bgCol, 0.2), 0.28 )--{ 0.3, 0.3, 0.3, 0.28 }
-style.gridNumberColor = color.alpha( color.raise(bgCol, 0.4), 0.5 )--{ 0.5, 0.5, 0.5, 0.5 }
+style.gridNumberColor = color.alpha( color.raise(bgCol, 0.4), 0.4 )--{ 0.5, 0.5, 0.5, 0.5 }
 style.xAxisColor = color.lower(style.dimTextColor, 0.1)--{ 0.8, 0.4, 0.4, 0.2 }
 style.xAxisColor[4] = 0.2
 style.xAxisColor[1] = style.xAxisColor[1] + 0.4
@@ -48,7 +48,7 @@ style.yAxisColor[2] = style.yAxisColor[2] + 0.4
 
 style.propertyTextColor = color.lower(style.textColor, 0.2)
 
-style.buttonColor = color.raise(style.baseColor, 0.1)
+style.buttonColor = color.raise(style.baseColor, 0.07)
 style.buttonHoverColor = color.raise(style.buttonColor, 0.03)
 style.buttonPressColor = color.raise(style.buttonColor, 0.18)
 style.buttonTextColor = style.textColor
@@ -56,7 +56,7 @@ style.buttonTextHoverColor = color.raise(style.buttonTextColor, 0.2)
 style.buttonBevelLighten = 0.15
 style.buttonBevelHoverLighten = 0.25
 style.buttonBevelDarken = style.buttonBevelLighten
-style.buttonBevelDepth = 2
+style.buttonBevelDepth = 1
 
 style.checkboxBGColor = color.lower(style.panelColor, 0.7)
 
@@ -70,14 +70,14 @@ style.inputFieldBevelDarken = style.buttonBevelLighten
 
 style.tabNormalCheckColor = color.raise(style.buttonColor, 0.15)
 style.tabHoverCheckColor = color.raise(style.buttonHoverColor, 0.15)
-style.tabNormalUncheckColor = color.lower(style.buttonColor, 0.06)
-style.tabHoverUncheckColor = color.lower(style.buttonHoverColor, 0.06)
+style.tabNormalUncheckColor = color.lower(style.buttonColor, 0.1)
+style.tabHoverUncheckColor = color.lower(style.buttonHoverColor, 0.1)
 style.tabPressColor = style.buttonPressColor
 
 style.tabTextNormalCheckColor = color.raise(style.buttonTextColor, 0.17)
 style.tabTextHoverCheckColor = style.buttonTextHoverColor
-style.tabTextNormalUncheckColor = color.lower(style.buttonTextColor, 0.15)
-style.tabTextHoverUncheckColor = color.lower(style.buttonTextHoverColor, 0.15)
+style.tabTextNormalUncheckColor = color.lower(style.buttonTextColor, 0.2)
+style.tabTextHoverUncheckColor = color.lower(style.buttonTextHoverColor, 0.2)
 
 style.tabCloseHoverCheckColor = color.raise(style.tabHoverCheckColor, 0.09)
 style.tabCloseHoverUncheckColor = color.raise(style.tabHoverUncheckColor, 0.09)
@@ -87,7 +87,7 @@ style.tabCloseTextNormalUncheckColor = color.lower(style.buttonTextColor, 0.3)
 style.dropdownEdgeColor = { 0, 0, 0, 1 }
 style.dropdownBGColor = color.lower(style.panelColor, 0.02)
 
-style.menuButtonColor = color.lower(style.buttonColor, 0.12)
+style.menuButtonColor = color.lower(style.buttonColor, 0.1)
 style.menuButtonHoverColor = style.buttonHoverColor
 style.menuButtonPressColor = color.lower(style.buttonPressColor, 0.1)
 
