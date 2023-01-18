@@ -39,7 +39,7 @@ function Float.initRuu(self, ruu, navList)
 	Float.super.initRuu(self, ruu, navList)
 	self.wgt = self.field:initRuu(self.ruu, self.onConfirm)
 	self.wgt:args(self, self.wgt)
-	self:addWidget(self.wgt)
+	self:registerWidget(self.wgt)
 end
 
 return Float

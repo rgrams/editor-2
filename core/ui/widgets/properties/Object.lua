@@ -56,7 +56,7 @@ function Object.initRuu(self, ruu, navList)
 
 	self.buttonWgt = self.button:initRuu(self.ruu, self.buttonPressed)
 	self.buttonWgt:args(self)
-	self:addWidget(self.buttonWgt)
+	self:registerWidget(self.buttonWgt)
 end
 
 return Object

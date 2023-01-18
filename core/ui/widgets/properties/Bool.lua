@@ -33,7 +33,7 @@ function Bool.initRuu(self, ruu, navList)
 	Bool.super.initRuu(self, ruu, navList)
 	self.wgt = self.checkbox:initRuu(ruu, self.onToggle, self.value)
 	self.wgt:args(self, self.wgt)
-	self:addWidget(self.wgt)
+	self:registerWidget(self.wgt)
 end
 
 return Bool

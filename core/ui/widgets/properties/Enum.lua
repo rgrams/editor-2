@@ -54,7 +54,7 @@ function Enum.initRuu(self, ruu, navList)
 
 	self.wgt = self.button:initRuu(self.ruu, self.onButtonPress)
 	self.wgt:args(self, self.wgt)
-	self:addWidget(self.wgt)
+	self:registerWidget(self.wgt)
 end
 
 return Enum

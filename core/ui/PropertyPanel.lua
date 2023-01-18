@@ -8,7 +8,7 @@ local PanelTheme = require "core.ui.widgets.themes.PanelTheme"
 local AddPropertyDialog = require "core.ui.AddPropertyDialog"
 local PropData = require "core.commands.data.PropData"
 local style = require "core.ui.style"
-local propClass = _G.propClassList
+local propClassList = _G.propClassList
 
 local spacing = 2
 
@@ -66,14 +66,14 @@ function PropertyPanel.addProperty(self, propType, propName)
 	if not enclosures or not enclosures[1] then
 		enclosures = scenes.active.selfSelection
 	end
-	local Class = propClass:get(propType)
-	local propData = PropData(propName, nil, Class)
+	local PropClass = propClassList:get(propType)
+	local propData = PropData(propName, nil, PropClass)
 	scenes.active.history:perform("addSamePropertyToMultiple", self, enclosures, propData)
 	self:updateProperties(selection) -- We'll ignore the signal from ourself, so manually update.
 end
 
-local function addPropertyWidget(self, selection, name, Class, value, obj)
-	local object = Class.WidgetClass(name, value, Class, obj)
+local function addPropertyWidget(self, selection, name, PropClass, value, obj)
+	local object = PropClass.WidgetClass(name, value, PropClass, obj)
 	self.wgtForProp[name] = object
 	self.tree:add(object, self)
 	object:setSelection(selection)
@@ -86,15 +86,15 @@ local function destroyPropertyWidget(self, object)
 	self.tree:remove(object)
 end
 
-local function getPropertyWidget(self, name, Class)
+local function getPropertyWidget(self, name, PropClass)
 	local object = self.wgtForProp[name]
-	if object and object.propertyClass == Class then
+	if object and object.propertyClass == PropClass then
 		return object
 	end
 end
 
-local function removePropertyWidget(self, name, Class)
-	local object = getPropertyWidget(self, name, Class)
+local function removePropertyWidget(self, name, PropClass)
+	local object = getPropertyWidget(self, name, PropClass)
 	if object then  destroyPropertyWidget(self, object)  end
 end
 
@@ -123,11 +123,11 @@ function PropertyPanel.updateProperties(self, selection)
 	-- Copy property list from the first object.
 	local firstObj = selection[1][1]
 	for i,property in ipairs(firstObj.properties) do
-		local Class, name = getmetatable(property), property.name
+		local PropClass, name = getmetatable(property), property.name
 		local value = property:getValue()
-		table.insert(commonProperties, { Class = Class, obj = property, name = name, value = value })
+		table.insert(commonProperties, { Class = PropClass, obj = property, name = name, value = value })
 		votesForName[name] = 1
-		classForName[name] = Class
+		classForName[name] = PropClass
 	end
 
 	for i,prop in ipairs(self.lastProps) do

@@ -82,10 +82,10 @@ function Vec4.initRuu(self, ruu, navList)
 	self.widgetY:args(self, self.widgetY, 2)
 	self.widgetZ:args(self, self.widgetZ, 3)
 	self.widgetW:args(self, self.widgetW, 4)
-	self:addWidget(self.widgetX)
-	self:addWidget(self.widgetY)
-	self:addWidget(self.widgetZ)
-	self:addWidget(self.widgetW)
+	self:registerWidget(self.widgetX)
+	self:registerWidget(self.widgetY)
+	self:registerWidget(self.widgetZ)
+	self:registerWidget(self.widgetW)
 end
 
 return Vec4

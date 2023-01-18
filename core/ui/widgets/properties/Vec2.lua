@@ -64,8 +64,8 @@ function Vec2.initRuu(self, ruu, navList)
 	self.widgetY = self.fieldY:initRuu(self.ruu, self.onConfirm)
 	self.widgetX:args(self, self.widgetX, "x")
 	self.widgetY:args(self, self.widgetY, "y")
-	self:addWidget(self.widgetX)
-	self:addWidget(self.widgetY)
+	self:registerWidget(self.widgetX)
+	self:registerWidget(self.widgetY)
 end
 
 return Vec2

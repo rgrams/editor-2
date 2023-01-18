@@ -57,11 +57,11 @@ function File.initRuu(self, ruu, navList)
 
 	self.fieldWgt = self.field:initRuu(self.ruu, self.onConfirm)
 	self.fieldWgt:args(self, self.fieldWgt)
-	self:addWidget(self.fieldWgt)
+	self:registerWidget(self.fieldWgt)
 
 	self.buttonWgt = self.button:initRuu(self.ruu, self.buttonPressed)
 	self.buttonWgt:args(self)
-	self:addWidget(self.buttonWgt)
+	self:registerWidget(self.buttonWgt)
 end
 
 return File

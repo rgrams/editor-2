@@ -71,15 +71,15 @@ function Font.initRuu(self, ruu, navList)
 
 	self.sizeWgt = self.sizeField:initRuu(self.ruu, self.onConfirm)
 	self.sizeWgt:args(self, self.sizeWgt, "size")
-	self:addWidget(self.sizeWgt)
+	self:registerWidget(self.sizeWgt)
 
 	self.pathWgt = self.pathField:initRuu(self.ruu, self.onConfirm)
 	self.pathWgt:args(self, self.pathWgt, "path")
-	self:addWidget(self.pathWgt)
+	self:registerWidget(self.pathWgt)
 
 	self.buttonWgt = self.button:initRuu(self.ruu, self.buttonPressed)
 	self.buttonWgt:args(self)
-	self:addWidget(self.buttonWgt)
+	self:registerWidget(self.buttonWgt)
 end
 
 return Font
