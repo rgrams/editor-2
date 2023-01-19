@@ -9,11 +9,12 @@ BaseClass.font = style.buttonFont
 BaseClass.labelColor = style.propertyTextColor
 BaseClass.spacing = 2
 BaseClass.width = 100
-BaseClass.height = 26
+BaseClass.height = 28
 
 function BaseClass.set(self, name, value, PropClass, propObj)
 	BaseClass.super.set(self, self.spacing, false, -1, self.width, self.height)
 	self:setMode("fill", "none")
+	self:setPad(0, 1)
 	self.layer = "gui"
 	self.propertyName = name
 	self.propertyObj = propObj

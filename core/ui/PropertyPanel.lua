@@ -11,7 +11,7 @@ local style = require "core.ui.style"
 local list = require "core.lib.list"
 local propClassList = _G.propClassList
 
-local spacing = 2
+local spacing = 0.00001 -- Eliminate collision gap between property widgets from </> but !=.
 
 function PropertyPanel.set(self)
 	PropertyPanel.super.set(self, spacing, false, nil, 250, 600, "E", "E", "fill")
