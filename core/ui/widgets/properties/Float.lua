@@ -35,8 +35,8 @@ function Float.onConfirm(self, wgt)
 	end
 end
 
-function Float.initRuu(self, ruu, navList)
-	Float.super.initRuu(self, ruu, navList)
+function Float.initRuu(self, ruu, ...)
+	Float.super.initRuu(self, ruu, ...)
 	self.wgt = self.field:initRuu(self.ruu, self.onConfirm)
 	self.wgt:args(self, self.wgt)
 	self:registerWidget(self.wgt)

@@ -66,8 +66,8 @@ function Font.buttonPressed(self)
 	end
 end
 
-function Font.initRuu(self, ruu, navList)
-	Font.super.initRuu(self, ruu, navList)
+function Font.initRuu(self, ruu, ...)
+	Font.super.initRuu(self, ruu, ...)
 
 	self.sizeWgt = self.sizeField:initRuu(self.ruu, self.onConfirm)
 	self.sizeWgt:args(self, self.sizeWgt, "size")

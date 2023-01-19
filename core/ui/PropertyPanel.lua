@@ -8,6 +8,7 @@ local PanelTheme = require "core.ui.widgets.themes.PanelTheme"
 local AddPropertyDialog = require "core.ui.AddPropertyDialog"
 local PropData = require "core.commands.data.PropData"
 local style = require "core.ui.style"
+local list = require "core.lib.list"
 local propClassList = _G.propClassList
 
 local spacing = 2
@@ -38,6 +39,7 @@ function PropertyPanel.initRuu(self, ruu)
 	self.widget = self.ruu:Panel(self, PanelTheme)
 	self.widget.ruuInput = self.ruuInput
 	self.wgtMap = {}
+	self.baseWgtList = {}
 end
 
 function PropertyPanel.init(self)
@@ -72,17 +74,36 @@ function PropertyPanel.addProperty(self, propType, propName)
 	self:updateProperties(selection) -- We'll ignore the signal from ourself, so manually update.
 end
 
+function PropertyPanel.deleteProperty(self, propName, caller)
+	caller = caller or self
+	local wgtObj = self.wgtForProp[propName]
+	if wgtObj and wgtObj:isFocused() then -- If widget for deleted is focused, focus prev, next, or Prop panel.
+		local wgtList = self.baseWgtList
+		local i = list.find(wgtList, wgtObj.panel)
+		local newFocus = wgtList[i-1]
+		if not newFocus then  newFocus = wgtList[i+1]  end
+		if not newFocus then  newFocus = self.widget  end
+		self.ruu:setFocus(newFocus)
+	end
+	local scene = scenes.active
+	local enclosures = scene.selection:copyList()
+	scene.history:perform("removeSamePropertyFromMultiple", caller, enclosures, propName)
+	if caller == self then
+		self:updateProperties(scene.selection) -- We'll ignore the signal from ourself, so manually update.
+	end
+end
+
 local function addPropertyWidget(self, selection, name, PropClass, value, obj)
 	local object = PropClass.WidgetClass(name, value, PropClass, obj)
 	self.wgtForProp[name] = object
 	self.tree:add(object, self)
 	object:setSelection(selection)
-	object:initRuu(self.ruu, self.wgtMap)
+	object:initRuu(self.ruu, self.wgtMap, self.baseWgtList)
 end
 
 local function destroyPropertyWidget(self, object)
 	self.wgtForProp[object.propertyName] = nil
-	object:destroyRuu(self.wgtMap)
+	object:destroyRuu(self.wgtMap, self.baseWgtList)
 	self.tree:remove(object)
 end
 
@@ -172,6 +193,7 @@ function PropertyPanel.updateProperties(self, selection)
 
 	self:allocateChildren()
 	self.ruu:mapNextPrev(self.wgtMap)
+	self.ruu:mapVerticalNeighbors(self.baseWgtList)
 	self.lastProps = commonProperties
 end
 

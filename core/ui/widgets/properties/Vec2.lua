@@ -57,8 +57,8 @@ function Vec2.onConfirm(self, wgt, axis)
 	end
 end
 
-function Vec2.initRuu(self, ruu, navList)
-	Vec2.super.initRuu(self, ruu, navList)
+function Vec2.initRuu(self, ruu, ...)
+	Vec2.super.initRuu(self, ruu, ...)
 
 	self.widgetX = self.fieldX:initRuu(self.ruu, self.onConfirm)
 	self.widgetY = self.fieldY:initRuu(self.ruu, self.onConfirm)

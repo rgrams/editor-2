@@ -51,8 +51,8 @@ function Object.buttonPressed(self)
 	self.tree:add(tool, viewport)
 end
 
-function Object.initRuu(self, ruu, navList)
-	Object.super.initRuu(self, ruu, navList)
+function Object.initRuu(self, ruu, ...)
+	Object.super.initRuu(self, ruu, ...)
 
 	self.buttonWgt = self.button:initRuu(self.ruu, self.buttonPressed)
 	self.buttonWgt:args(self)

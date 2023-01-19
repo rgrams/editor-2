@@ -29,9 +29,9 @@ function Bool.onToggle(self, wgt)
 	end
 end
 
-function Bool.initRuu(self, ruu, navList)
-	Bool.super.initRuu(self, ruu, navList)
-	self.wgt = self.checkbox:initRuu(ruu, self.onToggle, self.value)
+function Bool.initRuu(self, ruu, ...)
+	Bool.super.initRuu(self, ruu, ...)
+	self.wgt = self.checkbox:initRuu(self.ruu, self.onToggle, self.value)
 	self.wgt:args(self, self.wgt)
 	self:registerWidget(self.wgt)
 end

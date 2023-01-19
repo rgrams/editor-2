@@ -49,10 +49,10 @@ function Enum.onButtonPress(self, wgt)
 	self.tree:add(dropdown, guiRoot)
 end
 
-function Enum.initRuu(self, ruu, navList)
-	Enum.super.initRuu(self, ruu, navList)
+function Enum.initRuu(self, ruu, ...)
+	Enum.super.initRuu(self, ruu, ...)
 
-	self.wgt = self.button:initRuu(self.ruu, self.onButtonPress)
+	self.wgt = self.button:initRuu(ruu, self.onButtonPress)
 	self.wgt:args(self, self.wgt)
 	self:registerWidget(self.wgt)
 end

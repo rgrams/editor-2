@@ -52,8 +52,8 @@ function File.buttonPressed(self)
 	end
 end
 
-function File.initRuu(self, ruu, navList)
-	File.super.initRuu(self, ruu, navList)
+function File.initRuu(self, ruu, ...)
+	File.super.initRuu(self, ruu, ...)
 
 	self.fieldWgt = self.field:initRuu(self.ruu, self.onConfirm)
 	self.fieldWgt:args(self, self.fieldWgt)

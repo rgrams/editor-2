@@ -34,8 +34,8 @@ function String.onConfirm(self, wgt)
 	end
 end
 
-function String.initRuu(self, ruu, navList)
-	String.super.initRuu(self, ruu, navList)
+function String.initRuu(self, ruu, ...)
+	String.super.initRuu(self, ruu, ...)
 	self.wgt = self.field:initRuu(self.ruu, self.onConfirm)
 	self.wgt:args(self, self.wgt)
 	self:registerWidget(self.wgt)

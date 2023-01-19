@@ -3,6 +3,7 @@ local BaseClass = gui.Row:extend()
 BaseClass.className = "BaseClass"
 
 local style = require "core.ui.style"
+local listRemove = require("core.lib.list").remove
 
 BaseClass.font = style.buttonFont
 BaseClass.labelColor = style.propertyTextColor
@@ -40,14 +41,7 @@ local objToStr = require "core.philtre.lib.object-to-string"
 function BaseClass.ruuInput(wgt, depth, action, value, change)
 	if action == "delete" and change == 1 then -- Deleting the property.
 		local self = wgt.object
-		if not self.selection then
-			print("Error: PropertyWidget["..self.className.."].delete - No selection known.")
-		else
-			local scene = self.selection.scene
-			local cmd = "removeSamePropertyFromMultiple"
-			local enclosures = self.selection:copyList()
-			scene.history:perform(cmd, self, enclosures, self.propertyName)
-		end
+		editor.PropertyPanel:deleteProperty(self.propertyName, self)
 	elseif action == "right click" and change == 1 then -- For debugging -- TODO: Put info in tooltip.
 		local self = wgt.object
 		local prop = self.propertyObj
@@ -57,12 +51,14 @@ function BaseClass.ruuInput(wgt, depth, action, value, change)
 	end
 end
 
-function BaseClass.initRuu(self, ruu, navList)
+function BaseClass.initRuu(self, ruu, navList, baseWgtNavList)
 	self.ruu = ruu
 	self.widgetNavList = navList
 	self.panel = self.ruu:Panel(self)
 	self.panel.ruuInput = self.ruuInput
+	table.insert(baseWgtNavList, self.panel)
 	self.widgets = {}
+	return self.panel
 end
 
 function BaseClass.registerWidget(self, wgt) -- Add to keyboard navigation lists.
@@ -72,16 +68,17 @@ function BaseClass.registerWidget(self, wgt) -- Add to keyboard navigation lists
 end
 
 --[[ Example for inheriting class:
-function SubClass.initRuu(self, ruu, navList)
-	SubClass.super.initRuu(self, ruu, navList)
+function SubClass.initRuu(self, ruu, ...)
+	SubClass.super.initRuu(self, ruu, ...)
 	self.wgt = self.field:initRuu(self.ruu, self.onConfirm)
 	self:registerWidget(self.wgt, self, self.wgt)
 end
 --]]
 
--- Destroy our Ruu widgets & remove them from parent's list for keyboard navigation.
-function BaseClass.destroyRuu(self, navList)
-	self.ruu:destroy(self.panel) -- Panel is not in navigation navList.
+-- Destroy our Ruu widgets & remove them from parent's lists for keyboard navigation.
+function BaseClass.destroyRuu(self, navList, baseWgtNavList)
+	self.ruu:destroy(self.panel)
+	listRemove(baseWgtNavList, self.panel)
 	local widgets = self.widgets
 	for i=#navList,1,-1 do
 		local wgt = navList[i]
@@ -92,6 +89,15 @@ function BaseClass.destroyRuu(self, navList)
 			if not next(widgets) then
 				break
 			end
+		end
+	end
+end
+
+function BaseClass.isFocused(self)
+	if self.ruu then
+		if self.panel.isFocused then  return true  end
+		for widget in pairs(self.widget) do
+			if widget.isFocused then  return true  end
 		end
 	end
 end
