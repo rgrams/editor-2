@@ -62,9 +62,13 @@ function BaseClass.initRuu(self, ruu, navList, baseWgtNavList)
 end
 
 function BaseClass.registerWidget(self, wgt) -- Add to keyboard navigation lists.
-	if not self.firstWidget then  self.firstWidget = wgt  end
+	if not self.firstWidget then
+		self.firstWidget = wgt
+		self.panel.neighbor.next = wgt
+	end
 	self.widgets[wgt] = true
 	table.insert(self.widgetNavList, wgt)
+	wgt.neighbor.up = self.panel
 	return wgt
 end
 
