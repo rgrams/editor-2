@@ -94,6 +94,9 @@ function Dropdown.input(self, action, value, change, ...)
 		end
 	elseif action == Ruu.CANCEL and change == 1 then
 		self:close()
+	elseif action == "right click" and change == 1 then
+		self:close()
+		-- Still consume - Non-standard behavior, but seems nicer.
 	end
 	return true
 end
