@@ -72,6 +72,8 @@ function PropertyPanel.addProperty(self, propType, propName)
 	local propData = PropData(propName, nil, PropClass)
 	scenes.active.history:perform("addSamePropertyToMultiple", self, enclosures, propData)
 	self:updateProperties(selection) -- We'll ignore the signal from ourself, so manually update.
+	local wgtObj = self.wgtForProp[propName]
+	if wgtObj then  wgtObj:focusFirstWidget()  end
 end
 
 function PropertyPanel.deleteProperty(self, propName, selection, caller)

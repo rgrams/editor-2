@@ -62,6 +62,7 @@ function BaseClass.initRuu(self, ruu, navList, baseWgtNavList)
 end
 
 function BaseClass.registerWidget(self, wgt) -- Add to keyboard navigation lists.
+	if not self.firstWidget then  self.firstWidget = wgt  end
 	self.widgets[wgt] = true
 	table.insert(self.widgetNavList, wgt)
 	return wgt
@@ -100,6 +101,10 @@ function BaseClass.isFocused(self)
 			if widget.isFocused then  return true  end
 		end
 	end
+end
+
+function BaseClass.focusFirstWidget(self)
+	if self.ruu then  self.ruu:setFocus(self.firstWidget or self.panel)  end
 end
 
 function BaseClass.draw(self)
