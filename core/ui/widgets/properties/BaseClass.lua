@@ -41,7 +41,7 @@ local objToStr = require "core.philtre.lib.object-to-string"
 function BaseClass.ruuInput(wgt, depth, action, value, change)
 	if action == "delete" and change == 1 then -- Deleting the property.
 		local self = wgt.object
-		editor.PropertyPanel:deleteProperty(self.propertyName, self)
+		editor.PropertyPanel:deleteProperty(self.propertyName, self.selection, self)
 	elseif action == "right click" and change == 1 then -- For debugging -- TODO: Put info in tooltip.
 		local self = wgt.object
 		local prop = self.propertyObj

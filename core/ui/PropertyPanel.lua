@@ -74,7 +74,7 @@ function PropertyPanel.addProperty(self, propType, propName)
 	self:updateProperties(selection) -- We'll ignore the signal from ourself, so manually update.
 end
 
-function PropertyPanel.deleteProperty(self, propName, caller)
+function PropertyPanel.deleteProperty(self, propName, selection, caller)
 	caller = caller or self
 	local wgtObj = self.wgtForProp[propName]
 	if wgtObj and wgtObj:isFocused() then -- If widget for deleted is focused, focus prev, next, or Prop panel.
@@ -85,8 +85,8 @@ function PropertyPanel.deleteProperty(self, propName, caller)
 		if not newFocus then  newFocus = self.widget  end
 		self.ruu:setFocus(newFocus)
 	end
-	local scene = scenes.active
-	local enclosures = scene.selection:copyList()
+	local scene = selection.scene
+	local enclosures = selection:copyList()
 	scene.history:perform("removeSamePropertyFromMultiple", caller, enclosures, propName)
 	if caller == self then
 		self:updateProperties(scene.selection) -- We'll ignore the signal from ourself, so manually update.
