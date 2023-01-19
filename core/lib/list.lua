@@ -8,6 +8,16 @@ function M.contains(list, val)
 		end
 	end
 end
+M.find = M.contains
+
+function M.remove(list, val)
+	for i=1,#list do
+		if list[i] == val then
+			table.remove(list, i)
+			return i
+		end
+	end
+end
 
 -- Get a - b.
 -- AKA: Get the list of items that are -only- in `a`, -not- in `b`.
