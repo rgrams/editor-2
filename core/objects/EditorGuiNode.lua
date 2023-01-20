@@ -110,6 +110,7 @@ function EditorGuiNode.propertyWasSet(self, name, value, property)
 		self:updateAABB()
 	elseif name == "isGreedy" and property:is(Bool) then
 		self.isGreedy = value
+		self:wasModified()
 	elseif getmetatable(property) == Script then
 		if property.oldScript then
 			self:removeScript(name, property.oldPath, property.oldScript)
