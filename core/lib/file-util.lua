@@ -143,9 +143,11 @@ end
 
 -- Returns folder, filename (or nil).
 function M.findProject(sceneFilepath, projectFileExtension)
-	local mountPoint = "_searchFolder/"
+	local sourceFolder = love.filesystem.getSource()
 	local fromFolder = M.splitFilepath(sceneFilepath)
 	while true do
+		local mountPoint = "_searchFolder/"
+		if fromFolder == sourceFolder then  mountPoint = ""  end
 		local oldMountPoint = urfs.getMountPoint(fromFolder)
 		if oldMountPoint then  urfs.unmount(fromFolder)  end
 		if not urfs.mount(fromFolder, mountPoint) then
