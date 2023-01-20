@@ -15,6 +15,14 @@ function ChildScene.init(self)
 	assert(self.sceneFilepath, "ChildScene.init - no sceneFilepath")
 end
 
+function ChildScene.allocateChild(self) -- Pass through if children want it.
+	if self.parent.allocateChild then  self.parent:allocateChild(self)  end
+end
+
+function ChildScene.childrenModified(self) -- Pass through if children call it.
+	self:wasModified()
+end
+
 local function getIDFromPropDatas(propDatas)
 	for i,propData in ipairs(propDatas) do
 		if propData.name == "id" then
