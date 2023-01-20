@@ -54,6 +54,7 @@ local function copyPropertyData(child, omitUnmod, localFilepath)
 				value = getPropExportValue(prop, localFilepath),
 				type = prop.typeName
 			}
+			if not prop.isClassBuiltin then  propExportData.isExtra = true  end
 			table.insert(properties, propExportData)
 		end
 	end
