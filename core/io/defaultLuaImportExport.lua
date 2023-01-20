@@ -1,4 +1,6 @@
 
+-- Scene importer & exporter for the editor's default lua file format.
+
 local M = {}
 
 local objToStr = require "core.philtre.lib.object-to-string"
@@ -18,22 +20,22 @@ M.defaultOptions = {
 	omitUnmodifiedBuiltins = true
 }
 
-local function getPropExportValue(prop, filepath)
+local function getPropExportValue(prop, localFilepath)
 	local val = prop:copyValue()
 	local propType = prop.typeName
 	if propType == "file" or propType == "image" or propType == "script" then
 		if val ~= "" then
-			val = fileUtil.getRelativePath(filepath, val)
+			val = fileUtil.getRelativePath(localFilepath, val)
 		end
 	elseif propType == "font" then
 		if val[1] ~= "" then
-			val[1] = fileUtil.getRelativePath(filepath, val[1])
+			val[1] = fileUtil.getRelativePath(localFilepath, val[1])
 		end
 	end
 	return val
 end
 
-local function copyPropertyData(child, omitUnmod, filepath)
+local function copyPropertyData(child, omitUnmod, localFilepath)
 	local properties = {}
 	for _,prop in ipairs(child.properties) do
 		local doExport = false
@@ -49,7 +51,7 @@ local function copyPropertyData(child, omitUnmod, filepath)
 		if doExport then
 			local propExportData = {
 				name = prop.name,
-				value = getPropExportValue(prop, filepath),
+				value = getPropExportValue(prop, localFilepath),
 				type = prop.typeName
 			}
 			table.insert(properties, propExportData)
@@ -75,17 +77,17 @@ end
 
 local copyChildrenData
 
-local function copyChildData(child, options, filepath)
+local function copyChildData(child, options, localFilepath)
 	local omitUnmod = options.omitUnmodifiedBuiltins
 	local data = {}
 	local Class = getmetatable(child)
 	data.class = Class.displayName
 	if Class == ChildScene then
-		data.sceneFilepath = fileUtil.getRelativePath(filepath, child.sceneFilepath)
+		data.sceneFilepath = fileUtil.getRelativePath(localFilepath, child.sceneFilepath)
 		local childProperties = {}
 		for id,enclosure in pairs(child.sceneEnclosureIDMap) do
 			local obj = enclosure[1]
-			local props = copyPropertyData(obj, omitUnmod, filepath)
+			local props = copyPropertyData(obj, omitUnmod, localFilepath)
 			if #props > 0 then
 				childProperties[id] = props
 			end
@@ -99,31 +101,31 @@ local function copyChildData(child, options, filepath)
 			local addedObjList = getSceneAddedObjects(child.children, child.sceneEnclosureIDMap, {}, parentID)
 			for i,v in ipairs(addedObjList) do
 				addedObjects[v.parentID] = addedObjects[v.parentID] or {}
-				local childData = copyChildData(v.obj, options, filepath)
+				local childData = copyChildData(v.obj, options, localFilepath)
 				table.insert(addedObjects[v.parentID], childData)
 			end
 		end
 		local mods = {
-			rootProperties = copyPropertyData(child, omitUnmod, filepath),
+			rootProperties = copyPropertyData(child, omitUnmod, localFilepath),
 			childProperties = childProperties,
 			addedObjects = addedObjects,
 		}
 		data.properties = mods
 	else
-		data.properties = copyPropertyData(child, omitUnmod, filepath)
+		data.properties = copyPropertyData(child, omitUnmod, localFilepath)
 		if child.children then
-			data.children = copyChildrenData(child.children, options, filepath)
+			data.children = copyChildrenData(child.children, options, localFilepath)
 		end
 	end
 	return data
 end
 
-function copyChildrenData(children, options, filepath)
+function copyChildrenData(children, options, localFilepath)
 	local output = {}
 	for i=1,children.maxn or #children do
 		local child = children[i]
 		if child then
-			local data = copyChildData(child, options, filepath)
+			local data = copyChildData(child, options, localFilepath)
 			table.insert(output, data)
 		end
 	end
@@ -174,15 +176,15 @@ local function isAbsPath(path)
 	return path:match("^[\\/]")
 end
 
-local function getPropImportValue(val, name, Class, filepath)
+local function getPropImportValue(val, name, Class, localFilepath)
 	local propType = Class.typeName
 	if propType == "file" or propType == "image" or propType == "script" then
 		if val ~= "" and not isAbsPath(val) then
-			val = fileUtil.resolveRelativePath(filepath, val)
+			val = fileUtil.resolveRelativePath(localFilepath, val)
 		end
 	elseif propType == "font" then
 		if val[1] ~= "" and not isAbsPath(val[1]) then
-			val[1] = fileUtil.resolveRelativePath(filepath, val[1])
+			val[1] = fileUtil.resolveRelativePath(localFilepath, val[1])
 		end
 	end
 	return val
@@ -191,12 +193,12 @@ end
 -- Convert from import data: { type=, name=, value= }
 -- To : PropData { name, value, Class }
 -- And convert filepaths to global.
-local function makeAddPropDatas(importedProperties, filepath, isChildSceneObj)
+local function makeAddPropDatas(importedProperties, localFilepath, isChildSceneObj)
 	local propDatas = { isChildSceneObj = isChildSceneObj }
 	for i,prop in ipairs(importedProperties) do
 		local Class = propClassList:get(prop.type)
 		local name = prop.name
-		local value = getPropImportValue(prop.value, name, Class, filepath)
+		local value = getPropImportValue(prop.value, name, Class, localFilepath)
 		local defaultValue, isNonRemovable
 		if isChildSceneObj then
 			defaultValue, isNonRemovable = value, true
@@ -206,7 +208,7 @@ local function makeAddPropDatas(importedProperties, filepath, isChildSceneObj)
 	return propDatas
 end
 
-local function makeAddObjData(scene, objData, parentEnclosure, filepath, isChildSceneObj)
+local function makeAddObjData(scene, objData, parentEnclosure, localFilepath, isChildSceneObj)
 	local Class = classList:get(objData.class)
 	local enclosure = {}
 	local properties
@@ -215,16 +217,16 @@ local function makeAddObjData(scene, objData, parentEnclosure, filepath, isChild
 		local modsData = objData.properties
 		local mods = { isChildSceneObj = isChildSceneObj }
 		if modsData.rootProperties then
-			mods.rootProperties = makeAddPropDatas(modsData.rootProperties, filepath, isChildSceneObj)
+			mods.rootProperties = makeAddPropDatas(modsData.rootProperties, localFilepath, isChildSceneObj)
 		end
 		mods.childProperties = {}
 		if mods.childProperties then
 			for id,propData in pairs(modsData.childProperties) do
-				mods.childProperties[id] = makeAddPropDatas(propData, filepath)
+				mods.childProperties[id] = makeAddPropDatas(propData, localFilepath)
 			end
 		end
 
-		local scenePath = fileUtil.resolveRelativePath(filepath, objData.sceneFilepath)
+		local scenePath = fileUtil.resolveRelativePath(localFilepath, objData.sceneFilepath)
 		mods.sceneFilepath = scenePath
 		local _, addRootObjDatas, scenePropDatas = M.import(scenePath, nil, enclosure, scene, true)
 		children = addRootObjDatas
@@ -241,7 +243,7 @@ local function makeAddObjData(scene, objData, parentEnclosure, filepath, isChild
 					end
 					local parentEnc = parentAddObjData.enclosure
 					for i,addedObjData in ipairs(addedObjs) do
-						local addObjData = makeAddObjData(scene, addedObjData, parentEnc, filepath, isChildSceneObj)
+						local addObjData = makeAddObjData(scene, addedObjData, parentEnc, localFilepath, isChildSceneObj)
 						table.insert(parentAddObjData.children, addObjData)
 					end
 				else
@@ -251,13 +253,13 @@ local function makeAddObjData(scene, objData, parentEnclosure, filepath, isChild
 		end
 		properties = mods
 	else
-		properties = makeAddPropDatas(objData.properties, filepath, isChildSceneObj)
+		properties = makeAddPropDatas(objData.properties, localFilepath, isChildSceneObj)
 	end
 	local isSelected = false
 	if objData.children then -- ChildScene won't have children saved as such.
 		children = {}
 		for i,child in ipairs(objData.children) do
-			table.insert(children, makeAddObjData(scene, child, enclosure, filepath, isChildSceneObj))
+			table.insert(children, makeAddObjData(scene, child, enclosure, localFilepath, isChildSceneObj))
 		end
 	end
 	return AddObjData(scene, Class, enclosure, properties, isSelected, parentEnclosure, children)

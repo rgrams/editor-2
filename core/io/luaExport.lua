@@ -74,13 +74,13 @@ local String = require "core.objects.properties.String"
 local Vec2 = require "core.objects.properties.Vec2"
 local split = require "core.lib.string-split"
 
-local function writePropExportValue(prop, filepath)
+local function writePropExportValue(prop, localFilepath)
 	local val = prop:copyValue()
 	local name = prop.name
 	local propType = prop.typeName
 	if propType == "file" or propType == "image" or propType == "script" then
 		if val ~= "" then
-			val = fileUtil.getRelativePath(filepath, val)
+			val = fileUtil.getRelativePath(localFilepath, val)
 			local _, _, ext = fileUtil.splitFilepath(val)
 			if ext == ".lua" then
 				val = fileUtil.toRequirePath(val)
@@ -88,7 +88,7 @@ local function writePropExportValue(prop, filepath)
 		end
 	elseif propType == "font" then
 		if val[1] ~= "" then
-			val[1] = fileUtil.getRelativePath(filepath, val[1])
+			val[1] = fileUtil.getRelativePath(localFilepath, val[1])
 		end
 	elseif (name == "categories" or name == "mask") and prop:is(String) then
 		if val == "" then  return  end
@@ -106,17 +106,17 @@ local function writePropExportValue(prop, filepath)
 	write(name.." = "..objToStr(val)..",\n")
 end
 
-local function writePropertyData(child, omitUnmod, filepath, isSceneObj)
+local function writePropertyData(child, omitUnmod, localFilepath, isSceneObj)
 	local nonBuiltinProps = {}
 	for _,prop in ipairs(child.properties) do
 		if child.isChildSceneObj then
 			if not (omitUnmod and prop:isAtDefault()) then
-				if prop.isClassBuiltin then  writePropExportValue(prop, filepath)
+				if prop.isClassBuiltin then  writePropExportValue(prop, localFilepath)
 				else  table.insert(nonBuiltinProps, prop)  end
 			end
 		else
 			if not (omitUnmod and prop.isClassBuiltin and prop:isAtDefault()) then
-				if prop.isClassBuiltin then  writePropExportValue(prop, filepath)
+				if prop.isClassBuiltin then  writePropExportValue(prop, localFilepath)
 				else  table.insert(nonBuiltinProps, prop)  end
 			end
 		end
@@ -124,7 +124,7 @@ local function writePropertyData(child, omitUnmod, filepath, isSceneObj)
 	if nonBuiltinProps[1] then
 		openBlock("properties")
 		for _,prop in ipairs(nonBuiltinProps) do
-			writePropExportValue(prop, filepath)
+			writePropExportValue(prop, localFilepath)
 		end
 		closeBlock()
 	end
@@ -162,17 +162,17 @@ end
 
 local writeChildrenData
 
-local function writeChildData(child, options, filepath)
+local function writeChildData(child, options, localFilepath)
 	openBlock()
 
 	local omitUnmod = options.omitUnmodifiedBuiltins
 	local Class = getmetatable(child)
 	write("class = \""..Class.displayName.."\",\n")
-	writePropertyData(child, omitUnmod, filepath)
+	writePropertyData(child, omitUnmod, localFilepath)
 
 	if Class == ChildScene then
 		local absScenePath = child.sceneFilepath
-		local relScenePath = fileUtil.getRelativePath(filepath, absScenePath)
+		local relScenePath = fileUtil.getRelativePath(localFilepath, absScenePath)
 		local _, _, ext = fileUtil.splitFilepath(relScenePath)
 		if ext == ".lua" then
 			relScenePath = fileUtil.toRequirePath(relScenePath)
@@ -195,7 +195,7 @@ local function writeChildData(child, options, filepath)
 			local obj = enclosure[1]
 			if hasSceneModifications(obj, omitUnmod) then
 				openBlock(id)
-				writePropertyData(obj, omitUnmod, filepath, true)
+				writePropertyData(obj, omitUnmod, localFilepath, true)
 				closeBlock()
 			end
 		end
@@ -207,7 +207,7 @@ local function writeChildData(child, options, filepath)
 			for id,objList in pairs(addedObjMap) do
 				openBlock(id)
 				for _,obj in ipairs(objList) do
-					writeChildData(obj, options, filepath)
+					writeChildData(obj, options, localFilepath)
 				end
 				closeBlock()
 			end
@@ -216,7 +216,7 @@ local function writeChildData(child, options, filepath)
 	else
 		if child.children and child.children.maxn > 0 then
 			openBlock("children")
-			writeChildrenData(child.children, options, filepath)
+			writeChildrenData(child.children, options, localFilepath)
 			closeBlock(true)
 		end
 	end
@@ -224,12 +224,12 @@ local function writeChildData(child, options, filepath)
 	closeBlock()
 end
 
-function writeChildrenData(children, options, filepath)
+function writeChildrenData(children, options, localFilepath)
 	local output = {}
 	for i=1,children.maxn or #children do
 		local child = children[i]
 		if child then
-			writeChildData(child, options, filepath)
+			writeChildData(child, options, localFilepath)
 		end
 	end
 	return output
