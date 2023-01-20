@@ -36,7 +36,7 @@ end
 
 function EditorScene.initProperties(self)
 	local Bool = require("core.objects.properties.Bool")
-	self:addProperty(PropData("useProjectLocalPaths", false, Bool, false, true))
+	self:addProperty(PropData("useProjectLocalPaths", true, Bool, false, true))
 end
 
 function EditorScene.propertyWasSet(self, name, value, property)
