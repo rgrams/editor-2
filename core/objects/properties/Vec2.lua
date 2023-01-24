@@ -57,7 +57,7 @@ local _printStr = "(Prop[%s]: '%s', (%.3f, %.3f))"
 
 function Vec2.__tostring(self)
 	local value = self.value or self.defaultValue -- So we can print the Class which has no `value`.
-	return _printStr:format(self.type, self.name, value.x, value.y)
+	return _printStr:format(self.typeName, self.name, value.x, value.y)
 end
 
 return Vec2

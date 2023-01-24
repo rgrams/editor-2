@@ -58,7 +58,7 @@ local _printStr = "(Prop[%s]: '%s', { %s })"
 
 function VertexArray.__tostring(self)
 	local valStr = table.concat(self.value, ", ")
-	return _printStr:format(self.type, self.name, valStr)
+	return _printStr:format(self.typeName, self.name, valStr)
 end
 
 return VertexArray
