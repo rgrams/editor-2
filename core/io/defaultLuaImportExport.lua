@@ -20,6 +20,10 @@ M.defaultOptions = {
 	omitUnmodifiedBuiltins = true
 }
 
+-- Export keys for property data:
+local NAME, VALUE, TYPE, IS_EXTRA = 1, 2, 3, "isExtra"
+-- TODO: It's pretty darn unclear what type a "property" is.
+
 local function getPropExportValue(prop, localFilepath)
 	local val = prop:copyValue()
 	local propType = prop.typeName
@@ -50,11 +54,11 @@ local function copyPropertyData(child, omitUnmod, localFilepath)
 		end
 		if doExport then
 			local propExportData = {
-				name = prop.name,
-				value = getPropExportValue(prop, localFilepath),
-				type = prop.typeName
+				prop.name,
+				getPropExportValue(prop, localFilepath),
+				prop.typeName
 			}
-			if not prop.isClassBuiltin then  propExportData.isExtra = true  end
+			if not prop.isClassBuiltin then  propExportData[IS_EXTRA] = true  end
 			table.insert(properties, propExportData)
 		end
 	end
@@ -191,15 +195,18 @@ local function getPropImportValue(val, name, Class, localFilepath)
 	return val
 end
 
--- Convert from import data: { type=, name=, value= }
+-- Convert from import data: { type, name, value, isExtra=true/false }
 -- To : PropData { name, value, Class }
 -- And convert filepaths to global.
 local function makeAddPropDatas(importedProperties, localFilepath, isChildSceneObj)
 	local propDatas = { isChildSceneObj = isChildSceneObj }
 	for i,prop in ipairs(importedProperties) do
-		local Class = propClassList:get(prop.type)
-		local name = prop.name
-		local value = getPropImportValue(prop.value, name, Class, localFilepath)
+		local name, typeName, value = prop[NAME], prop[TYPE], prop[VALUE]
+		if not name then -- Compatibility for old key-value format.
+			name, typeName, value = prop.name, prop.type, prop.value
+		end
+		local Class = propClassList:get(typeName)
+		value = getPropImportValue(value, name, Class, localFilepath)
 		local defaultValue, isNonRemovable
 		if isChildSceneObj then
 			defaultValue, isNonRemovable = value, true
@@ -319,7 +326,9 @@ function M.import(filepath, options, parentEnc, scene, isChildSceneObj)
 	local useProjectPaths
 	if data.properties then
 		for i,prop in ipairs(data.properties) do
-			if prop.name == "useProjectLocalPaths" then
+			if prop[NAME] == "useProjectLocalPaths" then
+				useProjectPaths = prop[VALUE]
+			elseif prop.name == "useProjectLocalPaths" then -- Compatibility for old key-value format.
 				useProjectPaths = prop.value
 			end
 		end
