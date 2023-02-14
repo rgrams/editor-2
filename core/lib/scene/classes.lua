@@ -1,4 +1,5 @@
 
+-- For scene-loader. Constructors for all the default Philtre2D object types.
 local M = {
 	Object = Object,
 	World = World,
@@ -12,6 +13,10 @@ local M = {
 	["GUI Sprite"] = gui.Sprite,
 	["GUI Text"] = gui.Text,
 }
+
+local function copyColor(c)
+	return { c[1], c[2], c[3], c[4] }
+end
 
 local function copyExtras(obj, d)
 	if d.name and d.name ~= "" then  obj.name = d.name  end
@@ -135,7 +140,9 @@ end
 
 function Sprite.fromData(Class, d)
 	local ox, oy = nil, nil
-	local obj = Class(d.image, d.x, d.y, d.angle, d.sx, d.sy, d.color, ox, oy, d.kx, d.ky)
+	local color
+	if d.color then  color = copyColor(d.color)  end
+	local obj = Class(d.image, d.x, d.y, d.angle, d.sx, d.sy, color, ox, oy, d.kx, d.ky)
 	obj.blendMode = d.blendMode or "alpha"
 	copyExtras(obj, d)
 	return obj
@@ -194,7 +201,7 @@ function gui.Slice.fromData(Class, d)
 	if d.x ~= 0 or d.y ~= 0 then  obj:setPos(d.x, d.y)  end
 	if (d.angle or 0) ~= 0 then  obj:setAngle(d.angle)  end
 	obj.kx, obj.ky = d.kx or 0, d.ky or 0
-	if d.color then  obj.color = d.color  end
+	if d.color then  obj.color = copyColor(d.color)  end
 	copyExtras(obj, d)
 	return obj
 end
@@ -208,7 +215,9 @@ function gui.Sprite.fromData(Class, d)
 	local w, h = d.size and d.size.x or 100, d.size and d.size.y or 100
 	local sx, sy = w/iw, h/ih
 	-- image, sx, sy, color, pivot, anchor, modeX, modeY
-	local obj = Class(image, sx, sy, d.color, d.pivot, d.anchor, modeX, modeY, padX, padY)
+	local color
+	if d.color then  color = copyColor(d.color)  end
+	local obj = Class(image, sx, sy, color, d.pivot, d.anchor, modeX, modeY, padX, padY)
 	if d.x ~= 0 or d.y ~= 0 then  obj:setPos(d.x, d.y)  end
 	if (d.angle or 0) ~= 0 then  obj:setAngle(d.angle)  end
 	obj.kx, obj.ky = d.kx or 0, d.ky or 0
@@ -226,7 +235,7 @@ function gui.Text.fromData(Class, d)
 	if d.x ~= 0 or d.y ~= 0 then  obj:setPos(d.x, d.y)  end
 	if (d.angle or 0) ~= 0 then  obj:setAngle(d.angle)  end
 	obj.kx, obj.ky = d.kx or 0, d.ky or 0
-	if d.color then  obj.color = d.color  end
+	if d.color then  obj.color = copyColor(d.color)  end
 	copyExtras(obj, d)
 	return obj
 end

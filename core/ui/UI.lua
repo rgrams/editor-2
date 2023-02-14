@@ -3,11 +3,6 @@ local UI = gui.Column:extend()
 UI.className = "UI"
 
 local Ruu = require "core.ui.ruu.ruu"
-local Toolbar = require "core.ui.Toolbar"
-local TabBar = require "core.ui.TabBar"
-local Viewport = require "core.ui.Viewport"
-local PropertyPanel = require "core.ui.PropertyPanel"
-local ResizeHandle = require "core.ui.widgets.ResizeHandle"
 local updateSceneTitleScript = require "core.ui.updateSceneTitle_script"
 
 Ruu.isHoverAction["pan camera"] = true
