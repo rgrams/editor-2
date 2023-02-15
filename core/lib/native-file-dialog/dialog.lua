@@ -2,26 +2,27 @@
 local ffi = require "ffi"
 local OS = love.system.getOS()
 
-local sourceDir = love.filesystem.getSource()
-
-if not sourceDir:sub(-1, -1):match("[\\/]") then
-	-- If the source dir and working dir match, then it omits the trailing separator.
-	sourceDir = sourceDir .. "/"
-end
+local saveDir = love.filesystem.getSaveDirectory()
+local sourceDir = "core/lib/native-file-dialog/"
 
 local libPath
-
 if OS == "Linux" then
-	libPath = "core/lib/native-file-dialog/nfd.so"
+	libPath = "nfd.so"
 elseif OS == "Windows" then
-	libPath = "core/lib/native-file-dialog/nfd.dll"
+	if ffi.abi("64bit") then
+		libPath = "nfd64.dll"
+	else
+		libPath = "nfd.dll"
+	end
 elseif OS == "OS X" then
-	libPath = "core/lib/native-file-dialog/libnfd.dylib"
+	libPath = "libnfd.dylib"
 end
 
-libPath = sourceDir .. libPath
+-- Copy library file into save directory and load from there.
+local libData, sizeOrError = love.filesystem.read(sourceDir..libPath)
+love.filesystem.write(libPath, libData)
 
-local nfd = ffi.load(libPath)
+local nfd = ffi.load(saveDir.."/"..libPath)
 ffi.cdef[[
 	typedef char nfdchar_t;
 	typedef struct {
