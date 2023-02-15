@@ -99,7 +99,7 @@ local function mapPropertyValue(map, name, propType, value)
 			end
 		end
 	elseif propType == "font" then
-		if value[1] ~= "" then  value[1] = nil  end
+		if value[1] == "" then  value[1] = nil  end
 	elseif (name == "categories" or name == "mask") and propType == "string" then
 		if value == "" then  return  end
 		value = split(value, ", ")
