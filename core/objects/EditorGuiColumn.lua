@@ -33,6 +33,7 @@ function EditorGuiColumn.init(self)
 	if self.parent.allocateChild then  self.parent:allocateChild(self)  end
 	self:allocateChildren() -- Just force it.
 	self:updateAABB()
+	self:wasModified()
 end
 
 function EditorGuiColumn.allocateChildren(self)

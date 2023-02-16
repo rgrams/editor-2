@@ -41,6 +41,7 @@ end
 
 function EditorObject.init(self)
 	self:updateAABB()
+	self:wasModified()
 end
 
 -- Called from object-functions after fully removed from the tree (no longer in parent's child list).
