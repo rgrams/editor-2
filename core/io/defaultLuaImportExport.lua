@@ -3,7 +3,7 @@
 
 local M = {}
 
-local objToStr = require "core.philtre.lib.object-to-string"
+local objToStr = require "core.io.ordered-object-to-string"
 local fileUtil = require "core.lib.file-util"
 local scenes = require "core.scenes"
 local objectFn = require "core.commands.functions.object-functions"
