@@ -87,6 +87,14 @@ function EditorGuiSlice.draw(self)
 		love.graphics.setLineStyle("rough")
 	end
 	EditorGuiSlice.super.draw(self)
+
+	love.graphics.setColor(0.7, 0.7, 0.7, 0.05)
+	local w2, h2 = self.w/2, self.h/2
+	local m = self.margins
+	love.graphics.line(-w2+m.lt, -h2, -w2+m.lt, h2)
+	love.graphics.line(w2-m.rt, -h2, w2-m.rt, h2)
+	love.graphics.line(-w2, -h2+m.top, w2, -h2+m.top)
+	love.graphics.line(-w2, h2-m.bot, w2, h2-m.bot)
 end
 
 return EditorGuiSlice
