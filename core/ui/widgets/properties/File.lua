@@ -12,9 +12,12 @@ local fileUtil = require "core.lib.file-util"
 
 File.labelWidth = File.width/3
 local dialogBtnWidth = 24
+local defaultLastFolderKey = "lastFilePropFolder"
 
 function File.set(self, name, value, PropClass, propObj)
 	File.super.set(self, name, value, PropClass, propObj)
+
+	self.lastFolderKey = propObj.lastFolderKey or defaultLastFolderKey
 
 	self.field = FilepathInputField(self.value, 150)
 	table.insert(self.children, self.field)
@@ -44,9 +47,10 @@ function File.onConfirm(self, wgt)
 end
 
 function File.buttonPressed(self)
-	local path = fileDialog.open(config.lastFilePropFolder)
+	local lastFolder = config[self.lastFolderKey] or config.lastFilePropFolder or config.lastOpenFolder
+	local path = fileDialog.open(lastFolder)
 	if path then
-		config.lastFilePropFolder = fileUtil.splitFilepath(path)
+		config[self.lastFolderKey] = fileUtil.splitFilepath(path)
 		self.fieldWgt:setText(path)
 		self:onConfirm(self.fieldWgt)
 	end

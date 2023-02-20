@@ -22,6 +22,7 @@ M.lastOpenFolder = nil
 M.lastSaveFolder = nil
 M.lastExportFolder = nil
 M.lastFontPropFolder = nil
+M.lastImagePropFolder = nil
 M.lastFilePropFolder = nil
 
 M.zoomRate = 0.2
@@ -100,6 +101,7 @@ function M.save()
 		userConfig.lastSaveFolder = M.lastSaveFolder
 		userConfig.lastExportFolder = M.lastExportFolder
 		userConfig.lastFontPropFolder = M.lastFontPropFolder
+		userConfig.lastImagePropFolder = M.lastImagePropFolder
 		userConfig.lastFilePropFolder = M.lastFilePropFolder
 		userConfig.translateSnapIncrement = M.translateSnapIncrement
 

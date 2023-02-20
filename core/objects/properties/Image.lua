@@ -9,6 +9,7 @@ local imageCache = {}
 Image.name = "image"
 Image.typeName = "image"
 Image.WidgetClass = require("core.ui.widgets.properties.File")
+Image.lastFolderKey = "lastImagePropFolder"
 Image.defaultValue = ""
 
 _G.propClassList:add(Image, Image.typeName)
