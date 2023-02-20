@@ -19,6 +19,16 @@ function ChildScene.allocateChild(self, child) -- Pass through if children want 
 	if self.parent.allocateChild then  self.parent:allocateChild(child)  end
 end
 
+function ChildScene.allocate(self, ...)
+	if not self.children then  return  end
+	for i=1,self.children.maxn or #self.children do
+		local child = self.children[i]
+		if child and child.allocate then
+			child:allocate(...)
+		end
+	end
+end
+
 function ChildScene.childrenModified(self) -- Pass through if children call it.
 	self:wasModified()
 end
