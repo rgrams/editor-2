@@ -15,8 +15,8 @@ function ChildScene.init(self)
 	assert(self.sceneFilepath, "ChildScene.init - no sceneFilepath")
 end
 
-function ChildScene.allocateChild(self) -- Pass through if children want it.
-	if self.parent.allocateChild then  self.parent:allocateChild(self)  end
+function ChildScene.allocateChild(self, child) -- Pass through if children want it.
+	if self.parent.allocateChild then  self.parent:allocateChild(child)  end
 end
 
 function ChildScene.childrenModified(self) -- Pass through if children call it.
