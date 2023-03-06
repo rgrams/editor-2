@@ -67,6 +67,7 @@ end
 local function getRoundIncrement(snapKey, isAngle)
 	local onIncr = isAngle and config.rotateSnapIncrement or config.translateSnapIncrement
 	local offIncr = config.roundAllPropsTo
+	if config.snapModeEnabled then  onIncr, offIncr = offIncr, onIncr  end
 	return modkeys.isPressed(snapKey) and onIncr or offIncr
 end
 

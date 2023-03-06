@@ -27,6 +27,7 @@ M.lastFilePropFolder = nil
 
 M.zoomRate = 0.2
 
+M.snapModeEnabled = false
 M.translateSnapIncrement = 8
 M.rotateSnapIncrement = 15
 M.roundAllPropsTo = 0.001
@@ -104,6 +105,7 @@ function M.save()
 		userConfig.lastImagePropFolder = M.lastImagePropFolder
 		userConfig.lastFilePropFolder = M.lastFilePropFolder
 		userConfig.translateSnapIncrement = M.translateSnapIncrement
+		userConfig.snapModeEnabled = M.snapModeEnabled
 
 		local contentStr = objToString(userConfig)
 
