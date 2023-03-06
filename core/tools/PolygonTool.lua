@@ -64,6 +64,12 @@ function PolygonTool.final(self)
 	self.ruu:destroy(self.widget)
 end
 
+local function getRoundIncrement(snapKey, isAngle)
+	local onIncr = isAngle and config.rotateSnapIncrement or config.translateSnapIncrement
+	local offIncr = config.roundAllPropsTo
+	return modkeys.isPressed(snapKey) and onIncr or offIncr
+end
+
 local function hitCheckChildren(children, x, y, minDist, closestObj)
 	minDist = minDist or math.huge
 	for i=1,children.maxn do
@@ -240,10 +246,7 @@ function PolygonTool.drag(wgt, dx, dy, dragType)
 
 		local totalWDX, totalWDY = mwx - self.dragStartX, mwy - self.dragStartY
 
-		local snapIncr = config.roundAllPropsTo
-		if modkeys.isPressed(self.snapKey) then
-			snapIncr = config.translateSnapIncrement
-		end
+		local snapIncr = getRoundIncrement(self.snapKey)
 		local roundX, roundY = snapIncr, snapIncr
 		if modkeys.isPressed(self.snapToAxisKey) then
 			if math.abs(totalWDX) > math.abs(totalWDY) then
@@ -338,10 +341,7 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 				else
 					local wx, wy = Camera.current:screenToWorld(mx, my)
 					local lx, ly = activePoly:toLocal(wx, wy)
-					local snapIncr = config.roundAllPropsTo
-					if modkeys.isPressed(self.snapKey) then
-						snapIncr = config.translateSnapIncrement
-					end
+					local snapIncr = getRoundIncrement(self.snapKey)
 					lx, ly = math.round(lx, snapIncr), math.round(ly, snapIncr)
 					if not activePoly:getProperty("isLoop") then
 						-- Decide which end of the polyline to add to.

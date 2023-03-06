@@ -102,6 +102,12 @@ function Tool.final(self)
 	self.ruu:destroy(self.widget)
 end
 
+local function getRoundIncrement(snapKey, isAngle)
+	local onIncr = isAngle and config.rotateSnapIncrement or config.translateSnapIncrement
+	local offIncr = config.roundAllPropsTo
+	return modkeys.isPressed(snapKey) and onIncr or offIncr
+end
+
 local function startDrag(self, dragType)
 	self.isDragging = true
 	self.lastDragType = dragType
@@ -277,10 +283,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 	if dragType == "translate selection" then
 		local totalDX, totalDY = x - self.dragStartX, y - self.dragStartY
 		local inWorldSpace = self.dragInWorldSpace
-		local snapIncr = config.roundAllPropsTo
-		if modkeys.isPressed(self.snapKey) then
-			snapIncr = config.translateSnapIncrement
-		end
+		local snapIncr = getRoundIncrement(self.snapKey)
 		local roundX, roundY = snapIncr, snapIncr
 		if modkeys.isPressed(self.snapToAxisKey) then
 			if math.abs(totalDX) > math.abs(totalDY) then
@@ -311,10 +314,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 		self.isRotateDragging = true
 		local totalDX, totalDY = x - self.dragStartX + 1, y - self.dragStartY
 		local angle = math.deg(math.atan2(totalDY, totalDX))
-		local roundIncr = config.roundAllPropsTo
-		if modkeys.isPressed(self.snapKey) then
-			roundIncr = config.rotateSnapIncrement
-		end
+		local roundIncr = getRoundIncrement(self.snapKey, true)
 
 		if not self.startedDragCommand then
 			self.startedDragCommand = true
@@ -380,8 +380,7 @@ function Tool.drag(wgt, dx, dy, dragType)
 		end
 
 		-- Figure out transform origin and new AABB.
-		local isSnapped = modkeys.isPressed(self.snapKey)
-		local snapIncr = isSnapped and config.translateSnapIncrement or config.roundAllPropsTo
+		local snapIncr = getRoundIncrement(self.snapKey)
 
 		-- AABB is in world space.
 		local origAABB = self.originalDragAABB
@@ -640,10 +639,7 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 
 		elseif Input.isPressed("add modifier") then
 			local wx, wy = Camera.current:screenToWorld(mx, my)
-			local snapIncr = config.roundAllPropsTo
-			if modkeys.isPressed(self.snapKey) then
-				snapIncr = config.translateSnapIncrement
-			end
+			local snapIncr = getRoundIncrement(self.snapKey)
 			wx, wy = math.round(wx, snapIncr), math.round(wy, snapIncr)
 			wgt.object:addAt(self.lastAddClass, wx, wy)
 
