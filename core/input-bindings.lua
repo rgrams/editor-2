@@ -1,4 +1,4 @@
-
+-- { actionType, inputStr, actionName, ignoresMods }
 return {
 	{ "cursor", "mouse moved" },
 	{ "button", "M:1", "click", true },
@@ -32,7 +32,7 @@ return {
 	{ "button", "rctrl", "snap", true },
 
 	{ "button", "ctrl a", "select all" },
-	{ "button", "a", "add modifier" },
+	{ "button", "a", "add modifier", true },
 	{ "button", "shift a", "add" },
 	{ "button", "alt a", "add scene" },
 	{ "button", "alt shift a", "add last scene" },
