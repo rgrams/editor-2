@@ -640,6 +640,11 @@ function Tool.press(wgt, depth, mx, my, isKeyboard)
 
 		elseif Input.isPressed("add modifier") then
 			local wx, wy = Camera.current:screenToWorld(mx, my)
+			local snapIncr = config.roundAllPropsTo
+			if modkeys.isPressed(self.snapKey) then
+				snapIncr = config.translateSnapIncrement
+			end
+			wx, wy = math.round(wx, snapIncr), math.round(wy, snapIncr)
 			wgt.object:addAt(self.lastAddClass, wx, wy)
 
 		elseif self.hoverObj then

@@ -178,8 +178,8 @@ local function getPosDragArgList(self, enclosure, startOffsets, totalDX, totalDY
 	local startX, startY = self.dragStartX, self.dragStartY
 	for i,offset in ipairs(startOffsets) do
 		local wx, wy = startX + offset.x + totalDX, startY + offset.y + totalDY
-		wx, wy = math.round(wx, roundX), math.round(wy, roundY)
 		local lx, ly = self.hoverObj:toLocal(wx, wy)
+		lx, ly = math.round(lx, roundX), math.round(ly, roundY)
 		table.insert(argList, { enclosure, offset.i, lx, ly })
 	end
 	return argList
@@ -338,6 +338,11 @@ function PolygonTool.press(wgt, depth, mx, my, isKeyboard)
 				else
 					local wx, wy = Camera.current:screenToWorld(mx, my)
 					local lx, ly = activePoly:toLocal(wx, wy)
+					local snapIncr = config.roundAllPropsTo
+					if modkeys.isPressed(self.snapKey) then
+						snapIncr = config.translateSnapIncrement
+					end
+					lx, ly = math.round(lx, snapIncr), math.round(ly, snapIncr)
 					if not activePoly:getProperty("isLoop") then
 						-- Decide which end of the polyline to add to.
 						local vertIdx
