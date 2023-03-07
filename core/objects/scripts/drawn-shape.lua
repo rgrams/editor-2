@@ -130,8 +130,7 @@ local function polygonDraw(self)
 	love.graphics.setLineStyle("rough")
 end
 
-function script.editor_script_added(self, name, filepath, scr)
-	if scr ~= script then  return  end -- Don't care about other scripts being added.
+function script.editor_script_added(self, name, filepath)
 	self._oldDraw = self.draw
 	local color = { 1, 1, 1, 1 }
 	if self:is(Circle) then
@@ -161,8 +160,7 @@ function script.editor_script_added(self, name, filepath, scr)
 	end
 end
 
-function script.editor_script_removed(self, name, filepath, scr)
-	if scr ~= script then  return  end -- Don't care about other scripts being removed.
+function script.editor_script_removed(self, name, filepath)
 	self.draw = self._oldDraw
 	if self:is(Circle) then
 		self:removeProperty("angle")

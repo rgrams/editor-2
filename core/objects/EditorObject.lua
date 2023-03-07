@@ -144,12 +144,16 @@ function EditorObject.addScript(self, name, filepath, script)
 	if not script then  return  end
 	self.scripts = self.scripts or {}
 	table.insert(self.scripts, script)
-	self:call("editor_script_added", name, filepath, script)
+	if script.editor_script_added then
+		script.editor_script_added(self, name, filepath)
+	end
 end
 
 function EditorObject.removeScript(self, name, filepath, script)
 	if not script then  return  end
-	self:call("editor_script_removed", name, filepath, script)
+	if script.editor_script_removed then
+		script.editor_script_removed(self, name, filepath)
+	end
 	local scripts = self.scripts
 	if scripts then
 		for i=#scripts,1,-1 do
