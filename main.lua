@@ -147,6 +147,10 @@ function love.filedropped(file)
 	ui:openScene(file:getFilename())
 end
 
+function love.focus(hasFocus)
+	if hasFocus then  _G.shouldRedraw = true  end
+end
+
 function love.quit()
 	config.save()
 end
