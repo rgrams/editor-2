@@ -95,13 +95,16 @@ local function action_saveAs()
 end
 
 local function action_open()
-	local filepath = fileDialog.open(config.lastOpenFolder)
-	if not filepath then  return  end
+	local paths = fileDialog.openMultiple(config.lastOpenFolder)
+	if not paths then  return  end
 
-	local folder = fileUtil.splitFilepath(filepath)
-	config.lastOpenFolder = folder
-
-	openScene(filepath)
+	for i,filepath in ipairs(paths) do
+		if i == 1 then
+			local folder = fileUtil.splitFilepath(paths[1])
+			config.lastOpenFolder = folder
+		end
+		openScene(filepath)
+	end
 end
 
 local function getExporterNameList()
