@@ -96,7 +96,7 @@ function dialog.open(default_path, filters)
 	end
 end
 
-function dialog.openMultiple(filters, default_path)
+function dialog.openMultiple(default_path, filters)
 	local pathset = ffi.new('nfdpathset_t')
 	local result = nfd.NFD_OpenDialogMultiple(filters, default_path, pathset)
 	if result == nfd.NFD_OKAY then
