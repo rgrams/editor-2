@@ -152,6 +152,7 @@ editor.registerAction("save as", action_saveAs)
 editor.registerAction("open", action_open)
 editor.registerAction("export", action_export)
 editor.registerAction("export as", action_exportAs)
+editor.registerAction("open scene", openScene)
 
 editor.bindActionToInput("new", "new scene")
 editor.bindActionToInput("save", "save")

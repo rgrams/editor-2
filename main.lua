@@ -143,8 +143,7 @@ function love.filedropped(file)
 			end
 		end
 	end
-	local ui = editorTree:get("/Window/UI")
-	ui:openScene(file:getFilename())
+	editor.runAction("open scene", file:getFilename())
 end
 
 function love.focus(hasFocus)
