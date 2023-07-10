@@ -26,6 +26,7 @@ end
 
 function EditorGuiSlice.initProperties(self)
 	EditorGuiSlice.super.initProperties(self)
+	self:removeProperty("pad")
 	self:addProperty(PropData("image", nil, Image, nil, true))
 	self:addProperty(PropData("color", nil, Color, nil, true))
 	self:addProperty(PropData("margins", { 2, 2, 2, 2 }, Vec4, nil, true))
@@ -33,12 +34,29 @@ function EditorGuiSlice.initProperties(self)
 	margins.wgtFieldLabels = { "lt", "tp", "rt", "bt" }
 end
 
+local function updatePad(self)
+	local pad = self:getPropertyObj("pad")
+	if not pad or pad.typeName ~= "vec2" then
+		local m = self.margins
+		local oldX, oldY = self.padX, self.padY
+		self.padX = (m.lt + m.rt)/2 -- Use slice margins for default padding.
+		self.padY = (m.top + m.bot)/2
+		if self.padX ~= oldX or self.padY ~= oldY then
+			return true
+		end
+	end
+end
+
 function EditorGuiSlice.propertyWasSet(self, name, value, property)
 	EditorGuiSlice.super.propertyWasSet(self, name, value, property)
 	if name == "image" then
 		self.image = property.image
 		self:updateQuads()
-		self:updateInnerSize(self.lastAlloc:unpack())
+		updatePad(self)
+		if self:updateInnerSize(self.lastAlloc:unpack()) and self.tree then
+			self:updateTransform()
+			self:allocateChildren()
+		end
 	elseif name == "color" then
 		self.color = property:getValue()
 	elseif name == "margins" then
@@ -46,7 +64,11 @@ function EditorGuiSlice.propertyWasSet(self, name, value, property)
 		local m2 = property:getValue()
 		m.lt, m.top, m.rt, m.bot = m2[1], m2[2], m2[3], m2[4]
 		self:updateQuads()
-		self:updateInnerSize(self.lastAlloc:unpack())
+		updatePad(self)
+		if self:updateInnerSize(self.lastAlloc:unpack()) and self.tree then
+			self:updateTransform()
+			self:allocateChildren()
+		end
 	end
 end
 
